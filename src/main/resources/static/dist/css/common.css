@@ -1,0 +1,1198 @@
+/* =====================================================================
+   NoExit — 공통 CSS
+   Bootstrap 5.x 기반 · 커스텀 디자인 시스템
+   
+   사용법 (JSP head):
+   <link rel="stylesheet" href=".../bootstrap.min.css">
+   <link rel="stylesheet" href=".../common.css">   ← Bootstrap 이후에 로드
+   ===================================================================== */
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   1. CSS 변수 (디자인 토큰)
+   ───────────────────────────────────────────────────────────────────── */
+:root {
+  /* 브랜드 컬러 */
+  --ne-primary:        #fdb400;
+  --ne-primary-dark:   #c8900a;
+  --ne-primary-light:  #fff8e6;
+  --ne-primary-mid:    #fef0b0;
+
+  /* 텍스트 */
+  --ne-text:           #111827;
+  --ne-text-2:         #6b7280;
+  --ne-text-3:         #9ca3af;
+
+  /* 배경 */
+  --ne-bg:             #fafafa;
+  --ne-bg-warm:        #fff8f0;
+
+  /* 보더 */
+  --ne-border:         #f0f0f0;
+  --ne-border-dark:    #e5e7eb;
+
+  /* 그림자 */
+  --ne-shadow-sm:      0 1px 8px rgba(0, 0, 0, .06);
+  --ne-shadow:         0 4px 20px rgba(0, 0, 0, .09);
+  --ne-shadow-lg:      0 8px 32px rgba(0, 0, 0, .12);
+
+  /* 반지름 */
+  --ne-radius:         14px;
+  --ne-radius-md:      10px;
+  --ne-radius-sm:      8px;
+  --ne-radius-xs:      6px;
+
+  /* 상태 컬러 */
+  --ne-green:          #059669;
+  --ne-green-bg:       #ecfdf5;
+  --ne-blue:           #2563eb;
+  --ne-blue-bg:        #eff6ff;
+  --ne-amber:          #d97706;
+  --ne-amber-bg:       #fffbeb;
+  --ne-red:            #dc2626;
+  --ne-red-bg:         #fef2f2;
+  --ne-gray:           #6b7280;
+  --ne-gray-bg:        #f9fafb;
+
+  /* ── Bootstrap CSS 변수 덮어쓰기 ── */
+  --bs-primary:        #fdb400;
+  --bs-primary-rgb:    253, 180, 0;
+  --bs-link-color:     var(--ne-primary-dark);
+  --bs-link-hover-color: var(--ne-primary-dark);
+  --bs-border-radius:  var(--ne-radius-sm);
+  --bs-body-font-family: "Apple SD Gothic Neo", "Malgun Gothic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --bs-body-color:     var(--ne-text);
+  --bs-body-bg:        var(--ne-bg);
+  --bs-border-color:   var(--ne-border-dark);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   2. Bootstrap Primary 컬러 전체 오버라이드
+   ───────────────────────────────────────────────────────────────────── */
+
+/* btn-primary */
+.btn-primary {
+  --bs-btn-bg:              var(--ne-primary);
+  --bs-btn-border-color:    var(--ne-primary);
+  --bs-btn-hover-bg:        var(--ne-primary-dark);
+  --bs-btn-hover-border-color: var(--ne-primary-dark);
+  --bs-btn-active-bg:       var(--ne-primary-dark);
+  --bs-btn-active-border-color: var(--ne-primary-dark);
+  --bs-btn-disabled-bg:     var(--ne-primary);
+  --bs-btn-disabled-border-color: var(--ne-primary);
+  --bs-btn-color:           #111111;
+  --bs-btn-hover-color:     #111111;
+  --bs-btn-active-color:    #111111;
+  font-weight: 700;
+}
+
+/* btn-outline-primary */
+.btn-outline-primary {
+  --bs-btn-color:           var(--ne-primary-dark);
+  --bs-btn-border-color:    var(--ne-primary);
+  --bs-btn-hover-bg:        var(--ne-primary);
+  --bs-btn-hover-border-color: var(--ne-primary);
+  --bs-btn-hover-color:     #111111;
+  --bs-btn-active-bg:       var(--ne-primary-dark);
+  --bs-btn-active-border-color: var(--ne-primary-dark);
+  --bs-btn-active-color:    #111111;
+  font-weight: 600;
+}
+
+/* btn-link primary color */
+.btn-link {
+  color: var(--ne-primary-dark);
+}
+.btn-link:hover {
+  color: var(--ne-primary-dark);
+  opacity: .8;
+}
+
+/* form-control / form-select 포커스 */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--ne-primary);
+  box-shadow: 0 0 0 0.2rem rgba(253, 180, 0, .2);
+  outline: none;
+}
+
+.form-check-input:checked {
+  background-color: var(--ne-primary);
+  border-color:     var(--ne-primary);
+}
+
+/* Badge */
+.badge.bg-primary,
+.badge.text-bg-primary {
+  background-color: var(--ne-primary) !important;
+  color: #111111 !important;
+}
+
+/* text / bg / border utility */
+.text-primary  { color: var(--ne-primary-dark) !important; }
+.bg-primary    { background-color: var(--ne-primary) !important; color: #111 !important; }
+.border-primary { border-color: var(--ne-primary) !important; }
+
+/* link */
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--ne-primary-dark); opacity: .8; }
+
+/* nav-link */
+.nav-link.active,
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+  background-color: var(--ne-primary);
+  color: #111;
+}
+.nav-link {
+  color: var(--ne-text-2);
+}
+.nav-link:hover {
+  color: var(--ne-primary-dark);
+}
+
+/* Pagination */
+.page-link {
+  color: var(--ne-primary-dark);
+}
+.page-link:hover {
+  color: var(--ne-primary-dark);
+  background-color: var(--ne-primary-light);
+  border-color: var(--ne-border-dark);
+}
+.page-item.active .page-link {
+  background-color: var(--ne-primary);
+  border-color: var(--ne-primary);
+  color: #111;
+}
+
+/* Progress bar */
+.progress-bar {
+  background-color: var(--ne-primary);
+}
+
+/* Spinner */
+.text-primary.spinner-border,
+.spinner-border.text-primary {
+  color: var(--ne-primary) !important;
+}
+
+/* Dropdown */
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--ne-primary);
+  color: #111;
+}
+
+/* Tab */
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--ne-primary-dark);
+  border-bottom-color: var(--ne-primary);
+}
+.nav-tabs .nav-link:hover {
+  color: var(--ne-primary-dark);
+}
+
+/* Alert primary */
+.alert-primary {
+  --bs-alert-color:         #7a4f00;
+  --bs-alert-bg:            var(--ne-primary-light);
+  --bs-alert-border-color:  var(--ne-primary-mid);
+}
+
+/* Input group */
+.input-group-text {
+  background-color: var(--ne-bg);
+  border-color: var(--ne-border-dark);
+  color: var(--ne-text-2);
+}
+
+/* List group */
+.list-group-item.active {
+  background-color: var(--ne-primary);
+  border-color: var(--ne-primary);
+  color: #111;
+}
+
+/* accordion */
+.accordion-button:not(.collapsed) {
+  color: var(--ne-primary-dark);
+  background-color: var(--ne-primary-light);
+  box-shadow: inset 0 -1px 0 rgba(253,180,0,.25);
+}
+.accordion-button:focus {
+  border-color: var(--ne-primary);
+  box-shadow: 0 0 0 .2rem rgba(253,180,0,.2);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   3. 기본 (Base)
+   ───────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--bs-body-font-family);
+  font-size: 1rem;         /* 16px */
+  line-height: 1.6;
+  color: var(--ne-text);
+  background-color: var(--ne-bg);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  position: relative;
+  min-height: 100vh;       /* 브라우저가 모니터 화면 세로 크기를 얻어와 최소 높이로 잡습니다 */
+  padding-bottom: 120px;
+}
+ 
+.ne-main-content {
+  min-height: calc(100vh - 64px - 200px);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 800;
+  letter-spacing: -.5px;
+  line-height: 1.25;
+}
+
+hr {
+  border-color: var(--ne-border);
+  opacity: 1;
+}
+
+li{
+	list-style: none;
+}
+
+
+
+/* 14px 미만이 되는 곳 보정 */
+small, .small   { font-size: .875rem; }  /* 14px */
+.text-xs        { font-size: .875rem; }  /* 14px */
+ 
+/* Bootstrap .form-text 보정 */
+.form-text,
+.ne-hint {
+  font-size: .875rem;   /* 14px */
+  color: var(--ne-text-3);
+  margin-top: .25rem;
+}
+ 
+/* 스크롤바 (Chrome/Safari) */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--ne-bg); }
+::-webkit-scrollbar-thumb  { background: var(--ne-border-dark); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ne-text-3); }
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   4. 레이아웃 — 헤더
+   ───────────────────────────────────────────────────────────────────── */
+.ne-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1030;
+  height: 100px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--ne-border);
+  box-shadow: 0 1px 12px rgba(0, 0, 0, .05);
+}
+
+.ne-header .ne-header-inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 2rem;
+}
+
+/* 헤더 높이만큼 본문 밀기 */
+.ne-body-offset {
+  padding-top: 100px;
+}
+
+/* 로고 */
+.ne-logo {
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  flex-shrink: 0;
+}
+.ne-logo-main {
+  font-weight: 900;
+  font-size: 1.4rem;
+  letter-spacing: -2px;
+  color: var(--ne-text);
+  line-height: 1;
+}
+.ne-logo-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ne-primary);
+  margin: 0 1px 3px;
+}
+.ne-logo-sub {
+  font-size: .72rem;
+  color: var(--ne-text-3);
+  font-weight: 500;
+  letter-spacing: .02em;
+  margin-left: 6px;
+}
+
+/* 헤더 Nav */
+.ne-header-nav {
+  display: flex;
+  gap: .2rem;
+}
+.ne-header-nav .nav-item a,
+.ne-header-nav .nav-item span {
+  display: block;
+  padding: .38rem .8rem;
+  border-radius: var(--ne-radius-sm);
+  font-size: .88rem;
+  font-weight: 500;
+  color: var(--ne-text-2);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  border: none;
+  background: none;
+}
+.ne-header-nav .nav-item a:hover,
+.ne-header-nav .nav-item span:hover {
+  background: var(--ne-primary-light);
+  color: var(--ne-primary-dark);
+}
+.ne-header-nav .nav-item a.active,
+.ne-header-nav .nav-item span.active {
+  background: var(--ne-primary-light);
+  color: var(--ne-primary-dark);
+  font-weight: 700;
+}
+
+/* 헤더 검색창 */
+.ne-header-search {
+  flex: 1;
+  max-width: 240px;
+}
+.ne-header-search input {
+  width: 100%;
+  background: var(--ne-bg);
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: 20px;
+  padding: .38rem 1rem;
+  font-size: .84rem;
+  color: var(--ne-text);
+  outline: none;
+  transition: border-color .15s;
+}
+.ne-header-search input::placeholder { color: var(--ne-text-3); }
+.ne-header-search input:focus { border-color: var(--ne-primary); }
+
+/* 역할 뱃지 */
+.ne-role-pill {
+  font-size: .62rem;
+  font-weight: 800;
+  padding: .18em .5em;
+  border-radius: 4px;
+  background: var(--ne-primary);
+  color: #111;
+  vertical-align: middle;
+  margin-left: 3px;
+  line-height: 1.4;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   5. 레이아웃 — 푸터
+   ───────────────────────────────────────────────────────────────────── */
+.ne-footer {
+  background: #ffffff;
+  border-top: 1px solid var(--ne-border);
+  padding: 2.5rem 0 1.25rem;
+  margin-top: 3rem;
+}
+.ne-footer-logo {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: -1px;
+  color: var(--ne-text);
+  margin-bottom: .4rem;
+}
+.ne-footer-logo span { color: var(--ne-primary); }
+.ne-footer-col-title {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--ne-text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .6rem;
+}
+.ne-footer-col a {
+  display: block;
+  font-size: .8rem;
+  color: var(--ne-text-3);
+  text-decoration: none;
+  margin-bottom: .35rem;
+  transition: color .12s;
+}
+.ne-footer-col a:hover { color: var(--ne-primary-dark); }
+.ne-footer-copy {
+  border-top: 1px solid var(--ne-border);
+  padding-top: 1rem;
+  margin-top: 1.5rem;
+  font-size: .72rem;
+  color: var(--ne-text-3);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   6. 페이지 헤더 (브레드크럼 / 타이틀 영역)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-ph {
+  background: linear-gradient(135deg, var(--ne-primary-light) 0%, var(--ne-bg-warm) 60%, #ffffff 100%);
+  border-bottom: 1px solid var(--ne-border);
+  padding: 2.5rem 0;
+}
+.ne-ph-sm {
+  background: #ffffff;
+  border-bottom: 1px solid var(--ne-border);
+  padding: .9rem 0;
+}
+.ne-ph-sm .breadcrumb {
+  margin: 0;
+  font-size: .81rem;
+  background: none;
+  padding: 0;
+}
+.ne-ph-sm .breadcrumb-item a {
+  color: var(--ne-primary-dark);
+  text-decoration: none;
+}
+.ne-ph-sm .breadcrumb-item.active { color: var(--ne-text-2); }
+
+.ne-page-title {
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   7. 사이드바 네비게이션 (마이페이지 · 카페 관리)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-side-nav {
+  background: #ffffff;
+  border: 1px solid var(--ne-border);
+  border-radius: var(--ne-radius);
+  padding: .6rem;
+}
+.ne-side-nav a,
+.ne-side-nav .ne-side-nav-item {
+  display: block;
+  padding: .52rem 1rem;
+  border-radius: var(--ne-radius-sm);
+  font-size: .87rem;
+  font-weight: 500;
+  color: var(--ne-text-2);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .12s, color .12s;
+  margin-bottom: .15rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.ne-side-nav a:hover,
+.ne-side-nav .ne-side-nav-item:hover {
+  background: var(--ne-primary-light);
+  color: var(--ne-primary-dark);
+}
+.ne-side-nav a.active,
+.ne-side-nav .ne-side-nav-item.active {
+  background: var(--ne-primary);
+  color: #111111;
+  font-weight: 700;
+}
+.ne-side-nav .ne-side-nav-section {
+  font-size: .67rem;
+  font-weight: 700;
+  color: var(--ne-text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: .6rem 1rem .25rem;
+  margin-top: .3rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   8. 카드
+   ───────────────────────────────────────────────────────────────────── */
+.ne-card {
+  background: #ffffff;
+  border-radius: var(--ne-radius);
+  border: 1px solid var(--ne-border);
+  box-shadow: var(--ne-shadow-sm);
+  transition: box-shadow .18s, transform .18s;
+}
+.ne-card-hover:hover {
+  box-shadow: var(--ne-shadow);
+  transform: translateY(-2px);
+  cursor: pointer;
+}
+.ne-card-accent {
+  border-left: 3px solid var(--ne-primary);
+}
+
+/* 섹션 카드 (폼·필터 등) */
+.ne-sc {
+  background: #ffffff;
+  border-radius: var(--ne-radius);
+  border: 1px solid var(--ne-border);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.ne-sc-title {
+  font-weight: 700;
+  font-size: .9rem;
+  color: var(--ne-text);
+  padding-bottom: .5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--ne-primary);
+}
+
+/* 테마 이미지 영역 */
+.ne-room-img {
+  height: 150px;
+  border-radius: var(--ne-radius) var(--ne-radius) 0 0;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  overflow: hidden;
+}
+
+
+ 
+/* ─────────────────────────────────────────────────────────────────────
+   9. 상태 뱃지 (Status Badge)
+   ───────────────────────────────────────────────────────────────────── */
+ 
+/* ── 기본 구조 (크기 변형 전 공통) ── */
+.ne-st {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+  border-radius: 5px;
+  line-height: 1.3;
+  white-space: nowrap;
+ 
+  /* 기본 크기: md */
+  font-size: .875rem;      /* 14px */
+  padding: .3em .7em;
+}
+ 
+/* ── 크기 변형 ── */
+.ne-st-sm {
+  font-size: .75rem;       /* 12px — 테이블 내 보조 정보 */
+  padding: .22em .55em;
+  border-radius: 4px;
+}
+/* .ne-st 단독 = md (14px, 위에서 선언) */
+ 
+.ne-st-lg {
+  font-size: 1rem;         /* 16px — 강조 표시 */
+  padding: .35em .85em;
+  border-radius: 6px;
+}
+ 
+/* ── 컬러 변형 ── */
+.ne-st-green   { background: var(--ne-green-bg);  color: var(--ne-green); }
+.ne-st-blue    { background: var(--ne-blue-bg);   color: var(--ne-blue); }
+.ne-st-amber   { background: var(--ne-amber-bg);  color: var(--ne-amber); }
+.ne-st-red     { background: var(--ne-red-bg);    color: var(--ne-red); }
+ 
+/* ★ 신규: 경고 (채워진 빨간 배경) — 강제 취소·오류 등 강조 필요한 상황 */
+.ne-st-danger  {
+  background: var(--ne-red);
+  color: #ffffff;
+}
+ 
+.ne-st-gray    { background: var(--ne-gray-bg);   color: var(--ne-gray); }
+.ne-st-dark    { background: var(--ne-text);      color: #ffffff; }
+.ne-st-primary { background: var(--ne-primary-light); color: var(--ne-primary-dark); }
+ 
+/* ── 상태별 빠른 참조 (한 줄로 쓰는 경우) ── */
+/* 모집중      : ne-st ne-st-green           */
+/* 예약완료    : ne-st ne-st-blue            */
+/* 대기중/미완 : ne-st ne-st-amber           */
+/* 취소됨      : ne-st ne-st-red             */
+/* 강제취소    : ne-st ne-st-danger          */
+/* 종료/비활성 : ne-st ne-st-gray            */
+/* 파티장      : ne-st ne-st-dark            */
+/* 파티원      : ne-st ne-st-primary         */
+ 
+/* ──────────────────────
+   크기 조합 예시:
+   <span class="ne-st ne-st-sm ne-st-green">모집중</span>   → 12px
+   <span class="ne-st ne-st-green">모집중</span>            → 14px (기본)
+   <span class="ne-st ne-st-lg ne-st-green">모집중</span>   → 16px
+   ────────────────────── */
+ 
+ 
+/* ─────────────────────────────────────────────────────────────────────
+   태그 (장르·조건 등) — 뱃지와 별개로 사이즈 보정
+   ───────────────────────────────────────────────────────────────────── */
+.ne-tag {
+  display: inline-block;
+  background: var(--ne-bg);
+  border: 1px solid var(--ne-border-dark);
+  border-radius: 20px;
+  padding: .22em .75em;
+  font-size: .875rem;      /* 14px */
+  font-weight: 600;
+  color: var(--ne-text-2);
+  line-height: 1.4;
+}
+.ne-tag-sm {
+  font-size: .75rem;       /* 12px */
+  padding: .18em .6em;
+}
+.ne-tag-primary {
+  background: var(--ne-primary-light);
+  border-color: var(--ne-primary-mid);
+  color: var(--ne-primary-dark);
+}
+.ne-tag-dark {
+  background: var(--ne-text);
+  border-color: var(--ne-text);
+  color: #ffffff;
+}
+ 
+/* 매너온도 칩 */
+.ne-mannero {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  color: #92400e;
+  padding: .22em .65em;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: .875rem;      /* 14px */
+  line-height: 1.4;
+}
+ 
+/* 알림 카운트 */
+.ne-badge-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--ne-primary);
+  color: #111;
+  font-size: .75rem;       /* 12px — 숫자라 작아도 괜찮음 */
+  font-weight: 800;
+  padding: 0 5px;
+  margin-left: 3px;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   10. 버튼 커스텀
+   ───────────────────────────────────────────────────────────────────── */
+
+/* 공통 버튼 기본 스타일 보정 */
+.btn {
+  font-weight: 600;
+  border-radius: var(--ne-radius-sm);
+  transition: all .15s;
+  letter-spacing: -.01em;
+}
+.btn:focus-visible {
+  box-shadow: 0 0 0 .2rem rgba(253, 180, 0, .35);
+}
+
+/* 보조 버튼 (secondary) */
+.btn-secondary {
+  background-color: var(--ne-bg);
+  border-color: var(--ne-border-dark);
+  color: var(--ne-text);
+}
+.btn-secondary:hover {
+  background-color: var(--ne-border-dark);
+  border-color: var(--ne-border-dark);
+  color: var(--ne-text);
+}
+
+/* 아웃라인 보조 */
+.btn-outline-secondary {
+  border-color: var(--ne-border-dark);
+  color: var(--ne-text-2);
+}
+.btn-outline-secondary:hover {
+  background-color: var(--ne-bg);
+  border-color: var(--ne-primary);
+  color: var(--ne-primary-dark);
+}
+
+.ne-btn-deact{
+  background:#fff;color:var(--ne-red);
+  border:1.5px solid #fca5a5;border-radius:var(--ne-radius-sm);
+  font-weight:600;font-size:.875rem;padding:.35rem .85rem;cursor:pointer;
+  transition:all .13s;
+}
+.ne-btn-deact:hover{background:var(--ne-red-bg);}
+.ne-btn-deact:disabled,.ne-btn-deact.disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   11. 폼 컨트롤
+   ───────────────────────────────────────────────────────────────────── */
+.form-control,
+.form-select {
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: var(--ne-radius-sm);
+  font-size: .875rem;
+  color: var(--ne-text);
+  background-color: #ffffff;
+  transition: border-color .15s, box-shadow .15s;
+  line-height: 1.5;
+}
+.form-control:hover,
+.form-select:hover {
+  border-color: #c4c9d4;
+}
+.form-control::placeholder { color: var(--ne-text-3); }
+.form-control:disabled,
+.form-select:disabled {
+  background-color: var(--ne-bg);
+  color: var(--ne-text-3);
+  cursor: not-allowed;
+}
+
+.form-label {
+  font-weight: 600;
+  font-size: .85rem;
+  color: var(--ne-text);
+  margin-bottom: .3rem;
+}
+.form-text,
+.ne-hint {
+  font-size: .76rem;
+  color: var(--ne-text-3);
+  margin-top: .25rem;
+}
+.form-required {
+  color: #dc2626;
+  margin-left: .1em;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   12. 테이블
+   ───────────────────────────────────────────────────────────────────── */
+.ne-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+}
+.ne-table thead th {
+  background: var(--ne-bg);
+  font-size: .77rem;
+  font-weight: 700;
+  color: var(--ne-text-2);
+  padding: .65rem 1rem;
+  border-bottom: 1.5px solid var(--ne-border-dark);
+  text-align: left;
+  white-space: nowrap;
+}
+.ne-table tbody td {
+  padding: .75rem 1rem;
+  border-bottom: 1px solid var(--ne-border);
+  vertical-align: middle;
+}
+.ne-table tbody tr:last-child td { border-bottom: none; }
+.ne-table tbody tr:hover td {
+  background-color: #fafef0;
+}
+
+/* Bootstrap .table 보정 */
+.table > :not(caption) > * > * {
+  border-bottom-color: var(--ne-border);
+}
+.table thead th {
+  background: var(--ne-bg);
+  color: var(--ne-text-2);
+  font-weight: 700;
+  font-size: .8rem;
+}
+.table-hover > tbody > tr:hover > * {
+  background-color: #fafef0;
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(253, 180, 0, .03);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   13. 캘린더 (테마 상세 예약 선택)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-cal {
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: var(--ne-radius-md);
+  padding: 1rem;
+  background: #ffffff;
+}
+.ne-cal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .8rem;
+}
+.ne-cal-head .ne-cal-btn {
+  background: var(--ne-bg);
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: var(--ne-radius-xs);
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: .75rem;
+  color: var(--ne-text-2);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .12s, color .12s;
+}
+.ne-cal-head .ne-cal-btn:hover {
+  border-color: var(--ne-primary);
+  color: var(--ne-primary-dark);
+}
+.ne-cal-title { font-weight: 700; font-size: .9rem; }
+.ne-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+.ne-cal-dow {
+  text-align: center;
+  font-size: .68rem;
+  font-weight: 700;
+  color: var(--ne-text-3);
+  padding: .3rem 0;
+}
+.ne-cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .8rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background .1s;
+  position: relative;
+}
+.ne-cal-day:hover:not(.ne-cal-day-past):not(.ne-cal-day-empty) {
+  background: var(--ne-primary-light);
+}
+.ne-cal-day.has-slot { font-weight: 700; }
+.ne-cal-day.has-slot::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--ne-primary);
+}
+.ne-cal-day.selected {
+  background: var(--ne-primary) !important;
+  color: #111;
+  font-weight: 800;
+}
+.ne-cal-day.selected::after { background: #111; }
+.ne-cal-day.ne-cal-day-past  { color: var(--ne-border-dark); cursor: default; }
+.ne-cal-day.ne-cal-day-empty { cursor: default; }
+
+/* 시간 슬롯 버튼 */
+.ne-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+  margin-bottom: .75rem;
+}
+.ne-slot {
+  padding: .5rem .25rem;
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: var(--ne-radius-sm);
+  background: #ffffff;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .13s;
+  color: var(--ne-text-2);
+  line-height: 1.3;
+}
+.ne-slot:hover:not(.ne-slot-off) {
+  border-color: var(--ne-primary);
+  color: var(--ne-primary-dark);
+  background: var(--ne-primary-light);
+}
+.ne-slot.selected {
+  background: var(--ne-primary);
+  border-color: var(--ne-primary);
+  color: #111;
+  font-weight: 700;
+}
+.ne-slot.ne-slot-off {
+  background: var(--ne-bg);
+  color: var(--ne-text-3);
+  cursor: not-allowed;
+  border-color: var(--ne-border);
+  font-weight: 400;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   14. 가격 박스
+   ───────────────────────────────────────────────────────────────────── */
+.ne-price-box {
+  background: var(--ne-primary-light);
+  border: 1.5px solid var(--ne-primary-mid);
+  border-radius: var(--ne-radius-md);
+  padding: 1.25rem;
+}
+.ne-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .875rem;
+  padding: .35rem 0;
+}
+.ne-price-row.total {
+  border-top: 1px solid var(--ne-primary-mid);
+  margin-top: .5rem;
+  padding-top: .8rem;
+  font-weight: 800;
+  font-size: 1rem;
+}
+.ne-price-total-amount {
+  color: var(--ne-primary-dark);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   15. 상태 탭 (예약 현황 등)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-res-tab {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+.ne-res-tab .ne-tab-btn {
+  background: #ffffff;
+  border: 1.5px solid var(--ne-border-dark);
+  border-radius: 20px;
+  padding: .35rem 1.1rem;
+  font-size: .83rem;
+  font-weight: 600;
+  color: var(--ne-text-2);
+  cursor: pointer;
+  transition: all .13s;
+}
+.ne-res-tab .ne-tab-btn:hover {
+  border-color: var(--ne-primary);
+  color: var(--ne-primary-dark);
+}
+.ne-res-tab .ne-tab-btn.active {
+  background: var(--ne-primary);
+  border-color: var(--ne-primary);
+  color: #111;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   16. 알림 (Notice / Alert)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-notice {
+  background: var(--ne-primary-light);
+  border: 1.5px solid var(--ne-primary-mid);
+  border-radius: var(--ne-radius-sm);
+  padding: .75rem 1rem;
+  font-size: .84rem;
+  color: #7a4f00;
+}
+.ne-notice-warning {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+.ne-notice-danger {
+  background: var(--ne-red-bg);
+  border-color: #fca5a5;
+  color: var(--ne-red);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   17. 출석 체크 행
+   ───────────────────────────────────────────────────────────────────── */
+.ne-attend-row {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  background: #ffffff;
+  border: 1px solid var(--ne-border);
+  border-radius: var(--ne-radius-md);
+  padding: .8rem 1rem;
+  margin-bottom: .5rem;
+  transition: background .1s;
+}
+.ne-attend-row:hover { background: var(--ne-bg); }
+.ne-attend-row input[type="checkbox"] {
+  width: 1.15em; height: 1.15em;
+  accent-color: var(--ne-primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   18. 빈 상태 (Empty State)
+   ───────────────────────────────────────────────────────────────────── */
+.ne-empty {
+  text-align: center;
+  padding: 3.5rem 2rem;
+  color: var(--ne-text-3);
+}
+.ne-empty-icon {
+  font-size: 2.8rem;
+  margin-bottom: .75rem;
+  opacity: .4;
+}
+.ne-empty-title {
+  font-weight: 700;
+  font-size: .95rem;
+  color: var(--ne-text-2);
+  margin-bottom: .35rem;
+}
+.ne-empty-desc {
+  font-size: .84rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   19. 모달 보정
+   ───────────────────────────────────────────────────────────────────── */
+.modal-content {
+  border-radius: var(--ne-radius);
+  border: none;
+  box-shadow: var(--ne-shadow-lg);
+}
+.modal-header {
+  border-bottom: 2px solid var(--ne-primary);
+  padding: 1.1rem 1.5rem;
+}
+.modal-title { font-weight: 800; font-size: 1rem; }
+.modal-footer {
+  border-top: 1px solid var(--ne-border);
+  padding: .85rem 1.25rem;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────
+   20. 유틸리티
+   ───────────────────────────────────────────────────────────────────── */
+.ne-fw-black   { font-weight: 900 !important; }
+.ne-fw-heavy   { font-weight: 800 !important; }
+.ne-text-muted { color: var(--ne-text-2) !important; }
+.ne-text-faint { color: var(--ne-text-3) !important; }
+.ne-bg-warm    { background-color: var(--ne-bg-warm) !important; }
+.ne-divider {
+  height: 1px;
+  background: var(--ne-border);
+  margin: 1.25rem 0;
+}
+.ne-cursor-pointer { cursor: pointer; }
+.ne-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 레이아웃 컨테이너 */
+.ne-container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* sticky top 보정 (헤더 높이 반영) */
+.ne-sticky { position: sticky; top: 74px; }
+
+
+.ne-footer {
+  /* 모니터 바닥에 절대 위치로 고정 (본문이 길어지면 스크롤 맨 아래에 위치하게 됨) */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  
+  height: 120px;                  /* 너무 높지 않게 120px로 슬림화 */
+  background: #ccc;            /* 너무 진하지 않고 부드러운 다크 그레이 (차콜 톤) */
+  box-sizing: border-box;
+  padding: 1.5rem 0 1rem;
+  margin-top: 0;
+}
+
+.ne-footer-logo {
+  font-weight: 900;
+  font-size: 1.05rem;
+  letter-spacing: -1px;
+  color: #ffffff;
+  margin-bottom: .2rem;
+}
+.ne-footer-logo span { color: var(--ne-primary); }
+
+.ne-footer-col-title {
+  font-size: .68rem;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .4rem;
+}
+
+.ne-footer-col a {
+  display: block;
+  font-size: .78rem;
+  color: #9ca3af;
+  text-decoration: none;
+  margin-bottom: .2rem;
+  transition: color .12s;
+}
+.ne-footer-col a:hover { color: var(--ne-primary); }
+
+.ne-footer-copy {
+  border-top: 1px solid #4b5563;
+  padding-top: .6rem;
+  margin-top: .8rem;
+  font-size: .7rem;
+  color: #9ca3af;
+}
+
+/* 푸터 내부 일반 텍스트 색상 보정 */
+.ne-footer p, 
+.ne-footer span:not(.ne-footer-logo span) {
+  color: #9ca3af !important;
+}

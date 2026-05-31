@@ -1,0 +1,50 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+### MacOS (맥을 쓰는 팀장님을 위한 필수 설정) ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+### IntelliJ IDEA (혹시 인텔리제이를 쓰는 팀원이 있을 수 있으므로) ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Application Settings ###
+*.log
