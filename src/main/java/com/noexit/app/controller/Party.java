@@ -25,4 +25,10 @@ public class Party
 	{
 		return "party/partydetail";
 	}
+	
+	@GetMapping("board")
+	public String partyBoard()
+	{
+		return "party/partyboard";
+	}
 }
