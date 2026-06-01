@@ -202,12 +202,18 @@ button:hover { background: #f0f1f4; }
 }
 
 /* 스크롤 박스: 높이는 원하는 값으로 조절 */
-.party-apply .table-scroll,
-.party-guest .table-scroll {
-	height: 250px;
+.party-guest .table-scroll,
+.party-apply .table-scroll
+ {
+	height: 300px;
 	overflow-y: auto;
 	border: 1px solid var(--border);
 	border-radius: 8px;
+}
+
+.party-guest .table-scroll
+{
+	height: 150px;
 }
 
 /* 스크롤해도 헤더 고정 */
@@ -264,9 +270,9 @@ button:hover { background: #f0f1f4; }
 						
 						<div class="info-control">
 							
-							<button type="button" class="btn-success">예약 확정</button>
-							<button type="button" class="btn-primary">파티 수정</button>
-							<button type="button" class="btn-danger">파티 해산</button>
+							<button type="button" class="ne-st ne-st-blue">예약 확정</button>
+							<button type="button" class="ne-st ne-st-green">파티 수정</button>
+							<button type="button" class="ne-st ne-st-red">파티 해산</button>
 							
 						</div>
 						
@@ -300,8 +306,8 @@ button:hover { background: #f0f1f4; }
 										<td>7</td>
 										<td>미쿠 좋아하심?</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 									
@@ -312,8 +318,8 @@ button:hover { background: #f0f1f4; }
 										<td>19</td>
 										<td>ㅎㅇ</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 									<tr>
@@ -323,8 +329,8 @@ button:hover { background: #f0f1f4; }
 										<td>19</td>
 										<td>ㅎㅇ</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 									<tr>
@@ -334,8 +340,8 @@ button:hover { background: #f0f1f4; }
 										<td>19</td>
 										<td>ㅎㅇ</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 									<tr>
@@ -345,8 +351,8 @@ button:hover { background: #f0f1f4; }
 										<td>19</td>
 										<td>ㅎㅇ</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 									<tr>
@@ -356,8 +362,8 @@ button:hover { background: #f0f1f4; }
 										<td>19</td>
 										<td>ㅎㅇ</td>
 										<td>
-											<button type="button" class="btn-primary">승인</button>
-											<button type="button" class="btn-danger">거절</button>
+											<button type="button" class="ne-st ne-st-green">승인</button>
+											<button type="button" class="ne-st ne-st-red">거절</button>
 										</td>
 									</tr>
 								</tbody>
@@ -382,7 +388,7 @@ button:hover { background: #f0f1f4; }
 							</div>
 							
 							<div class="msg mine">
-								<button type="button" style="font-size: small;">삭제</button>
+								<button type="button" class="ne-st ne-st-red" style="font-size: small;">삭제</button>
 								<span class="comment">오 얼마임?</span>
 								<span class="writer">김주열</span>
 							</div>
@@ -409,7 +415,7 @@ button:hover { background: #f0f1f4; }
 							</div>
 							
 							<div class="msg mine">
-								<button type="button" style="font-size: small;">삭제</button>
+								<button type="button" class="ne-st ne-st-red" style="font-size: small;">삭제</button>
 								<span class="comment">제 정신임?</span>
 								<span class="writer">김주열</span>
 							</div>
@@ -419,7 +425,7 @@ button:hover { background: #f0f1f4; }
 						<div class="comment-input">
 							
 							<input type="text" placeholder="댓글"> 
-							<button type="button">작성</button>
+							<button type="button" class="ne-st ne-st-blue">작성</button>
 						</div>
 					
 					</div> <!-- .party-comment -->
@@ -449,8 +455,8 @@ button:hover { background: #f0f1f4; }
 										<td>9</td>
 										<td>준비 중</td>
 										<td>
-											<button type="button" class="btn-primary">Ready</button>
-											<button type="button" class="btn-danger">탈퇴하기</button>
+											<button type="button" class="ne-st ne-st-green">Ready</button>
+											<button type="button" class="ne-st ne-st-red">탈퇴하기</button>
 											<!-- <button type="button" class="btn-danger">강퇴하기</button> -->
 										</td>
 									</tr>
@@ -460,8 +466,8 @@ button:hover { background: #f0f1f4; }
 										<td>39</td>
 										<td>준비완료</td>
 										<td>
-											<button type="button" class="btn-primary">Ready</button>
-											<button type="button" class="btn-danger">탈퇴하기</button>
+											<button type="button" class="ne-st ne-st-green">Ready</button>
+											<button type="button" class="ne-st ne-st-red">탈퇴하기</button>
 											<!-- <button type="button" class="btn-danger">강퇴하기</button> -->
 										</td>
 									</tr>
