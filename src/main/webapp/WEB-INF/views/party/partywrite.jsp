@@ -87,7 +87,9 @@ form[name='writeForm']
 								</td>
 							</tr>
 						</table>
-					
+						
+						<br>
+						
 						<button type="button">개설하기</button>
 						 
 					</form>

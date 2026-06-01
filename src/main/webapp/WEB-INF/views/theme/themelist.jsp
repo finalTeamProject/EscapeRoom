@@ -83,6 +83,14 @@
 	padding: 2px 4px;
 }
 
+.ne-sc:hover
+{
+	background: none;        /* 배경 강조 제거 */
+	box-shadow: none;        /* 그림자/광택(글로우) 제거 */
+	color: inherit;          /* 글자색 변화 제거 */
+	text-decoration: none;   /* 밑줄 제거 */
+}
+
 </style>
 
 </head>

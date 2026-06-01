@@ -116,7 +116,8 @@ table {
 }
 
 /* ===== 버튼 ===== */
-button {
+button 
+{
 	cursor: pointer;
 	border: 1px solid var(--border);
 	background: var(--surface);
@@ -128,22 +129,16 @@ button {
 }
 button:hover { background: #f0f1f4; }
 
-
-.btn-primary { background: var(--primary); border-color: var(--primary); color:#fff; }
-.btn-primary:hover { background: var(--primary-dark); }
-.btn-danger  { background: var(--danger); border-color: var(--danger); color:#fff; }
-.btn-success { background: var(--success); border-color: var(--success); color:#fff; }
-
 .party-info button { margin-right: 6px; margin-top: 12px; }
 
 /* ===== 댓글 ===== */
-.comment-show {
+.comment-show 
+{
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
 	background: #fafbfc;
 	border: 1px solid var(--border);
-	border-radius: 10px;
 	width: 100%;
 	flex: 1;
 	min-height: 200px;
@@ -170,8 +165,9 @@ button:hover { background: #f0f1f4; }
 	font-size: 14px;
 	line-height: 1.4;
 }
-.msg.other .comment { background: #eceef1; border-top-left-radius: 4px; }
-.msg.mine  .comment { background: var(--primary); color:#fff; border-top-right-radius: 4px; }
+
+.msg.other .comment { background: #eceef1;}
+.msg.mine  .comment { background: var(--primary); color:#fff; }
 
 .msg button {
 	padding: 2px 6px;
@@ -188,13 +184,9 @@ button:hover { background: #f0f1f4; }
 	flex: 1;
 	padding: 10px 12px;
 	border: 1px solid var(--border);
-	border-radius: 8px;
 	font-size: 14px;
 }
-.comment-input input:focus {
-	outline: none;
-	border-color: var(--primary);
-}
+
 .comment-input button {
 	background: var(--primary);
 	border-color: var(--primary);
@@ -401,7 +393,7 @@ button:hover { background: #f0f1f4; }
 							</div>
 							<div class="msg other">
 								<span class="writer">윤주열</span>
-								<span class="comment">50만원</span>
+								<span class="comment">삭제된 댓글입니다.</span>
 							</div>
 							<div class="msg other">
 								<span class="writer">윤주열</span>
