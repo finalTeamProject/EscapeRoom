@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.UserMapper">
+
+<insert id="insertAccount" parameterType="com.noexit.app.model.User">
+
+	<selectKey keyProperty="userId" resultType="Long" order="BEFORE">
+		SELECT SEQ_USER_ID.NEXTVAL
+		FROM DUAL
+	</selectKey>
+
+	INSERT INTO USER_ACCOUNT (USER_ID, LOGIN_ID, PASSWORD, NICKNAME)
+	VALUES (#{userId}, #{loginId}, #{password}, #{nickName})
+</insert>
+
+
+<insert id="insertInfo" parameterType="com.noexit.app.model.User">
+
+	INSERT INTO USER_INFO (USER_ID, EMAIL, NAME, PHONE, GENDER, BIRTHDATE)
+	VALUES (#{userId}, #{email}, #{name}, #{phone}, #{gender}, #{birthDate})
+</insert>
+
+
+</mapper>
