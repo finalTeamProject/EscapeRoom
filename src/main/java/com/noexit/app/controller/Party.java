@@ -19,4 +19,10 @@ public class Party
 	{
 		return "party/partylist";
 	}
+	
+	@GetMapping("detail")
+	public String partyDetail()
+	{
+		return "party/partydetail";
+	}
 }
