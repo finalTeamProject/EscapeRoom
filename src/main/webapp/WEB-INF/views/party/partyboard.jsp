@@ -258,9 +258,11 @@ button:hover { background: #f0f1f4; }
 							</tr>
 							<tr>
 								<th>테마명</th>
-								<td>그레이</td>
+								<td colspan="3">그레이</td>
+							</tr>
+							<tr>
 								<th>일시</th>
-								<td>2026-06-03 18:00</td>
+								<td colspan="3">2026-06-03 18:00</td>
 							</tr>
 							<tr>
 								<th>방장 한마디</th>
