@@ -9,22 +9,33 @@
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
 <style type="text/css">
-	
+
 .list
 {
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(2, 2fr);
 	gap: 10px;
+}
+
+.ne-sc
+{
+	display: flex;
+}
+
+.image
+{
+	background-color: gray;
+	flex: 0 0 50%;
 }
 
 .description
 {
 	text-align: center;
-}
-
-th
-{
-	width: 100px;
+	flex: 0 0 1;
+	min-width: 0;
+	table-layout: fixed;
+	width: 100%;
+	text-align: center;
 }
 
 .search-form
@@ -72,37 +83,6 @@ th
 	padding: 2px 4px;
 }
 
-
-	/*
-	.list 
-	{
-	    margin-top: 50px;
-	    width: 1000px;
-	    background-color: orange;
-	    display: grid;
-	    grid-template-columns: repeat(5, 1fr);
-	    gap: 10px;
-	    padding: 10px;
-	    box-sizing: border-box;
-	}
-	
-	.item 
-	{ 
-		display: block; 
-		text-decoration: none; 
-		color: inherit;
-		height: 200px; 
-		background-color: green; 
-		overflow-y: auto;
-	}
-	
-	.image
-	{
-		width: 100%;
-		height: 50%;
-		background-color: white;
-	}
-	 */
 </style>
 
 </head>
@@ -115,7 +95,7 @@ th
 				
 				<div class="search-form">
 					
-					<form action="" class="search">
+					<form action="" class="search" method="post">
 						
 						<select class="search-type">
 							<option value="cafeName">카페명</option>
@@ -129,7 +109,6 @@ th
 						<br>
 						
 						<div class="filter">
-						
 							필터
 							<br>
 							평점
@@ -139,10 +118,6 @@ th
 							공포도
 							<input type="text" class="search-input" name="minHorror" placeholder="최소 공포도">
 							<input type="text" class="search-input" name="maxHorror" placeholder="최대 공포도">
-							<br>
-							활동도
-							<input type="text" class="search-input" name="minAct" placeholder="최소 활동도">
-							<input type="text" class="search-input" name="maxAct" placeholder="최대 활동도">
 							<br>
 							가격
 							<input type="text" class="search-input" name="minPrice" placeholder="최소 가격">
@@ -158,227 +133,44 @@ th
 					
 					<a class="ne-sc" href="" >
 						
-						<div class="ne-sc-title">테마 이미지</div>
+						<div class="image">테마 이미지</div>
 							
 							<table class="description">
 								<tr>
+									<th>카페명</th>
+									<td>우주별</td>		
+								</tr>
+								<tr>
 									<th>방이름</th>
 									<td>그레이</td>
+								</tr>
+								<tr>
+									<th>평점</th>
+									<td>★★★★☆</td>
+								</tr>
+								<tr>
+									<th>공포도</th>
+									<td>★★★★☆</td>
+								</tr>
+								<tr>
+									<th>시간</th>
+									<td>60분</td>	
 								</tr>
 								<tr>
 									<th>장르</th>
 									<td>추리</td>
 								</tr>
 								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
+									<th>인원</th>
+									<td>2 ~ 4</td>
 								</tr>
 								<tr>
 									<th>가격</th>
 									<td>30000</td>
 								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
 							</table>
 					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
-								</tr>
-								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
-								</tr>
-								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
-								</tr>
-								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
-								</tr>
-								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
-					
-					<a class="ne-sc" href="" >
-						
-						<div class="ne-sc-title">테마 이미지</div>
-							
-							<table class="description">
-								<tr>
-									<th>방이름</th>
-									<td>그레이</td>
-								</tr>
-								<tr>
-									<th>장르</th>
-									<td>추리</td>
-								</tr>
-								<tr>
-									<th>가격</th>
-									<td>30000</td>
-								</tr>
-								<tr>
-									<th>최소인원</th>
-									<td>2명</td>
-								</tr>
-								<tr>
-									<th>최대인원</th>
-									<td>4명</td>
-								</tr>
-								<tr>
-									<th>성인유무</th>
-									<td>N</td>
-								</tr>							
-							</table>
-					</a>
+		
 					
 				</div>
 				
