@@ -18,7 +18,15 @@ public class Theme
 	public String themeDetail()
 	{
 		// dto 로 담아서 넘겨줌
-		
+
 		return "theme/themedetail";
 	}
+
+	
+	@GetMapping("enroll")
+	public String enrollForm()
+	{
+		return "theme/themeEnrollForm";
+	}
+	
 }
