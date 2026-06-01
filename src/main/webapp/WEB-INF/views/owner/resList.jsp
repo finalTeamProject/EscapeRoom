@@ -34,6 +34,7 @@
 						<table class="ne-table">
 							<thead>
 								<tr>
+									<th>번호</th>
 									<th>테마</th>
 									<th>예약일</th>
 									<th>예약자</th>
@@ -45,8 +46,9 @@
 							</thead>
 							<tbody>
 								<tr>
+									<td class="text-center">1</td>
 									<td>어둠의 저택</td>
-									<td>2026-06-01 14:00</td>
+									<td>2026-06-01<br> 14:00</td>
 									<td>홍길동</td>
 									<td>010-4544-4544</td>
 									<td>4명</td>
@@ -56,6 +58,7 @@
 									</td>
 								</tr>
 								<tr class="cancle">
+									<td class="text-center">2</td>
 									<td>바이러스 연구소</td>
 									<td>2026-06-01 12:00</td>
 									<td>윤주열</td>
@@ -67,18 +70,27 @@
 									</td>
 								</tr>
 								<tr>
+									<td class="text-center">3</td>
 									<td>어둠의 저택</td>
 									<td>2026-06-01 10:00</td>
 									<td>김민준</td>
 									<td>010-1234-1234</td>
 									<td>3명</td>
-									<td>예약완료</td>
+									<td><span class="ne-st ne-st-blue">예약완료</span></td>
 									<td>
 										<button type="button" class="btn ne-btn-deact">예약취소</button>
 									</td>
 								</tr>
+								
 							</tbody>
 						</table>
+						<div class="page-navigation">
+							<a href="#"> 1 </a>
+							<a href="#"> 2 </a>
+							<span>3</span>
+							<a href="#"> 4 </a>
+							<a href="#"> 5 </a>
+						</div>
 					</div>
 				</div>
 			</div>
