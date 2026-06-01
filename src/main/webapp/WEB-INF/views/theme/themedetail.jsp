@@ -44,6 +44,7 @@
 	{	
 		width: 50px;
 		border-right: 1px solid #ccc;
+		background-color: #e5e7eb;
 	}
 	
 	.description td
@@ -135,10 +136,6 @@
 							<tr>
 								<th>테마 소개</th>
 								<td>주열님이 강력 추천하는 테마</td>
-							</tr>
-							<tr>
-								<th>소요시간</th>
-								<td>60분</td>
 							</tr>
 							<tr>
 								<th>1인 가격</th>
