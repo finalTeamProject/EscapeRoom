@@ -13,4 +13,10 @@ public class Party
 	{
 		return "party/partywrite";
 	}
+	
+	@GetMapping("list")
+	public String partyList()
+	{
+		return "party/partylist";
+	}
 }
