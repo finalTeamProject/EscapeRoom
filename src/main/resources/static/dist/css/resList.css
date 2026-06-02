@@ -1,0 +1,90 @@
+.resWrap{
+	/* height: 750px; */
+	box-sizing: border-box;
+	margin: 20px 0; 
+	padding: 20px;
+	box-sizing: border-box;
+}
+.title{
+	font-size: 20px;
+	font-weight: bold;
+	margin-bottom: 10px;
+	color: #333;
+}	
+
+
+.resList{
+	width: 100%;
+	background-color: #fff;
+	/* border: 1px solid #ccc; */
+	box-shadow: 2px 2px 10px rgba(0,0,0,0.05);
+	padding: 20px 30px;
+	box-sizing: border-box;
+	border-radius: 5px;
+	position: relative;
+}
+
+.inputBox{
+	margin-bottom: 15px;
+	position: absolute;
+	top: 20px;
+	right: 10px;
+	
+}
+
+.inputBox .ne-box{
+	
+	margin-left: 10px;
+	width: 150px;
+	padding-left: 10px;
+}
+
+.cancle{
+	background-color: #eee;
+	color: #999;
+}
+
+.resWrap .ne-table tbody tr.cancle:hover td{
+	background-color: #eee;
+}
+
+.resWrap .ne-table{
+	margin-top: 50px;
+}
+
+.ne-table th{
+	text-align: center;
+}
+
+.page-navigation{
+	margin-top: 10px;
+	text-align: center;
+}
+.page-navigation > *{
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+	border: 1px solid #ccc;
+	line-height: 30px;
+	box-sizing: border-box;
+}
+.page-navigation span{
+	background-color: #fdb800;
+	color: #fff;
+	font-weight: bold;
+	border: none;
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
