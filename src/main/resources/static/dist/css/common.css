@@ -276,6 +276,7 @@ li{
 /* 14px 미만이 되는 곳 보정 */
 small, .small   { font-size: .875rem; }  /* 14px */
 .text-xs        { font-size: .875rem; }  /* 14px */
+.text-xxs 		{ font-size: .75rem ; }  /* 16px * 0.75 = 12px */
  
 /* Bootstrap .form-text 보정 */
 .form-text,
@@ -314,8 +315,8 @@ small, .small   { font-size: .875rem; }  /* 14px */
 }
 
 /* 헤더 높이만큼 본문 밀기 */
-/* .ne-body-offset {
-  padding-top: 100px;
+.ne-body-offset {
+  padding-top: 125px;
 }
  */
 /* 로고 */
