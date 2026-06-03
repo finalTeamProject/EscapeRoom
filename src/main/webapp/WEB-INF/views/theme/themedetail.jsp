@@ -10,90 +10,150 @@
 
 <style type="text/css">
 
-	.info
-	{
-		padding-top: 30px;
-		display: flex;
-	}
-	
-	.image
-	{
-		width: 300px;
-		height: 500px;
-		background-color: white; 
-		margin-right: 30px;
-	}
-	
-	.description
-	{
-		text-align: center;
-		border-collapse: collapse;
-	}
+.container
+{
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 20px 0;
+}
 
+.theme-info-wrap
+{
+	display: grid;
+	grid-template-columns : 2fr 3fr;
+	gap: 20px;
+}
 
-	.description th,
-	.description td { border-bottom: 1px solid #ccc; }
-	
-	.description tr:last-child th,
-	.description tr:last-child td { border-bottom: none; }
-	
-	.description th,
-	.description td { padding: 6px 10px; }
-		
-	.description th
-	{	
-		width: 50px;
-		border-right: 1px solid #ccc;
-		background-color: #e5e7eb;
-	}
-	
-	.description td
-	{
-		width: 700px;
-	}
+.theme-image
+{
+	background-color: #f5f5f5;
+}
 
-	.comment
-	{
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-	    gap: 10px;
-	}
-	
-	.schedule .date,
-	.schedule .time
-	{
-		display: flex;
-		flex-wrap: wrap;
-		gap: 8px;
-	}
-	
-	
-	.schedule .date 
-	{ 
-		margin-bottom: 16px; 
-	}
-	
-	.schedule .time
-	{
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-	}
-	
-	.schedule button
-	{
-		padding: 8px 14px;
-		border: 1px solid #ccc;
-		border-radius: 6px;
-		background: #fff;
-		cursor: pointer;
-		font-size: 13px;
-	}
-	
-	.schedule button:hover 
-	{
-	 	background: #f3f3f3; 
-	}
-	
+.theme-info
+{
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.info-item
+{
+	display: flex;
+	justify-content: space-between;
+ 	padding: 5px;
+  	background: #f5f5f5;
+  	border-radius: 5px;
+}
+
+.theme-description 
+{
+  	display: flex;
+  	flex-direction: column;
+  	gap: 5px;
+}
+
+.theme-description span 
+{
+  	font-weight: bold;
+}
+
+.theme-description p 
+{
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: #f5f5f5;
+}
+
+.slot-list 
+{
+  	display: flex;
+  	flex-direction: column;
+  	gap: 10px;
+}
+
+.slot-list > span
+{
+	font-weight: bold;
+}
+
+.slot 
+{
+  	display: flex;
+  	align-items: center;
+  	gap: 15px;
+  	padding: 10px;
+  	border: 1px solid black;
+  	border-radius: 10px;
+}
+
+.slot-date 
+{
+  font-weight: bold;
+}
+
+.slot-time 
+{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slot-time button, .slot-time span
+{
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.slot-time span
+{
+	background: #d1d1d1;
+}
+
+.slot-time button
+{
+	background: white;
+}
+
+.slot-time button:hover
+{
+	background-color: orange;
+}
+
+.review-wrap > span
+{
+	font-weight: bold;
+}
+
+.review-total
+{
+	width: 30%;
+}
+
+.review 
+{
+  display: flex;
+  justify-content: space-between;
+}
+
+.review-list
+{
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;	
+	gap : 10px;
+}
+
+.comment p 
+{
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+
 </style>
 
 </head>
@@ -104,261 +164,178 @@
 		<div class="ne-container">
 			<div class="container">
 				
-				<div class="theme">
+				<div class="theme-info-wrap">
 					
-					<div class="info">
+					<div class="theme-image">
+						<span>테마이미지</span>
+					</div>
+					
+					<div class="theme-info">
 						
-						<div class="image">
-							테마이미지
+						<div class="info-item">
+							<span>카페명</span>
+							<span>우주별</span>
 						</div>
 						
-						<table class="description">
-							<tr>
-								<th>카페명</th>
-								<td>우주별</td>
-							</tr>
-							<tr>
-								<th>카페연락처</th>
-								<td>010-1234-1234</td>
-							</tr>
-							<tr>
-								<th>카페위치</th>
-								<td>홍대입구 근처 어딘가</td>
-							</tr>
-							<tr>
-								<th>테마명</th>
-								<td>그레이</td>
-							</tr>
-							<tr>
-								<th>소요시간</th>
-								<td>60분</td>
-							</tr>
-							<tr>
-								<th>테마 소개</th>
-								<td>주열님이 강력 추천하는 테마</td>
-							</tr>
-							<tr>
-								<th>1인 가격</th>
-								<td>30000</td>
-							</tr>
-							<tr>
-								<th>난이도</th>
-								<td>★★★★★</td>
-							</tr>
-							<tr>
-								<th>활동도</th>
-								<td>★★★★★</td>
-							</tr>
-							<tr>
-								<th>공포도</th>
-								<td>★★★★★</td>
-							</tr>
-							<tr>
-								<th>인원 수</th>
-								<td>2 ~ 4</td>
-							</tr>
-							<tr>
-								<th>성인 유무</th>
-								<td>Y/N</td>
-							</tr>
-						</table>
+						<div class="info-item">
+							<span>카페위치</span>
+							<span>홍대입구 5분 거리</span>
+						</div>
+						
+						<div class="info-item">
+							<span>카페전화번호</span>
+							<span>010-1234-11234</span>
+						</div>
+						
+						<div class="info-item">
+							<span>테마명</span>
+							<span>그레이</span>
+						</div>
+						
+						<div class="info-item">
+							<span>테마 장르</span>
+							<span>추리</span>
+						</div>
+						
+						<div class="info-item">
+							<span>테마 시간</span>
+							<span>60분</span>
+						</div>
+						
+						<div class="info-item">
+							<span>난이도</span>
+							<span>★★★★★</span>
+						</div>
+						
+						<div class="info-item">
+							<span>공포도</span>
+							<span>★★★★☆</span>
+						</div>
+						
+						<div class="info-item">
+							<span>테마 가격</span>
+							<span>30000</span>
+						</div>
+						
+						<div class="info-item">
+							<span>테마 인원</span>
+							<span>2 ~ 4</span>
+						</div>
+						
+					</div>
+				</div>
+				
+				<div class="theme-description">
+					<span>테마 소개</span>
+					<p>1960년 대 뉴욕에서 당신은 탐정이 되어 사건의 실마리를 찾아 범인을 찾아내야 합니다. </p>
+				</div>
+							
+				<div class="slot-list">
+					
+					<span>예약 목록</span>
+					
+					<div class="slot">
+					
+						<div class="slot-date">
+							<span>2026-06-01</span>
+						</div>
+						
+						<div class="slot-time">
+							<span class="ne-st ne-st-gray">10:00</span>
+							<button type="button" value="slotId" onclick="">12:00</button>
+							<button type="button" value="slotId" onclick="">14:00</button>
+							<button type="button" value="slotId" onclick="">16:00</button>
+						</div>
 						
 					</div>
 					
-					<br>
+					<div class="slot">
 					
-					<div class="schedule">
-						
-						<div class="date">
-							
-							<button type="button">2026-06-01</button>
-							<button type="button">2026-06-02</button>
-							<button type="button">2026-06-03</button>
-							<button type="button">2026-06-04</button>
-							<button type="button">2026-06-05</button>
-							
+						<div class="slot-date">
+							<span>2026-06-02</span>
 						</div>
-									
-						<div class="time">
-							
-							<button type="button">10:00</button>
-							<button type="button">12:00</button>
-							<button type="button">14:00</button>
-							<button type="button">16:00</button>
-							<button type="button">18:00</button>
-							
-						</div>									
-									
+						
+						<div class="slot-time">
+							<button type="button" value="slotId" onclick="">10:00</button>
+							<button type="button" value="slotId" onclick="">12:00</button>
+							<button type="button" value="slotId" onclick="">14:00</button>
+							<button type="button" value="slotId" onclick="">16:00</button>
+						</div>
+						
 					</div>
 					
-					<br>
-						
-					<br><br>
+				</div>							
+				
+				<div class="review-wrap">
 					
-					<div class="review">
+					<span>리뷰</span>
+					
+					<div class="review-total">
 						
-						<div class="total">
-														
-							<div class="ne-sc item">
-							  <div class="ne-sc-title">리뷰 통계</div>
+						<div class="ne-sc item">
+							<div class="ne-sc-title">리뷰 통계 (1개)</div>
 							  	
-							  	<table class="total-review">
-							  		<tr>
-							  			<th>체감난이도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감공포도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감활동도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>몰입도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>만족도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  	</table>
+							 <div class="review">
+							 	<span>만족도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	 
 							  
-							</div>
-							
+							 <div class="review">
+							 	<span>체감난이도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	
+							   
+							 <div class="review">
+							 	<span>체감공포도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	 
+							  
+							 <div class="review">
+							 	<span>체감활동도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	  
+							  
+							 <div class="review">
+							 	<span>몰입도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	  
+							  
 						</div>
 						
-						<br>
+					</div>
+					
+					<div class="review-list">
 						
-						<div class="comment">
-						
-							<div class="ne-sc item">
-							  <div class="ne-sc-title">작성자닉네임</div>
-							  	
-							  	<table class="user-review">
-							  		<tr>
-							  			<th>체감난이도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감공포도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감활동도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>몰입도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>만족도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>한줄 코멘트</th>
-							  			<td>재밌음</td>
-							  		</tr>
-							  	</table>
-							  
-							</div>
+						<div class="ne-sc item">
+						  	<div class="ne-sc-title">윤주열</div>
 							
-							<div class="ne-sc item">
-							  <div class="ne-sc-title">작성자닉네임</div>
-							  	
-							  	<table class="user-review">
-							  		<tr>
-							  			<th>체감난이도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감공포도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감활동도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>몰입도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>만족도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>한줄 코멘트</th>
-							  			<td>재밌음</td>
-							  		</tr>
-							  	</table>
+							 <div class="review">
+							 	<span>만족도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	 
 							  
-							</div>
+							 <div class="review">
+							 	<span>체감난이도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	
+							   
+							 <div class="review">
+							 	<span>체감공포도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	 
+							  
+							 <div class="review">
+							 	<span>체감활동도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	  
+							  
+							 <div class="review">
+							 	<span>몰입도</span>
+							 	<span>★★★☆☆</span>
+							 </div>	
 							
-							<div class="ne-sc item">
-							  <div class="ne-sc-title">작성자닉네임</div>
-							  	
-							  	<table class="user-review">
-							  		<tr>
-							  			<th>체감난이도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감공포도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감활동도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>몰입도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>만족도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>한줄 코멘트</th>
-							  			<td>재밌음</td>
-							  		</tr>
-							  	</table>
-							  
-							</div>
-							
-							<div class="ne-sc item">
-							  <div class="ne-sc-title">작성자닉네임</div>
-							  	
-							  	<table class="user-review">
-							  		<tr>
-							  			<th>체감난이도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감공포도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>체감활동도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>몰입도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>만족도</th>
-							  			<td>★★★☆☆</td>
-							  		</tr>
-							  		<tr>
-							  			<th>한줄 코멘트</th>
-							  			<td>재밌음</td>
-							  		</tr>
-							  	</table>
-							  
+							<div class="comment">
+								<p>장치가 다양하고 색다른 요소가 많이 있습니다. 방탈출 초보분들께 강추합니다.</p>
 							</div>
 							
 						</div>

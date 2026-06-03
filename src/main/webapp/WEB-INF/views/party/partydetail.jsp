@@ -7,6 +7,109 @@
 <meta charset="UTF-8">
 <title>partydetail.jsp</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+
+<style type="text/css">
+
+.container 
+{
+  display: flex;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.party-info-wrap 
+{
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 50%
+}
+
+.party-apply-wrap 
+{
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 40%;
+}
+
+.title 
+{
+  font-size: 20px;
+  font-weight: bold;
+}
+
+hr 
+{
+  border-top: 1px solid #ccc;
+}
+
+.party-info-wrap > div 
+{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.party-name 
+{
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.theme-info
+{
+  flex-direction: row !important;
+  flex-wrap: wrap;
+}
+
+.party-condition 
+{
+  flex-wrap: wrap;
+}
+
+.party-crew 
+{
+ 	display: flex;
+ 	flex-direction: column;
+ 	gap: 5px;
+}
+
+.crew 
+{
+	display: flex;
+	gap: 10px;
+	justify-content: space-between;
+}
+
+.party-apply-wrap form 
+{
+  margin-bottom: 12px;
+}
+
+.apply-comment 
+{
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.party-apply-wrap button 
+{
+  width: 100%;
+  border-radius: 5px;
+}
+
+</style>
+
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -15,25 +118,65 @@
 		<div class="ne-container">
 			<div class="container">
 				
-				<div class="info">
+				<div class="party-info-wrap">
 					
-					<span>테마이미지</span><br>
-					<span>테마명</span><br>
-					<span>최소인원</span><br>
-					<span>최대인원</span><br>
-					<span>예약시간</span><br>
-					<span>파티명</span><br>
-					<span>성별조건</span><br>
-					<span>개설일</span><br>
-					<span>현재파티원</span><br>
-					<span>한마디</span><br>
-					<span>파티상태</span><br>
+					<span class="title">파티 정보</span>
+					<hr>
 					
-					<input type="text" name="comment" placeholder="신청 메시지"><br>
-					<button type="button">신청하기</button> or
-					<button type="button">취소하기</button>
+					<div class="party-name">
+						<span>주열룸</span>
+					</div>
 					
-				</div>
+					<div class="theme-info">
+						<span>우주별&nbsp;&nbsp;</span>
+						<span>그레이&nbsp;&nbsp;</span>
+						<span>2026-06-01&nbsp;&nbsp;</span>
+						<span>18:00&nbsp;&nbsp;</span>
+						<span>2명 ~ 4명</span>
+					</div>
+					
+					<div class="party-condition">
+						<span>성별 동성/무관</span>
+						<span>미쿠 좋아하는 사람만 오셈</span>						
+					</div> 
+					
+					<div class="party-crew">
+					
+						<span>파티 현황</span>
+						
+						<div class="crew">
+							<span>윤주열</span>
+							<span>29세</span>
+							<span>남자</span>
+							<span>🌡️36.5</span>
+							<span class="ne-st ne-st-green">파티장</span>
+						</div>
+						
+						<div class="crew">
+							<span>김주열</span>
+							<span>29세</span>
+							<span>남자</span>
+							<span>🌡️36.5</span>
+							<span class="ne-st ne-st-blue">파티원</span>
+						</div>
+					</div> 
+					
+				</div> <!-- .party-info-wrap -->
+				
+				<div class="party-apply-wrap">
+					
+					<span class="title">파티 신청</span>
+					<hr>
+					
+					<form action="" name="party-apply-form" method="post">
+						
+						<input type="text" class="apply-comment" placeholder="신청 메시지" name="applyComment">
+						<input type="hidden" value="partyId" name="partyId">
+					</form>
+					 
+					<button type="button" class="btn btn-primary" onclick="partyApply()">신청하기</button>
+					 
+				</div> <!-- .party-apply-wrap -->
 				
 			</div>
 		</div>

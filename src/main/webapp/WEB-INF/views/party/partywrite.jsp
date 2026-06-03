@@ -10,24 +10,65 @@
 
 <style type="text/css">
 
-.write
+.container 
 {
-	background-color: white;
-	width: 40%;
-	margin: 0 auto;     
-	padding: 30px;     
-	margin-top: 30px;
+  width: 500px;
+  margin-top: 40px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border: 1px solid black;
+  border-radius: 8px;
 }
 
-form[name='writeForm'] 
-{  
-	margin: 0 auto;
-	text-align: center;
+.title-wrap .title 
+{
+  font-size: 22px;
+  font-weight: bold;
 }
 
-.write table 
+.title-wrap hr 
 {
-	margin: 0 auto;
+  border-top: 1px solid #ccc;
+}
+
+.theme-info-wrap 
+{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 5px;
+}
+
+.write-wrap form 
+{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.write-wrap span 
+{
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.write-wrap input[type="text"] 
+{
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.wrtie-btn 
+{
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 5px;
 }
 
 </style>
@@ -40,60 +81,37 @@ form[name='writeForm']
 		<div class="ne-container">
 			<div class="container">
 				
-				<div class="write">
-					
-					<form action="" name="writeForm">
-						
-						<table>
-							<tr>
-								<th>카페명</th>
-								<td>
-									바인딩 한 카페명
-								</td>
-							</tr>
-							<tr>
-								<th>테마명</th>
-								<td>
-									바인딩한 테마명
-								</td>
-							</tr>
-							<tr>
-								<th>예약일시</th>
-								<td>
-									바인딩한 일시
-								</td>							
-							</tr>
-							<tr>
-								<th>파티명</th>
-								<td>
-									<input type="text" name="partyName">
-								</td>							
-							</tr>
-							<tr>
-								<th>성별 조건</th>
-								<td>
-									<label>
-										<input type="radio" value="0" name="gender" checked="checked"> 무관
-									</label>
-									<label>
-										<input type="radio" value="1" name="gender"> 동성
-									</label>
-								</td>
-							</tr>
-							<tr>
-								<th>한마디</th>
-								<td>
-									<input type="text" name="partyComment">
-								</td>
-							</tr>
-						</table>
-						
-						<br>
-						
-						<button type="button">개설하기</button>
-						 
+				<div class="title-wrap">
+					<span class="title">파티 개설</span>
+					<hr>
+				</div>
+				
+				<div class="theme-info-wrap">
+					<span>카페명 : 우주별</span>	
+					<span>테마명 : 그레이</span>
+					<span>날짜 : 2026-06-01</span>
+					<span>시간 : 18:00</span>
+					<span>인원수 : 2 ~ 4</span>
+					<span>가격 : 30000</span>
+				</div>
+				
+				<div class="write-wrap">
+					<form action="" class="write-form" method="post">
+						<span>파티명</span>
+						<input type="text" name="partyname">
+						<label>
+						<span>동성만</span>
+						<input type="checkbox" name="genderCondition">
+						</label>
+						<span>방장 한마디</span>
+						<input type="text" name="partyComment">
+						<input type="hidden" value="slotId" name="slotId">
 					</form>
-					
+				</div>
+				
+				<div class="wrtie-btn">
+					<button type="button" class="btn btn-primary" onclick="partyWrite()">파티 개설</button>				
+					<button type="button" class="btn btn-outline-primary" onclick="window.location.href='${path}/theme/list'">취소하기</button>
 				</div>
 				
 			</div>

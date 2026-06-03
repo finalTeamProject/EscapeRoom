@@ -5,17 +5,8 @@
 	padding: 20px;
 	box-sizing: border-box;
 }
-.title{
-	font-size: 20px;
-	font-weight: bold;
-	margin-bottom: 10px;
-	color: #333;
-}	
 
-.inputBox{
-	margin-bottom: 15px;
-	
-}
+
 
 .resList{
 	width: 100%;
@@ -25,9 +16,50 @@
 	padding: 20px 30px;
 	box-sizing: border-box;
 	border-radius: 5px;
+	position: relative;
+}
+
+.inputBox{
+	margin-bottom: 15px;
+	position: absolute;
+	top: 20px;
+	right: 10px;
+	
+}
+
+.inputBox .ne-box{
+	
+	margin-left: 10px;
+	width: 150px;
+	padding-left: 10px;
 }
 
 .cancle{
 	background-color: #eee;
 	color: #999;
 }
+
+.resWrap .ne-table tbody tr.cancle:hover td{
+	background-color: #eee;
+}
+
+.resWrap .ne-table{
+	margin-top: 50px;
+}
+
+.ne-table th{
+	text-align: center;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
