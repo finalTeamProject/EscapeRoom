@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.AdminMapper">
+
+	<select id="findByLoginId" parameterType="string" resultType="com.noexit.app.model.Admin">
+		SELECT ADMIN_ID,
+		       LOGIN_ID,
+		       CRYPTPACK.DECRYPT(PASSWORD, '12341234') AS PASSWORD
+		FROM ADMIN_ACCOUNT
+		WHERE LOGIN_ID = #{loginId}
+	</select>
+
+</mapper>
