@@ -39,7 +39,7 @@
 		<div class="nav-right">
 			<ul class="d-flex m-0 gap-3">
 				<li><a href="#">CAFE</a></li>
-				<li><a href="#">LOGIN</a></li>
+				<li><a href="${pageContext.request.contextPath }/user/login">LOGIN</a></li>
 			</ul>
 		</div>
 	</header>
