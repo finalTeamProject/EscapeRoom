@@ -1,0 +1,14 @@
+package com.noexit.app.model;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class ThemeSlotDTO
+{
+	private long slotId;
+	private String resDate;
+	private String resTime;
+	private String status;
+}

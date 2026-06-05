@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.ThemeMapper">
+
+<!-- 
+		List<GenreDTO> getGenreList();
+		List<Cafe> getCafeList(long userId);
+		int themeInsert(ThemeDTO dto);
+		int themeUpdate(ThemeDTO dto);
+		int themeDelete(long themeId);
+		
+		↓ 아래 메소드는 작성함
+		
+		ThemeDTO getThemeById(long themeId);
+		List<ThemeDTO> getThemeList(Map<String, Object> map);
+		List<ThemeSlotDTO> getThemeSlot(long themeId);
+		List<ThemeReviewDTO> getThemeReview(long themeId);
+ -->
+ 	
+ 	<!-- 
+ 		
+ 		
+ 		명철님 남은거 여기다 작성하세요 
+ 		
+ 		
+ 	-->
+ 	
+ 	
+ 	
+ 	
+ 	<sql id="where-list">	
+ 		<![CDATA[
+			(INSTR(${schType},#{kwd}) > 0) 			
+ 		]]>		 		
+ 	</sql>
+ 	
+ 	<!-- 테마 정보 가져오기 -->
+ 	<select id="getThemeById" parameterMap="long" resultMap="com.noexit.app.model.ThemeDTO">
+		SELECT A.ROOM_ID themeId, A.ROOM_IMG imagePath, B.CAFE_NAME cafeName
+		, B.ADDRESS || ' ' || B.ADDRESS_DETAIL cafeLocation, B.PHONE cafePhone
+		, A.ROOM_NAME themeName, C.GENRE_NAME genre, A.DURATION duration
+		, A.DIFFICULTY difficulty, A.HORROR_GRADE horror, A.ACTIVITY_GRADE activity
+		, A.PRICE price, A.IS_ADULT adult, A.MIN_PLAYERS minPlayers
+		, A.MAX_PLAYERS maxPlayers, A.ROOM_DESC description
+		FROM ROOM A
+		JOIN CAFE B
+		ON A.CAFE_ID = B.CAFE_ID
+		JOIN ROOM_GENRE C
+		ON A.GENRE_ID = C.GENRE_ID
+		WHERE A.ROOM_ID = #{themeId}
+ 	</select>
+ 	
+ 	<!-- 테마 목록 가져오기 (리스트) -->
+ 	<select id="getThemeList" parameterType="map" resultType="com.noexit.app.model.ThemeDTO">
+ 		SELECT A.ROOM_ID themeId, A.ROOM_IMG themeImage, A.ROOM_NAME name
+ 		, B.GENRE_NAME genre, A.DURATION duration, A.DIFFICULTY difficulty
+ 		, A.HORROR_GRADE horror, A.MIN_PLAYERS minPlayers, A.MAX_PLAYERS maxPlayers
+		FROM ROOM A
+		JOIN ROOM_GENRE B
+		ON A.GENRE_ID = B.GENRE_ID 
+ 		<where>
+	 		<if test="kwd != null and kwd != ''">
+	 			<include refid="where-list"></include>
+	 		</if>
+	 		AND A.ROOM_ID > #{lastId}
+ 		</where>
+ 		ORDER BY A.ROOM_ID	DESC
+ 	</select>
+ 
+ 	<!-- 하나의 테마의 슬롯 현황 가져오기 -->
+ 	<select id="getThemeSlot" parameterType="long" resultType="com.noexit.app.model.ThemeSlotDTO">
+ 		SELECT RES_OPEN_ID,TO_CHAR(OPEN_AT,'YYYY-MM-DD') as resDate, TO_CHAR(OPEN_AT, 'HH24:MI') as resTime , FN_RESERVATION_CHECK(RES_OPEN_ID) AS status
+		FROM RES_OPEN
+		WHERE ROOM_ID = 1
+		ORDER BY OPEN_AT ASC
+ 	</select>
+ 
+ 	<!-- 하나의 테마의 리뷰 리스트 가져오기 -->
+ 	<select id="getThemeReview" parameterMap="long" resultType="com.noexit.app.model.ThemeReviewDTO">	
+ 		SELECT C.NICKNAME name, A.SATISFACTION satisfaction, A.DIFFICULTY difficulty
+ 		, A.HORROR horror, A.ACTIVITY activity, A.IMMERSION immersion, A.REVIEW_COMMENT comment
+		FROM REVIEW A
+		JOIN ATTENDANCE_DETAIL B
+		ON A.DETAIL_ID = B.DETAIL_ID
+		JOIN USER_ACCOUNT C
+		ON B.USER_ID = C.USER_ID
+ 		JOIN ATTENDANCE D
+		ON B.ATTENDANCE_ID = D.ATTENDANCE_ID
+		JOIN RESERVATION E
+		ON D.RESERVATION_ID = E.RESERVATION_ID
+		JOIN PARTY_ROOM F
+		ON E.PARTY_ID = F.PARTY_ID
+		JOIN RES_OPEN G
+		ON F.RES_OPEN_ID = G.RES_OPEN_ID
+		WHERE G.ROOM_ID = #{themeId}
+		ORDER BY A.REVIEW_ID DESC
+ 	</select>
+ 
+</mapper>

@@ -230,6 +230,11 @@
 						</div>
 						
 						<div class="info-item">
+							<span>활동도</span>
+							<span>★★★★☆</span>
+						</div>
+						
+						<div class="info-item">
 							<span>테마 가격</span>
 							<span>30000</span>
 						</div>
@@ -237,6 +242,11 @@
 						<div class="info-item">
 							<span>테마 인원</span>
 							<span>2 ~ 4</span>
+						</div>
+						
+						<div class="info-item">
+							<span>성인 전용</span>
+							<span>Y/N</span>
 						</div>
 						
 					</div>

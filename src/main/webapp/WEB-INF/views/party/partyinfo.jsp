@@ -17,14 +17,14 @@
   padding-bottom: 20px;
   gap: 20px;
   align-items: flex-start;
-}
+} 
 
 .party-info-wrap 
 {
   padding: 20px;
   border: 1px solid black;
   border-radius: 5px;
-  width: 50%
+  width: 60%;
 }
 
 .party-apply-wrap 
@@ -32,7 +32,7 @@
   padding: 20px;
   border: 1px solid black;
   border-radius: 5px;
-  width: 40%;
+  width: 30%;
 }
 
 .title 
@@ -172,6 +172,8 @@ hr
 						<span>2026-06-01&nbsp;&nbsp;</span>
 						<span>18:00&nbsp;&nbsp;</span>
 						<span>2명 ~ 4명</span>
+						<span>30000</span>
+						<span>예약 가능/예약 불가</span>
 					</div>
 					
 					<div class="party-condition">
