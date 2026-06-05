@@ -117,11 +117,11 @@
 
 	let schType = "${schType}";
 	let kwd = "${kwd}";
-	let lastId;
+	let lastId = 0;
 	let minPrice = "${minPrice}";
 	let maxPrice = "${maxPrice}";
-	let minScore = "${minScore}";
-	let maxScore = "${maxScore}";
+	let minLevel = "${minLevel}";
+	let maxLevel = "${maxLevel}";
 	let minHorror = "${minHorror}";
 	let maxHorror = "${maxHorror}";
 	
@@ -185,10 +185,10 @@
 						</div>
 						
 						<div class="filter-item">
-							<span>평점</span>
-							<input type="text" name="minScore" placeholder="최소 평점">
+							<span>레벨</span>
+							<input type="text" name="minLevel" placeholder="최소 난이도">
 							~
-							<input type="text" name="maxScore" placeholder="최대 평점"> 
+							<input type="text" name="maxLevel" placeholder="최대 난이도"> 
 						</div>
 						
 						<div class="filter-item">
@@ -233,7 +233,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							
@@ -280,7 +280,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							
@@ -327,7 +327,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							

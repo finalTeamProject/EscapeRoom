@@ -118,7 +118,7 @@
 	
 	let schType = '${schType}';
 	let kwd = "${kwd}";
-	let lastId;
+	let lastId = 0;
 	let minDate = "${minDate}";
 	let maxDate = "${maxDate}";
 	let minTime = "${minTime}";

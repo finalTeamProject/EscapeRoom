@@ -67,7 +67,7 @@ public class Theme
 	 * @return
 	 */
 	@PostMapping()
-	public String themeListItem(@RequestParam(name="schType", defaultValue = "cafeName") String schType
+	public String themeListData(@RequestParam(name="schType", defaultValue = "cafeName") String schType
 						  , @RequestParam(name="kwd", defaultValue = "") String kwd
 						  , @RequestParam(name="lastId", defaultValue = "0") long lastId
 						  , Model model)
@@ -76,6 +76,22 @@ public class Theme
 		 * 유효성 검사 목록
 		 *
 		 * 없음
+		 * 
+		 */ 
+		
+		/* 
+		 * 가져 와야하는 테마 정보는
+		 * 
+		 * 테마 번호
+		 * 테마 이미지 경로
+		 * 테마명
+		 * 테마 장르명
+		 * 테마 시간
+		 * 테마 난이도
+		 * 테마 공포도
+		 * 테마 최소 인원
+		 * 테마 최대 인원
+		 * 
 		 */
 
 		return "";
@@ -95,6 +111,42 @@ public class Theme
 		 * 유효성 검사 목록
 		 *
 		 * 존재하는 themeId 인가?
+		 * 
+		 */
+		
+		/*
+		 * 가져와야 하는 테마 정보
+		 * 
+		 * 테마 번호
+		 * 테마 이미지 경로
+		 * 카페명
+		 * 카페위치
+		 * 카페전화번호
+		 * 테마명
+		 * 테마 장르
+		 * 테마 시간
+		 * 난이도
+		 * 공포도
+		 * 활동도
+		 * 테마 가격
+		 * 최소 인원
+		 * 최대 인원
+		 * 테마 소개
+		 * 
+		 * 예약 슬롯 목록
+		 * 
+		 * 날짜 , 시간 , 슬롯 번호 
+		 * 
+		 * 리뷰 개수
+		 * 리뷰 목록
+		 * 
+		 * 작성자 
+		 * 만족도
+		 * 체감난이도
+		 * 체감공포도
+		 * 체감활동도
+		 * 몰입도
+		 * 코멘트
 		 */
 
 		return "theme/themeinfo";

@@ -22,7 +22,7 @@ public class Party
 	 * 파티 개설 폼으로 이동
 	 */
 	@GetMapping("write")
-	public String partyWrite(@RequestParam(name="slotId") long slotId, Model model)
+	public String partyWrite(@RequestParam(name="slotId", defaultValue = "0") long slotId, Model model)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -34,6 +34,19 @@ public class Party
 		 * 예약되지 않은 slodId 인가?
 		 * 
 		 * mode = "write" 전달
+		 * 
+		 */
+		
+		/*
+		 * 가져와야 하는 데이터
+		 * 
+		 * 카페명
+		 * 테마명
+		 * 날짜
+		 * 시간
+		 * 최소 인원
+		 * 최대 인원
+		 * 가격
 		 */
 		
 		return "party/partywrite";
@@ -56,6 +69,14 @@ public class Party
 		 * 존재하는 slotId 인가?
 		 * 
 		 * 예약되지 않은 slodId 인가?
+		 * 
+		 * 파티명 길이 
+		 * 
+		 * 파티코멘트 길이
+		 */
+		
+		/*
+		 * 가져올 데이터 없음
 		 */
 		
 		return "redirect:/party/board/1";
@@ -65,7 +86,7 @@ public class Party
 	 * 파티 리스트로 이동
 	 */
 	@GetMapping("list")
-	public String partyList(@RequestParam(name="schType", defaultValue = "themeName") String schType
+	public String partyListPage(@RequestParam(name="schType", defaultValue = "themeName") String schType
 						  , @RequestParam(name="kwd", defaultValue = "") String kwd
 						  , Model model)
 	{
@@ -75,7 +96,50 @@ public class Party
 			model.addAttribute("kwd", kwd);
 		}
 		
+		/*
+		 * 여유 되면 필터도 넣어야 하는데 머가 되게 많네?
+		 */
+		
 		return "party/partylist";
+	}
+	
+	/*
+	 * 파티 리스트 받아오기
+	 * 
+	 * AJAX 처리
+	 */
+	@PostMapping("list")
+	public String partyListData(@RequestParam(name="schType", defaultValue = "themeName") String schType
+							  , @RequestParam(name="kwd", defaultValue = "") String kwd
+							  , @RequestParam(name="lastId") long lastId
+							  , Model model)
+	{
+		/*
+		 * 유효성 검사 목록
+		 * 
+		 * 없음
+		 */
+		
+		/*
+		 * 가져와야 하는 데이터
+		 * 
+		 * 테마 번호
+		 * 테마 이미지 경로
+		 * 테마명
+		 * 날짜
+		 * 시간
+		 * 파티명
+		 * 평균 매너 온도
+		 * 평균 나이
+		 * 현재 인원 수 
+		 */
+		
+		if(!kwd.isBlank())
+		{
+			
+		}
+		
+		return "";
 	}
 	
 	/*
@@ -87,20 +151,46 @@ public class Party
 		/*
 		 * 유효성 검사 목록
 		 * 
-		 * 로그인 / 비로그인	비로그인이면 신청 버튼 비활성화
-		 * 
 		 * 존재하는 partId 인가?
 		 * 
-		 * 활성화된 파티인가?
+		 * active 상태인 파티인가?
 		 * 
+		 * 
+		 * 상태 : anonymous / crew / matching / idle
+		 * 
+		 * 로그인 / 비로그인	비로그인이면 신청 버튼 비활성화
 		 * 파티원 / 비파티원    파티원이면   신청 버튼 비활성화
+		 * 
 		 * 신청자 / 비신청자	신청자면     취소 버튼 활성화 
 		 *                      비신청자면   신청 버튼 활성화
 		 * 
 		 * 구분해서 바인딩
 		 */
 		
-		return "party/partydetail";
+		/*
+		 * 가져와야 하는 데이터 
+		 * 
+		 * 파티번호
+		 * 파티상태
+		 * 파티명
+		 * 카페명
+		 * 테마명
+		 * 날짜
+		 * 시간
+		 * 최소 인원
+		 * 최대 인원
+		 * 성별 조건
+		 * 파티 코멘트
+		 * 
+		 * 파티원 정보
+		 * 닉네임
+		 * 나이
+		 * 성별
+		 * 매너온도
+		 * 포지션(파티장/파티원)
+		 */
+		
+		return "party/partyinfo";
 	}
 	
 	/*
@@ -116,13 +206,19 @@ public class Party
 		 * 
 		 * 존재하는 파티인가?
 		 * 
-		 * 해산된 파티인가?
+		 * hidden 상태가 아닌 파티인가?
 		 * 
 		 * 파티장/파티원 인지?  	아니라면 partyList 로
 		 * 
 		 * 파티장/파티원 구분해서 바인딩
 		 * 
 		 * 파티 보드 활성화/비활성화 구분
+		 */
+		
+		/*
+		 * 가져와야 하는 데이터 
+		 * 없네? 
+		 * 죄다 AJAX 라서
 		 */
 		
 		return "party/partyboard";
@@ -141,11 +237,13 @@ public class Party
 		 * 
 		 * 존재하는 파티인가?
 		 * 
-		 * 활성화된 파티인가? 
+		 * active 상태인 파티인가? 
 		 * 
 		 * 파티장/파티원인지?   	맞다면 파티보드창으로
 		 * 
 		 * 이미 신청내역이 있는지?  있다면 파티정보창으로
+		 * 
+		 * 코멘트 길이 제한
 		 */
 		
 		/*
@@ -168,13 +266,28 @@ public class Party
 		 * 
 		 * 존재하는 파티인가?
 		 * 
-		 * 해산되지 않은 파티인가?
+		 * active/close 상태인 파티인가?
 		 * 
 		 * 파티장인가?
 		 * 
 		 * mode="update" 전달
 		 * 
 		 * 파티 정보 바인딩해서 전달
+		 */
+		
+		/*
+		 * 받아와야 하는 데이터
+		 * 
+		 * 카페명
+		 * 테마명
+		 * 날짜
+		 * 시간
+		 * 최소 인원 수
+		 * 최대 인원 수
+		 * 가격
+		 * 파티명
+		 * 성별 조건
+		 * 파티코멘트
 		 */
 		
 		return "party/partywrite";
@@ -194,11 +307,16 @@ public class Party
 		 * 
 		 * 존재하는 파티 인가?
 		 * 
-		 * 활성화된 파티 인가?
+		 * active/close 상태인 파티 인가?
 		 * 
 		 * 파티장인가?
 		 * 
 		 * 파티 해산 이후 리스트로 리다이렉트
+		 */
+		
+		/*
+		 * 받아올 데이터 
+		 * 없음
 		 */
 		
 		return "redirect:/party/list";
@@ -219,9 +337,14 @@ public class Party
 		 * 
 		 * 존재하는 파티 인가?
 		 * 
-		 * 활성화된 파티 인가?
+		 * active/close/fix 상태인 파티인가?
 		 * 
 		 * 파티장/파티원 인가?
+		 */
+		
+		/*
+		 * 받아올 데이터
+		 * 없음
 		 */
 		
 		return "";
@@ -246,6 +369,11 @@ public class Party
 		 * 댓글 작성자인가?
 		 */
 		
+		/*
+		 * 받아올 데이터
+		 * 없음
+		 */
+		
 		return "";
 	}
 	
@@ -263,9 +391,16 @@ public class Party
 		 * 
 		 * 존재하는 파티 인가?
 		 * 
-		 * 활성화된 파티 인가?
+		 * 레디를 하지 않은 상태인가?
+		 * 
+		 * active/close 상태인 파티 인가?
 		 * 
 		 * 파티원 인가?
+		 */
+		
+		/*
+		 * 받아올 데이터
+		 * 없음
 		 */
 		
 		return "";
@@ -285,11 +420,16 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * 활성화된 파티인가?
+		 * active/close 상태인 파티인가?
 		 * 
 		 * 현재 파티원인가?
 		 * 
 		 * 파티장인가?
+		 */
+		
+		/*
+		 * 받아올 데이터
+		 * 없음
 		 */
 		
 		return "";
@@ -313,11 +453,16 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * 활성화된 파티인가?
+		 * active/close 상태인 파티인가?
 		 * 
 		 * 현재 파티원인가?
 		 * 
 		 * 자기자신인가?
+		 */
+		
+		/*
+		 * 받아올 데이터
+		 * 없음
 		 */
 		
 		return "";
@@ -340,13 +485,15 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * 활성화된 파티인가?
+		 * active 상태인 파티인가?
 		 * 
 		 * 현재 파티원이 아닌가?
 		 * 
-		 * 최대 인원 미만인가?
-		 * 
 		 * 파티장인가?
+		 */
+		
+		/*
+		 * 받아올 데이터 없음
 		 */
 		
 		return "";
@@ -369,11 +516,92 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * 활성화된 파티인가?
+		 * active/close/fix 상태인 파티인가?
 		 * 
 		 * 현재 파티원이 아닌가?
 		 * 
 		 * 파티장인가?
+		 */
+		
+		/*
+		 * 받아올 데이터
+		 * 없음
+		 */
+		
+		return "";
+	}
+	
+	/*
+	 * 파티 정보를 바인딩해서 전달하는 메소드
+	 * ㅈㄴ 바쁜 메소드
+	 * 
+	 * AJAX 처리
+	 */
+	@PostMapping("data/{partyid}")
+	public String partyData(@PathVariable(name="partyid") long partyId)
+	{
+		/*
+		 * 유효성 검사 목록
+		 * 
+		 * 로그인 했는가?
+		 * 
+		 * 존재하는 파티인가?
+		 * 
+		 * 파티 상태가 hidden 이 아닌가?
+		 * 
+		 * 파티장/파티원 인가?
+		 */
+		
+		/*
+		 * 받아올 데이터 
+		 * 
+		 * 
+		 * 파티 정보
+		 * 
+		 * 슬롯 상태 : 가능 / 불가능
+		 * 
+		 * 파티 상태
+		 * 파티명
+		 * 카페명
+		 * 테마명
+		 * 날짜
+		 * 시간
+		 * 최소인원
+		 * 최대인원
+		 * 성별조건
+		 * 파티코멘트
+		 * 
+		 * 
+		 * 파티원 정보
+		 * 
+		 * 닉네임
+		 * 나이
+		 * 성별
+		 * 매너온도
+		 * 레디상태
+		 * 포지션
+		 * 상태
+		 * 
+		 * 
+		 * 파티 댓글 정보
+		 * 
+		 * 댓글 번호
+		 * 작성자
+		 * 작성 내용
+		 * 삭제 유무
+		 * 
+		 * 
+		 * 파티 신청
+		 * 
+		 * 닉네임
+		 * 나이
+		 * 성별
+		 * 매너온도
+		 * 신청 코멘트
+		 * 상태
+		 * 
+		 * 
+		 * 
 		 */
 		
 		return "";
