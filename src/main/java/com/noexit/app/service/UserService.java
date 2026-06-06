@@ -9,4 +9,5 @@ public interface UserService {
 	public int countByLoginId(String loginId); // 중복 확인
 	public User login(User user);
 	public String findRole(Long userId);
+	public User selectByLoginId(String loginId);
 }

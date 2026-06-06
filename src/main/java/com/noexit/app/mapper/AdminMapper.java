@@ -7,6 +7,6 @@ import com.noexit.app.model.Admin;
 @Mapper
 public interface AdminMapper {
 	
-	Admin findByLoginId(String loginId);
+	public Admin findByLoginId(String loginId);
 
 }

@@ -30,7 +30,14 @@ $(function(){
 			$("#loginId").focus();
 			return;
 		}
-		
+
+		if (!/^(?=.*[a-zA-Z])[a-zA-Z0-9]{6,15}$/.test(loginId)) {
+			$("#error").html("아이디는 6~15자 영문+숫자(영문 1자 이상 필수)로 입력해주세요.")
+			           .css({color: "red", display: "inline"});
+			$("#loginId").focus();
+			return;
+		}
+
 		  $("#loginId").on("input", function(){
 		      if (isIdChecked) {
 		          isIdChecked = false;
@@ -69,6 +76,72 @@ $(function(){
 			$("#idChkBtn").focus();
 			return;
 		}
+
+		// 비밀번호 8자 이상
+		let pw = $("#password").val();
+		if (pw.length < 8) {
+			$("#error").html("비밀번호는 8자 이상이어야 합니다.")
+			           .css({color: "red", display: "inline"});
+			$("#password").focus();
+			return;
+		}
+
+		// 비밀번호 확인 일치
+		if (pw !== $("#passwordConfirm").val()) {
+			$("#error").html("비밀번호가 일치하지 않습니다.")
+			           .css({color: "red", display: "inline"});
+			$("#passwordConfirm").focus();
+			return;
+		}
+
+		// 닉네임 2~10자
+		let nick = $("#nickName").val().trim();
+		if (nick.length < 2 || nick.length > 10) {
+			$("#error").html("닉네임은 2~10자로 입력해주세요.")
+			           .css({color: "red", display: "inline"});
+			$("#nickName").focus();
+			return;
+		}
+
+		// 이름 필수
+		if ($("#name").val().trim() === "") {
+			$("#error").html("이름을 입력해주세요.")
+			           .css({color: "red", display: "inline"});
+			$("#name").focus();
+			return;
+		}
+
+		// 이메일 형식
+		if (!/^[\w.+-]+@[\w-]+(\.[\w-]+)+$/.test($("#email").val().trim())) {
+			$("#error").html("올바른 이메일 형식이 아닙니다.")
+			           .css({color: "red", display: "inline"});
+			$("#email").focus();
+			return;
+		}
+
+		// 연락처 11자리 숫자
+		if (!/^\d{11}$/.test($("#phone").val().trim())) {
+			$("#error").html("연락처는 11자리 숫자만 입력해주세요.")
+			           .css({color: "red", display: "inline"});
+			$("#phone").focus();
+			return;
+		}
+
+		// 성별 필수
+		if ($("input[name='gender']:checked").length === 0) {
+			$("#error").html("성별을 선택해주세요.")
+			           .css({color: "red", display: "inline"});
+			return;
+		}
+
+		// 생년월일 필수
+		if ($("#birthDate").val() === "") {
+			$("#error").html("생년월일을 선택해주세요.")
+			           .css({color: "red", display: "inline"});
+			$("#birthDate").focus();
+			return;
+		}
+
 		$("#signUpForm").submit();
 	});
 });
@@ -99,6 +172,11 @@ $(function(){
 			<div class="mb-3">
 				<label for="password" class="form-label">비밀번호<span class="form-required">*</span></label>
 				<input type="password" id="password" name="password" class="form-control" placeholder="8자 이상">
+			</div>
+
+			<div class="mb-3">
+				<label for="passwordConfirm" class="form-label">비밀번호 확인<span class="form-required">*</span></label>
+				<input type="password" id="passwordConfirm" class="form-control" placeholder="비밀번호 한 번 더 입력">
 			</div>
 
 			<div class="mb-3">

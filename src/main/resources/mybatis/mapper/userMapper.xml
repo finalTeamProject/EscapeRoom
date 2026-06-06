@@ -35,6 +35,12 @@
       AND PASSWORD = CRYPTPACK.ENCRYPT(#{password}, '12341234')
 </select>
 
+<select id="findByLoginId" parameterType="string" resultType="com.noexit.app.model.User">
+      SELECT USER_ID, LOGIN_ID, NICKNAME, CREATED_AT
+      FROM USER_ACCOUNT
+      WHERE LOGIN_ID = #{loginId}
+</select>
+
 <select id="countCafeByUserId" parameterType="long" resultType="int">
       SELECT COUNT(*) FROM CAFE WHERE USER_ID = #{userId}
 </select>

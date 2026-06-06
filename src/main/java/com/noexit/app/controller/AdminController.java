@@ -40,6 +40,7 @@ public class AdminController {
 
 		session.setAttribute("loginAdmin", dto);
 		session.setAttribute("role", "ADMIN");
+		
 		return "redirect:/";
 	}
 
@@ -47,7 +48,9 @@ public class AdminController {
 	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 		session.invalidate();
-		return "redirect:/";
+		//세션 삭제
+		
+		return "redirect:/admin/login";
 	}
 
 }
