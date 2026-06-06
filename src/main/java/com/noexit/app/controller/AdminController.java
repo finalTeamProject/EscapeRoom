@@ -50,4 +50,19 @@ public class AdminController {
 		return "redirect:/";
 	}
 
+	// admin/main 테스트용
+	@GetMapping("/main")
+	public String adminMain(HttpSession session, Model model) {
+
+		
+		return "admin/main";
+	}
+	
+	@GetMapping("/cafelist")
+	public String adminUserList() {
+		
+		return "admin/list";
+	}
+	
+	
 }

@@ -57,31 +57,14 @@
 	}
 
 
+
+
 </style>
 
 </head>
 <body>
-	<header class="ne-header d-flex justify-content-around align-items-center bg-white shadow-sm">
-		<div class="nav-left">
-			<ul class="d-flex m-0 gap-3">
-				<li><strong>관리자 페이지</strong></li>
-			</ul>
-		</div>
-		
-		<div class="logo">
-			<h1 class="m-0">
-				<a href="${pageContext.request.contextPath }/" class="no-hover">
-					<img src="${pageContext.request.contextPath }/dist/images/logo.png" alt="로고이미지" style="height: 40px;" />
-				</a>
-			</h1>
-		</div>
-		<div class="nav-right">
-			<ul class="d-flex m-0 gap-3">
-				<li><a href="${pageContext.request.contextPath }/admin/login">LOGOUT</a></li>
-			</ul>
-		</div>
-	</header>
 
+<%@ include file="/WEB-INF/views/common/adminHeader.jsp" %>
 
 
 <div class="left-sidebar-wrapper">
@@ -89,69 +72,52 @@
 		
 		
 		<div class="ne-side-nav-section">관리자 메뉴</div>
-		<a href="/mypage/record" id="record" class="">카페 조회 및 숨김</a>
+		<a href="/admin/cafelist" id="record" class="">카페 조회 및 숨김</a>
 		<a href="/mypage/party" id="party"  class="">테마 · 리뷰 조회 및 숨김</a>
 		<a href="/mypage/reservations" id="reservations"  class="">전체 회원 목록 조회</a>
-		<a href="/" id="home">홈으로</a>	
 	</nav>
 	
-	<div class ="ne-sc"><!-- 메인 섹션 구성 -->
-	
-		<div class="ne-card ne-card-accent">
-			<div class="ne-sc-title">
-				<h3 class="m-0 mb-1 fw-bold" style="padding:10px;" >최근 개설 카페 요약</h3>
-			</div>
-			<div class= "card-flex">
-				<div class= "ne-card">
-					<h4 class = "cafe-name">카페명 바인딩</h4>			
-				</div>
-				<div class= "ne-card">
-					<h4 class = "cafe-name">카페명 바인딩</h4>			
-				</div>
-				<div class= "ne-card">
-					<h4 class = "cafe-name">카페명 바인딩</h4>			
-				</div> 			
-			</div>
-		</div>
-		
+	<div class ="ne-sc"><!-- 메인 섹션 -->
 
-		<div class="ne-card ne-card-accent">
+		
+		<div class="card-flex justify-content-center gap-3 w-100" style="padding: 10px;">
 			
-			<div class="ne-cafe-count ne-count">
-				<div class="ne-sc-title">
-					<h3 class="m-0 mb-1 fw-bold" style="padding:10px;" >전체 테마 수</h3>
+			<div class="ne-card ne-card-accent ne-count" style="border-color: #afdcf1; text-align: center; width: 33.33% !important;">
+				<div class="ne-sc-title justify-content-center" style="border-bottom: 1px solid #afdcf1;">
+					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 테마 수</div>
 				</div>
-				<div class="ne-cafe-count" style="border-color: red; width: 50px; height: 50px;">
-					으아아아아
+				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
+					전
 				</div>
 			</div>
 			
-			<div class="ne-theme-count ne-count">
-				<div class="ne-sc-title">
-					<h3 class="m-0 mb-1 fw-bold" style="padding:10px;" >전체 카페 수</h3>
+			<div class="ne-card ne-card-accent ne-count" style="border-color: #ffcedc; text-align: center; width: 33.33% !important;">
+				<div class="ne-sc-title justify-content-center" style="border-bottom: 1px solid #ffcedc;">
+					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 카페 수</div>
+				</div>
+				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
+					전체 카페 수
 				</div>
 			</div>
 			
-			<div class="ne-theme-count ne-count">
-				<div class="ne-sc-title">
-					<h3 class="m-0 mb-1 fw-bold" style="padding:10px;" >전체 회원 수</h3>
+			<div class="ne-card ne-card-accent ne-count" style="border-color: #cee7c7; text-align: center; width: 33.33% !important;">
+				<div class="ne-sc-title justify-content-center" style="border-bottom: 1px solid #cee7c7;">
+					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 회원 수</div>
 				</div>
-			</div>	
+				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
+					전체 회원 수
+				</div>
+			</div>
+			
 		</div>
 	
-	</div><!-- 메인 섹션 구성 -->
+	</div>
 </div>
 
 
 
 
-
-
-
-
-
-
-	<%@ include file="/WEB-INF/views/common/footer.jsp" %>
+<%@ include file="/WEB-INF/views/common/footer.jsp" %>
 
 
 
