@@ -1,0 +1,113 @@
+SELECT USER
+FROM DUAL;
+
+
+
+-- 로그인한 유저의 예약 목록 뽑아오기 
+-- 사용자예약아이디, 카페아이디, 카페명, 테마아이디, 테마명, 예약인원, 파티장/파티장, 예약상태(예약중/플레이완료/예약취소)
+-- 예약오픈아이디, 예약오픈일시, 예약한날짜, 출석여부(출석완료/노쇼/출석미등록), 취소타입(취소완료/매장취소), 취소 일자
+/*
+SELECT VRA.RESERVATION_ID, VRA.CAFE_ID, VRA.CAFE_NAME, VRA.ROOM_ID, VRA.ROOM_NAME, VRA.TOTAL_MEMBER
+, CASE WHEN VRA.LEADER_ID = :USER_ID  -- 로그인 한 사용자 아이디 
+        THEN '파티장' ELSE '파티원' 
+      END AS PARTY_ROLE
+, CASE 
+    WHEN RC.RESERVATION_ID IS NOT NULL THEN '예약 취소' 
+    WHEN VRA.OPEN_AT < SYSDATE THEN  '플레이 완료'
+    ELSE '예약 중' 
+  END AS RES_STATUS
+, VRA.RES_OPEN_ID, VRA.OPEN_AT, VRA.BOOKED_AT
+, FN_GET_ATTEND_STATUS(VRA.RESERVATION_ID, :USER_ID) AS ATTEND_STATUS
+, CASE
+    WHEN RC.RESERVATION_ID IS NULL THEN NULL
+    WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) = 'USER' 
+        THEN '취소 완료'
+    WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) IN ('OWNER', 'MANAGER')
+        THEN '매장 취소'       
+    ELSE '알 수 없음' 
+        END AS CANCEL_TYPE
+, RC.CANCEL_AT AS CANCELED_AT
+FROM VW_RESERVATION_ALL VRA
+    LEFT JOIN RESERVATION_CANCEL RC
+    ON VRA.RESERVATION_ID = RC.RESERVATION_ID
+WHERE VRA.LEADER_ID = :USER_ID --로그인 한 사용자아이디
+    OR VRA.PARTY_ID IN (
+        SELECT PA.PARTY_ID
+        FROM PARTY_MEMBER PM 
+            JOIN PARTY_APPLY PA
+            ON PM.APPLY_ID = PA.APPLY_ID
+        WHERE PA.USER_ID = :USER_ID -- 로그인 한 사용자 아이디
+            AND NOT EXISTS(
+                            SELECT PK.MEMBER_ID
+                            FROM PARTY_KICK PK
+                            WHERE PK.MEMBER_ID = PM.MEMBER_ID
+                            )
+    );
+
+
+*/
+
+
+
+-- 예약 중/예약취소/플레이완료인 목록 가져오기
+SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, TOTAL_MEMBER
+    , PARTY_ROLE, RES_STATUS, RES_OPEN_ID, OPEN_AT, BOOKED_AT
+    , ATTEND_STATUS, CANCEL_TYPE, CANCELED_AT
+FROM (
+    SELECT VRA.RESERVATION_ID, VRA.CAFE_ID, VRA.CAFE_NAME, VRA.ROOM_ID, VRA.ROOM_NAME, VRA.TOTAL_MEMBER
+    , CASE WHEN VRA.LEADER_ID = :USER_ID  -- 로그인 한 사용자 아이디 
+            THEN '파티장' ELSE '파티원' 
+          END AS PARTY_ROLE
+    , CASE 
+        WHEN RC.RESERVATION_ID IS NOT NULL THEN '예약 취소' 
+        WHEN VRA.OPEN_AT_DT < SYSDATE THEN  '플레이 완료'
+        ELSE '예약 중' 
+      END AS RES_STATUS
+    , VRA.RES_OPEN_ID, VRA.OPEN_AT, VRA.BOOKED_AT
+    , FN_GET_ATTEND_STATUS(VRA.RESERVATION_ID, :USER_ID) AS ATTEND_STATUS
+    , CASE
+        WHEN RC.RESERVATION_ID IS NULL THEN NULL
+        WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) = 'USER' 
+            THEN '취소 완료'
+        WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) IN ('OWNER', 'MANAGER')
+            THEN '매장 취소'       
+        ELSE '알 수 없음' 
+            END AS CANCEL_TYPE
+    , RC.CANCEL_AT AS CANCELED_AT
+    FROM VW_RESERVATION_ALL VRA
+        LEFT JOIN RESERVATION_CANCEL RC
+        ON VRA.RESERVATION_ID = RC.RESERVATION_ID
+    WHERE VRA.LEADER_ID = :USER_ID --로그인 한 사용자아이디
+        OR VRA.PARTY_ID IN (
+            SELECT PA.PARTY_ID
+            FROM PARTY_MEMBER PM 
+                JOIN PARTY_APPLY PA
+                ON PM.APPLY_ID = PA.APPLY_ID
+            WHERE PA.USER_ID = :USER_ID -- 로그인 한 사용자 아이디
+                AND NOT EXISTS(
+                                SELECT PK.MEMBER_ID
+                                FROM PARTY_KICK PK
+                                WHERE PK.MEMBER_ID = PM.MEMBER_ID
+                                )
+        )
+)
+-- 분기 시 사용 
+WHERE RES_STATUS = '플레이 완료';
+WHERE RES_STATUS = '예약 중';
+WHERE RES_STATUS = '예약 취소';
+
+
+
+-- 카페의 예약 현황 목록
+SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, RES_OPEN_ID, OPEN_AT
+, RESERVATION_ID, LEADER_ID, LEADER_NAME, LEADER_PHONE, TOTAL_MEMBER
+FROM VW_RES_OPEN_BOOKED
+WHERE CAFE_ID = 내 카페아이디
+ORDER BY OPEN_AT
+;
+
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
+
+SELECT *
+FROM MESSAGE_DELETE;
+
