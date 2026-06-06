@@ -1,8 +1,6 @@
 $(function(){
 	
-	
-	
-	
+
 	$(".tabWrap .tab").click(function(){
 		
 		let idx = $(this).index();
