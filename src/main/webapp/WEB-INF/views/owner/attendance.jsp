@@ -10,21 +10,22 @@
 	href='${pageContext.request.contextPath }/dist/css/attendance.css' />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <script type="text/javascript">
-
+/*
 	function attendOk(num){
 		if(confirm('출석 처리 하시겠습니까?')){
-			//const url = "${pageContext.request.contextPath}/owner/attendance/check/" + num;
-			//location.href=url;
+			const url = "${pageContext.request.contextPath}/owner/attendance/check/" + num;
+			location.href=url;
 		}
 	}
 	
-	function noshowOk(num){
+	function noshowOk(userId){
 		if(confirm('노쇼 처리 하시겠습니까?')){
-			//const url = "${pageContext.request.contextPath}/owner/attendance/noshow/" + num;
-			//location.href=url;
+			let f = document.createElement('form');
+
+			f.submit();
 		}
 	}
-
+*/
 </script>
 </head>
 <body>
@@ -37,6 +38,9 @@
 			</aside>
 			<div class="col-md-10 resWrap">
 				<div class="title">출석 체크</div>
+				<c:if test="${not empty resultMessage}">
+					<div class="alert alert-info">${resultMessage}</div>
+				</c:if>
 				<div class="d-flex justify-content-between">
 					<div class="resList">
 						<div class="inputBox d-flex">
@@ -73,8 +77,8 @@
 									<td>2명</td>
 									<td><span class="status-wait">대기</span></td>
 									<td>
-										<button type="button" class="btn btn-primary" onclick="attendOk(1)">출석</button>
-										<button type="button" class="btn ne-btn-deact" onclick="noshowOk(1)">노쇼</button>
+										<button type="button" class="btn btn-primary" onclick="attendOk()">출석</button>
+										<button type="button" class="btn ne-btn-deact" onclick="noshowOk()">노쇼</button>
 									</td>
 								</tr>
 								<tr>
@@ -103,8 +107,8 @@
 									<td>5명</td>
 									<td><span class="status-wait">대기</span></td>
 									<td>
-										<button type="button" class="btn btn-primary" onclick="attendOk(4)">출석</button>
-										<button type="button" class="btn ne-btn-deact" onclick="noshowOk(4)">노쇼</button>
+										<button type="button" class="btn btn-primary" onclick="attendOk()">출석</button>
+										<button type="button" class="btn ne-btn-deact" onclick="noshowOk()">노쇼</button>
 									</td>
 								</tr>
 								<tr>
@@ -115,8 +119,8 @@
 									<td>2명</td>
 									<td><span class="status-wait">대기</span></td>
 									<td>
-										<button type="button" class="btn btn-primary" onclick="attendOk(5)">출석</button>
-										<button type="button" class="btn ne-btn-deact" onclick="noshowOk(5)">노쇼</button>
+										<button type="button" class="btn btn-primary" onclick="attendOk()">출석</button>
+										<button type="button" class="btn ne-btn-deact" onclick="noshowOk()">노쇼</button>
 									</td>
 								</tr>
 							</tbody>

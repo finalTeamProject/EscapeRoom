@@ -39,7 +39,10 @@
 		<div class="nav-right">
 			<ul class="d-flex m-0 gap-3">
 				<c:if test="${role == 'OWNER'}">
-					<li><a href="${pageContext.request.contextPath }/owner/res/open">CAFE</a></li>
+					<li><a href="${pageContext.request.contextPath }/owner/res/open">테마관리</a></li>
+				</c:if>
+				<c:if test="${role == 'MANAGER'}">
+					<li><a href="${pageContext.request.contextPath }/owner/attendance">출석체크</a></li>
 				</c:if>
 				<c:choose>
 					<c:when test="${not empty sessionScope.loginAdmin}">

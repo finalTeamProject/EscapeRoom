@@ -93,6 +93,9 @@ $(function(){
 			<div class="text-end mt-4">
 				<button type="submit" class="btn btn-primary">등록 신청</button>
 				<button type="button" class="btn btn-outline-primary" onclick="history.back()">취소</button>
+				   	<c:if test="${not empty errorMessage}">
+       				 <div class="text-danger">${errorMessage}</div>
+    			   </c:if>
 				
 			</div>
 

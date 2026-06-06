@@ -14,6 +14,8 @@ import com.noexit.app.model.ThemeDTO;
 import com.noexit.app.model.ThemeReviewDTO;
 import com.noexit.app.model.ThemeSlotDTO;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +25,19 @@ import lombok.extern.slf4j.Slf4j;
 public class ThemeServiceImpl implements ThemeService {
 
 	private final ThemeMapper themeMapper;
+	private final ServletContext servletContext;
 
-	private final String uploadPath = "C:/escapeRoom/uploads/theme";
+	private String uploadPath;
+
+	@PostConstruct
+	public void init() {
+		uploadPath = servletContext.getRealPath("/uploads/theme");
+
+		File file = new File(uploadPath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+	}
 
 	@Override
 	public int themeInsert(ThemeDTO dto) throws Exception {

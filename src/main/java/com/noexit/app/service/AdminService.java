@@ -4,6 +4,6 @@ import com.noexit.app.model.Admin;
 
 public interface AdminService {
 
-	Admin login(Admin admin);
+	public Admin login(Admin admin);
 
 }

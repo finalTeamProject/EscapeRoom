@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.AttendanceMapper">
+
+	<update id="insertNoshow" statementType="CALLABLE" parameterType="com.noexit.app.model.Manner">
+		{ CALL SP_INSERT_NOSHOW(
+			#{userId,  mode=IN,  jdbcType=NUMERIC},
+			#{newTemp, mode=OUT, jdbcType=NUMERIC}
+		) }
+	</update>
+
+</mapper>

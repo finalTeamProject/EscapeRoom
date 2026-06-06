@@ -131,15 +131,18 @@
 				<div class="ne-hint">테마 메인에 노출될 포스터 이미지를 업로드하세요.</div>
 			</div>
 
+			<c:if test="${not empty errorMessage}">
+				<div class="text-danger mb-2">${errorMessage}</div>
+			</c:if>
 			<div class="text-end mt-4">
-				<button type="submit" class="btn btn-primary">등록 신청</button>
+				<button type="submit" class="btn btn-primary">등록</button>
 				<button type="button" class="btn btn-outline-primary" onclick="history.back()">취소</button>
 				
 			</div>
 
 		</form>
 	</div>
-</div>
+</div> <!-- class="container my-5" style="max-width: 720px;"  -->
 
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>
 
