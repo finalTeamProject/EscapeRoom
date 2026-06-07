@@ -12,9 +12,12 @@ public class MyReservationDTO {
 	private long reservationId;
 	private long cafeId;
 	private String cafeName;
+	private String cafeTel;
 	private long roomId;
 	private String roomName;
 	private int totalMember;
+	private long partyId;
+	private String partyName;
 	private String partyRole;
 	private String resStatus;
 	private long resOpenId;
