@@ -1,10 +1,13 @@
 package com.noexit.app.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.noexit.app.mapper.AdminMapper;
 import com.noexit.app.model.Admin;
 import com.noexit.app.model.AdminDashboard;
+import com.noexit.app.model.Cafe;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +34,19 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	
+	// 관리자 메인 대시보드 데이터 바인딩 메소드
 	@Override
 	public AdminDashboard getDashboardStats() {
 	    
-		
 		return mapper.getDashboardStats();
 	}
+	
+	// 카페 리스트 바인딩 메소드
+	@Override
+    public List<Cafe> getCafeList() {
+		
+        return mapper.getCafeList();
+    }
+	
+	
 }

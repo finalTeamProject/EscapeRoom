@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,6 +43,15 @@
 	
 	.table td {
 		vertical-align: middle;
+	}
+	
+	.active{
+		font-weight: bold;
+		background-color: #75ff91;
+		border-radius: 5px;
+	}
+	.hidden{
+	
 	}
 </style>
 
@@ -102,37 +112,39 @@
 				</thead>
 				<tbody>
 					<c:choose>
-						<c:when test="${not empty cafeList}">
-							<c:forEach var="cafe" items="${cafeList}">
+						<c:when test="${not empty list}">
+							<c:forEach var="cafe" items="${list}">
 								<tr>
 									<td>${cafe.cafeId}</td>
 									<td class="text-start fw-semibold px-3">${cafe.cafeName}</td>
-									<td>${cafe.brNo}</td>
 									<td>
-										<fmt:formatDate value="${cafe.createdAt}" pattern="yyyy-MM-dd" />
+										${fn:substring(cafe.brNo, 0, 3)}-${fn:substring(cafe.brNo, 3, 5)}-${fn:substring(cafe.brNo, 5, 10)}
 									</td>
 									<td>
-										<c:choose>
-											<c:when test="${cafe.status == 'ACTIVE'}">
-												<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">ACTIVE</span>
-											</c:when>
-											<c:otherwise>
-												<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">HIDDEN</span>
-											</c:otherwise>
-										</c:choose>
+										<fmt:formatDate value="${cafe.createdAt}"/>
 									</td>
 									<td>
-										<c:choose>
-											<c:when test="${cafe.status == 'ACTIVE'}">
-												<button type="button" class="btn btn-sm btn-outline-danger fw-semibold px-3" 
-														onclick="openHideModal('${cafe.cafeId}', '${cafe.cafeName}')">
-													숨김
-												</button>
-											</c:when>
-											<c:otherwise>
-												<span class="text-muted small">제어 불가</span>
-											</c:otherwise>
-										</c:choose>
+									    <c:choose>
+									        <c:when test="${cafe.status == '활성화'}">
+									            <span class="border active px-2 py-1">ACTIVE</span>
+									        </c:when>
+									        <c:otherwise>
+									            <span class="border hidden px-2 py-1">HIDDEN</span>
+									        </c:otherwise>
+									    </c:choose>
+									</td>
+									<td>
+									    <c:choose>
+									        <c:when test="${cafe.status == '활성화'}">
+									            <button type="button" class="btn btn-sm btn-outline-danger fw-semibold px-3" 
+									                    onclick="openHideModal('${cafe.cafeId}', '${cafe.cafeName}')">
+									                숨김
+									            </button>
+									        </c:when>
+									        <c:otherwise>
+									            <span class="text-muted small">제어 불가</span>
+									        </c:otherwise>
+									    </c:choose>
 									</td>
 								</tr>
 							</c:forEach>
@@ -176,7 +188,7 @@
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title fw-bold text-danger">카페 숨김(비활성화) 경고</h5>
+				<h5 class="modal-title fw-bold">카페 숨김(비활성화) 경고</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<form action="${pageContext.request.contextPath}/admin/cafe/hide" method="post">
