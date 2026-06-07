@@ -19,24 +19,102 @@ END;
 SELECT *
 FROM party
 
+-- 2. 전체 유저 매너온도 조회 뷰
+CREATE OR REPLACE VIEW VW_USER_MANNER AS
+SELECT 
+    U.USER_ID, 
+    NVL(FN_GET_MANNER(U.USER_ID), 36.5) AS MANNER_TEMP
+FROM USER_ACCOUNT U;
+
+SELECT * FROM VIEW_USER_MANNER;
+
+DROP VIEW VIEW_CAFE_DETAIL;
+
+
+-- 3. 관리자 메인 대시보드 요약
+SELECT 
+	        (SELECT COUNT(*) FROM CAFE) AS totalCafeCount,
+	        (SELECT COUNT(*) FROM USER_ACCOUNT) AS totalMemberCount,
+	        (SELECT COUNT(*) FROM ROOM) AS totalThemeCount
+FROM DUAL
 
 
 
--- 전체 유저 매너온도 조회
-SELECT USER_ID , FN_GET_MANNER(USER_ID) AS MANNER_TEMP
-FROM MANNER_HISTORY
-GROUP BY USER_ID
-order by user_id asc;
+-- 4. 카페 정보 뷰
+CREATE OR REPLACE VIEW VW_CAFE_DETAIL AS
+SELECT 
+    c.CAFE_ID, 
+    c.USER_ID, 
+    c.BR_NO, 
+    c.CAFE_NAME, 
+    c.PHONE, 
+    c.POSTAL_CODE, 
+    c.ADDRESS, 
+    c.ADDRESS_DETAIL, 
+    c.CREATED_AT,
+    (CASE 
+        WHEN d.CAFE_ID IS NOT NULL THEN '비활성화'
+        ELSE '활성화'
+    END) AS STATUS
+FROM CAFE c
+LEFT JOIN CAFE_DROP d ON c.CAFE_ID = d.CAFE_ID;
+    
+
+
+
+-- 5. 매너온도 상호평가 정산 프로시저
+CREATE OR REPLACE PROCEDURE PRC_EVA_MANNER_INSERT
+IS
+BEGIN
+    INSERT INTO MANNER_HISTORY (MANNER_HISTORY_ID, USER_ID, REASON_ID, SCORE, CREATED_AT)
+    SELECT 
+        MANNER_REASON_SEQ.NEXTVAL,
+        T.USER_ID,
+        2, 
+        T.TOTAL_SCORE,
+        SYSDATE
+    FROM 
+    (
+        SELECT 
+            AD.USER_ID,
+            SUM(CASE 
+                WHEN ME.ANSWER_ID = 1 THEN 0.1 
+                WHEN ME.ANSWER_ID = 2 THEN -0.3 
+                ELSE 0 
+            END) AS TOTAL_SCORE
+        FROM ATTENDANCE A
+        JOIN ATTENDANCE_DETAIL AD ON A.ATTENDANCE_ID = AD.ATTENDANCE_ID
+        JOIN MUTUAL_EVALUATION ME ON AD.DETAIL_ID = ME.DETAIL_ID
+        WHERE A.CREATED_AT <= SYSDATE - (4320 / 1440) 
+        
+        AND NOT EXISTS (
+            SELECT 1 FROM MANNER_HISTORY MH 
+            WHERE MH.REASON_ID = 2 
+            AND MH.CREATED_AT >= A.CREATED_AT + (4320 / 1440)
+        )
+        GROUP BY AD.USER_ID, AD.ATTENDANCE_ID
+    ) T;
+
+    COMMIT;
+END;
+
+
+-- 6.매너온도 상호평가 정산 스케쥴러
+BEGIN
+    DBMS_SCHEDULER.CREATE_JOB (
+        job_name        => 'JOB_MANNER_BATCH',
+        job_type        => 'STORED_PROCEDURE',
+        job_action      => 'PRC_EVAL_MANNER_INSERT',
+        start_date      => SYSTIMESTAMP,
+        repeat_interval => 'FREQ=HOURLY; INTERVAL=1', 
+        enabled         => TRUE
+    );
+END;
 
 
 
 
-
-
-
-
-
-
-
+SELECT *
+FROM MANNER_REASON;
 
 

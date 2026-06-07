@@ -18,7 +18,13 @@
 	        (SELECT COUNT(*) FROM USER_ACCOUNT) AS "totalMemberCount",
 	        (SELECT COUNT(*) FROM ROOM) AS "totalThemeCount"
 		FROM DUAL
-</select>
+	</select>
+
+	<select id="getCafeList" resultType="com.noexit.app.model.Cafe">
+	    SELECT * FROM VW_CAFE_DETAIL ORDER BY CAFE_ID DESC
+	</select>
+
+
 
 	
 </mapper>

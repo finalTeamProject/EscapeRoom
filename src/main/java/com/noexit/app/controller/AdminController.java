@@ -1,5 +1,7 @@
 package com.noexit.app.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.noexit.app.model.Admin;
 import com.noexit.app.model.AdminDashboard;
+import com.noexit.app.model.Cafe;
 import com.noexit.app.service.AdminService;
 
 import jakarta.servlet.http.HttpSession;
@@ -60,7 +63,6 @@ public class AdminController {
 			// 서비스 호출
 			AdminDashboard status = service.getDashboardStats();
 			
-			System.out.println("데이터 확인: " + status);
 			// status 적재
 			model.addAttribute("status", status);
 		
@@ -69,8 +71,15 @@ public class AdminController {
 	}
 	
 	@GetMapping("/cafelist")
-	public String adminUserList() {
+	public String adminUserList(HttpSession session, Model model) {
 		
+		// 서비스 호출
+		List<Cafe> list = service.getCafeList();
+		
+		// list 적재
+		model.addAttribute("list", list);
+		
+		// 뷰 리턴
 		return "admin/list";
 	}
 	
