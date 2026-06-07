@@ -35,6 +35,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return manner;
 	}
 
+
 	@Override
 	public List<AttendanceListDTO> selectListByOwnerUserId(Long ownerUserId) {
 
@@ -86,4 +87,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 		return dto;
 	}
+
+	
+	
+
 }

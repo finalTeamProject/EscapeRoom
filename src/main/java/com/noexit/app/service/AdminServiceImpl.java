@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.noexit.app.mapper.AdminMapper;
 import com.noexit.app.model.Admin;
+import com.noexit.app.model.AdminDashboard;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,4 +30,11 @@ public class AdminServiceImpl implements AdminService {
 		return result;
 	}
 
+	
+	@Override
+	public AdminDashboard getDashboardStats() {
+	    
+		
+		return mapper.getDashboardStats();
+	}
 }

@@ -3,6 +3,7 @@ package com.noexit.app.service;
 import java.util.List;
 import java.util.Map;
 
+import com.noexit.app.model.CancelMailDTO;
 import com.noexit.app.model.MyReservationDTO;
 
 public interface MyReservationService {
@@ -26,5 +27,12 @@ public interface MyReservationService {
 	public List<MyReservationDTO> canceledList(Map<String, Object> map);
 	
 	// 사용자 예약 취소 프로시저
+	public void cancelReservation(long reservationId, long userId) throws Exception;
+	
+	// 페이징 처리
+	public Map<String, Object> getReservationPageData(long userId, int currentTab, int currentPage, int size);
+	
+	// 예약 취소 메일 보낼 파티원 목록 조회
+	public List<CancelMailDTO> mailList(long reservationId);
 	
 }

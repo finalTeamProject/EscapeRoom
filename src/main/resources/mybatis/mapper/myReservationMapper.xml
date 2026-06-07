@@ -4,49 +4,47 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.noexit.app.mapper.MyReservationMapper">
 
-	<!-- 반복해서 사용할 조회 쿼리 SQL 조각 구성 -->
+
 	<sql id="myReservationQuery">
-		SELECT VRA.RESERVATION_ID, VRA.CAFE_ID, VRA.CAFE_NAME, VRA.ROOM_ID,
-		VRA.ROOM_NAME, VRA.TOTAL_MEMBER
-		, CASE WHEN VRA.LEADER_ID = #{userId}
-		THEN '파티장' ELSE '파티원'
-		END AS PARTY_ROLE
-		, CASE
-		WHEN RC.RESERVATION_ID IS NOT NULL THEN '예약 취소' 
-	        <![CDATA[
-	        	WHEN VRA.OPEN_AT_DT < SYSDATE THEN  '플레이 완료'
-	        ]]>
-		ELSE '예약 중'
-		END AS RES_STATUS
-		, VRA.RES_OPEN_ID, VRA.OPEN_AT, VRA.BOOKED_AT
-		, FN_GET_ATTEND_STATUS(VRA.RESERVATION_ID, #{userId}) AS ATTEND_STATUS
-		, CASE
-		WHEN RC.RESERVATION_ID IS NULL THEN NULL
-		WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) = 'USER'
-		THEN '취소 완료'
-		WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) IN
-		('OWNER', 'MANAGER')
-		THEN '매장 취소'
-		ELSE '알 수 없음'
-		END AS CANCEL_TYPE
-		, RC.CANCEL_AT AS CANCELED_AT
-		FROM VW_RESERVATION_ALL VRA
-		LEFT JOIN RESERVATION_CANCEL RC
-		ON VRA.RESERVATION_ID = RC.RESERVATION_ID
-		WHERE VRA.LEADER_ID = #{userId}
-		OR VRA.PARTY_ID IN (
-		SELECT PA.PARTY_ID
-		FROM PARTY_MEMBER PM
-		JOIN PARTY_APPLY PA
-		ON PM.APPLY_ID = PA.APPLY_ID
-		WHERE PA.USER_ID = #{userId}
-		AND NOT EXISTS(
-		SELECT PK.MEMBER_ID
-		FROM PARTY_KICK PK
-		WHERE PK.MEMBER_ID = PM.MEMBER_ID
-		)
-		)
+	  SELECT VRA.RESERVATION_ID, VRA.CAFE_ID, VRA.CAFE_NAME , VRA.PHONE
+		, VRA.ROOM_ID, VRA.ROOM_NAME, VRA.TOTAL_MEMBER
+		, VRA.PARTY_ID, VRA.PARTY_NAME
+    	, CASE WHEN VRA.LEADER_ID = #{userId}
+            THEN '파티장' ELSE '파티원' 
+          END AS PARTY_ROLE
+    	, CASE 
+        	WHEN VRA.CANCEL_AT IS NOT NULL THEN '예약 취소' 
+         	<![CDATA[WHEN VRA.OPEN_AT < SYSDATE THEN  '플레이 완료' ]]>
+        	ELSE '예약 중' 
+      	  END AS RES_STATUS
+    	, VRA.RES_OPEN_ID, VRA.OPEN_AT, VRA.BOOKED_AT
+    	, FN_GET_ATTEND_STATUS(VRA.RESERVATION_ID, #{userId}) AS ATTEND_STATUS
+    	, CASE
+        	WHEN VRA.CANCEL_AT IS NULL THEN NULL
+        	WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, VRA.CANCEL_USER, VRA.CANCEL_AT) = 'USER' 
+            	THEN '취소 완료'
+        	WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, VRA.CANCEL_USER, VRA.CANCEL_AT) IN ('OWNER', 'MANAGER')
+           		 THEN '매장 취소'       
+        	ELSE '알 수 없음' 
+          END AS CANCEL_TYPE
+    	, VRA.CANCEL_AT AS CANCELED_AT
+   	 FROM VW_RESERVATION_ALL VRA
+    WHERE VRA.LEADER_ID = #{userId}
+        OR VRA.PARTY_ID IN (
+			            SELECT PA.PARTY_ID
+			            FROM PARTY_MEMBER PM 
+			                JOIN PARTY_APPLY PA
+			                ON PM.APPLY_ID = PA.APPLY_ID
+			            WHERE PA.USER_ID = #{userId}
+			                AND NOT EXISTS(
+			                                SELECT PK.MEMBER_ID
+			                                FROM PARTY_KICK PK
+			                                WHERE PK.MEMBER_ID = PM.MEMBER_ID
+			                                )
+        )
+	
 	</sql>
+
 
 	<!-- 예약 중인 건 갯수 -->
 	<select id="bookedCount" parameterType="Long"
@@ -84,13 +82,14 @@
 	<!-- 예약 중인 목록 조회 -->
 	<select id="bookedList" parameterType="map"
 		resultType="com.noexit.app.model.MyReservationDTO">
-		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME,
-		OPEN_AT, TOTAL_MEMBER, PARTY_ROLE
+		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, PHONE AS CAFE_TEL, ROOM_ID, ROOM_NAME
+		, PARTY_ID, PARTY_NAME
+		, TO_CHAR(OPEN_AT,'YYYY-MM-DD HH24:MI') AS OPEN_AT , TOTAL_MEMBER, PARTY_ROLE
 		FROM (
 		<include refid="myReservationQuery" />
 		)
 		WHERE RES_STATUS = '예약 중'
-		ORDER BY OPEN_AT DESC
+		ORDER BY TO_DATE(OPEN_AT, 'YYYY-MM-DD HH24:MI') DESC
 		OFFSET #{offset} ROWS
 		FETCH FIRST #{size} ROWS ONLY
 
@@ -99,13 +98,14 @@
 	<!--플레이완료된 목록 조회 -->
 	<select id="doneList" parameterType="map"
 		resultType="com.noexit.app.model.MyReservationDTO">
-		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME,
-		OPEN_AT, ATTEND_STATUS
+		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, PHONE AS CAFE_TEL, ROOM_ID, ROOM_NAME
+		, PARTY_ID, PARTY_NAME
+		, TO_CHAR(OPEN_AT,'YYYY-MM-DD HH24:MI') AS OPEN_AT , ATTEND_STATUS
 		FROM (
 		<include refid="myReservationQuery" />
 		)
 		WHERE RES_STATUS = '플레이 완료'
-		ORDER BY OPEN_AT DESC
+		ORDER BY TO_DATE(OPEN_AT, 'YYYY-MM-DD HH24:MI') DESC
 		OFFSET #{offset} ROWS
 		FETCH FIRST #{size} ROWS ONLY
 	</select>
@@ -115,16 +115,97 @@
 	<select id="canceledList" parameterType="map"
 		resultType="com.noexit.app.model.MyReservationDTO">
 
-		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME,
-		OPEN_AT, CANCEL_TYPE, CANCELED_AT
+		SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, PHONE AS CAFE_TEL, ROOM_ID, ROOM_NAME
+		, PARTY_ID, PARTY_NAME
+		, TO_CHAR(OPEN_AT,'YYYY-MM-DD HH24:MI') AS OPEN_AT , CANCEL_TYPE
+		, TO_CHAR(CANCELED_AT, 'YYYY-MM-DD')
 		FROM (
 		<include refid="myReservationQuery" />
 		)
 		WHERE RES_STATUS = '예약 취소'
-		ORDER BY OPEN_AT DESC
+		ORDER BY TO_DATE(OPEN_AT, 'YYYY-MM-DD HH24:MI') DESC
 		OFFSET #{offset} ROWS
 		FETCH FIRST #{size} ROWS ONLY
+	</select>
+	
+	
+	<!-- 예약취소 프로시저 호출 -->
+	<update id="cancelReservation" statementType="CALLABLE">
+		{ CALL PRC_RESERVATION_CANCEL( #{userId}, #{reservationId})	}
+	</update>
+	
+	<!-- 예약 취소 메일 보낼 파티원 목록 조회 -->
+	<select id="mailList" resultType="com.noexit.app.model.CancelMailDTO" parameterType="Long">
+		SELECT PD.PARTY_ID, VRA.PARTY_NAME
+		, VRA.CAFE_ID, VRA.CAFE_NAME
+		, VRA.ROOM_ID, VRA.ROOM_NAME
+		, VRA.RES_OPEN_ID
+		, TO_CHAR(VRA.OPEN_AT, 'YYYY-MM-DD HH24:MI') AS OPEN_AT
+		, PA.USER_ID, UA.NICKNAME, UI.NAME, UI.EMAIL
+		FROM PARTY_DROP PD
+		    JOIN PARTY_APPLY PA
+		        ON PD.PARTY_ID = PA.PARTY_ID
+		    JOIN PARTY_MEMBER PM
+		        ON PA.APPLY_ID = PM.APPLY_ID
+		    JOIN USER_ACCOUNT UA 
+		        ON PA.USER_ID = UA.USER_ID
+		    JOIN USER_INFO UI
+		        ON UA.USER_ID = UI.USER_ID
+		    JOIN (
+		            SELECT PARTY_ID, PARTY_NAME, CAFE_ID, CAFE_NAME
+		                 , ROOM_ID, ROOM_NAME, RES_OPEN_ID, OPEN_AT
+		            FROM VW_RESERVATION_ALL
+		            WHERE RESERVATION_ID = #{reservationId}
+		        ) VRA ON VRA.PARTY_ID = PD.PARTY_ID
+		WHERE PD.PARTY_ID = (
+		        SELECT PARTY_ID FROM RESERVATION
+		        WHERE RESERVATION_ID = #{reservationId}
+		    ) AND PM.MEMBER_ID NOT IN( SELECT MEMBER_ID
+		                              FROM PARTY_KICK      
+		    )
+		UNION
+		SELECT PD.PARTY_ID, VRA.PARTY_NAME
+		, VRA.CAFE_ID, VRA.CAFE_NAME
+		, VRA.ROOM_ID, VRA.ROOM_NAME
+		, VRA.RES_OPEN_ID
+		, TO_CHAR(VRA.OPEN_AT, 'YYYY-MM-DD HH24:MI') AS OPEN_AT
+		, P.USER_ID, UA.NICKNAME, UI.NAME, UI.EMAIL
+		FROM PARTY_DROP PD
+		    JOIN PARTY P
+		        ON PD.PARTY_ID = P.PARTY_ID
+		    JOIN USER_ACCOUNT UA
+		        ON P.USER_ID = UA.USER_ID
+		    JOIN USER_INFO UI
+		        ON UA.USER_ID = UI.USER_ID
+		    JOIN (
+		            SELECT PARTY_ID, PARTY_NAME, CAFE_ID, CAFE_NAME
+		                 , ROOM_ID, ROOM_NAME, RES_OPEN_ID, OPEN_AT
+		            FROM VW_RESERVATION_ALL
+		            WHERE RESERVATION_ID = #{reservationId}
+		        ) VRA ON VRA.PARTY_ID = PD.PARTY_ID
+		WHERE PD.PARTY_ID = (
+		        SELECT PARTY_ID FROM RESERVATION
+		        WHERE RESERVATION_ID = #{reservationId}
+		    )
 	</select>
 
 
 </mapper> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

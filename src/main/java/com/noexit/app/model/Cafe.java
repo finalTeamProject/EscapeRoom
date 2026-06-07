@@ -20,5 +20,6 @@ public class Cafe {
 	private String address;
 	private String addressDetail;
 	private Date createdAt;
+	private String status;
 
 }

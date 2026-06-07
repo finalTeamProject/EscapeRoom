@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<!--발송 메일 스타일 적용을 위한 html  -->
+	<div style="font-family: sans-serif; max-width: 500px; margin: 0 auto;">
+		<h2>[NoExit] 예약 취소 안내</h2>
+		<p> <strong>{NAME}</strong>님의 참여하신 파티의 예약이 취소되었습니다.</p>
+		<table style="border-collapse: collapse; width: 100%;">
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5;">파티명</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{PARTY_NAME}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5;">테마</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{ROOM_NAME}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; border: 1px solid #ddd; background: #f5f5f5;">예약 일시</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{OPEN_AT}</td>
+            </tr>
+        </table>
+		 <p style="color: #888; font-size: 12px;">본 메일은 발신 전용입니다.</p>
+	</div>
+
+
+</body>
+</html>
