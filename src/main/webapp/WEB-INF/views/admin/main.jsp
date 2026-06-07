@@ -87,7 +87,7 @@
 					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 테마 수</div>
 				</div>
 				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
-					전
+					${status.totalThemeCount }개
 				</div>
 			</div>
 			
@@ -96,7 +96,7 @@
 					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 카페 수</div>
 				</div>
 				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
-					전체 카페 수
+					${status.totalCafeCount }개
 				</div>
 			</div>
 			
@@ -105,7 +105,7 @@
 					<div class="m-0 fw-bold fs-4" style="padding:20px;">전체 회원 수</div>
 				</div>
 				<div class="ne-cafe-count fw-bolder fs-1" style="min-height: 100px; padding: 25px 10px;">
-					전체 회원 수
+					${status.totalMemberCount }명
 				</div>
 			</div>
 			
@@ -115,11 +115,7 @@
 </div>
 
 
-
-
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>
-
-
 
 
 </body>

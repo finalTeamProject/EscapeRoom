@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.noexit.app.model.Admin;
+import com.noexit.app.model.AdminDashboard;
 import com.noexit.app.service.AdminService;
 
 import jakarta.servlet.http.HttpSession;
@@ -53,11 +54,17 @@ public class AdminController {
 		return "redirect:/admin/login";
 	}
 
-	// admin/main 테스트용
 	@GetMapping("/main")
 	public String adminMain(HttpSession session, Model model) {
-
 		
+			// 서비스 호출
+			AdminDashboard status = service.getDashboardStats();
+			
+			System.out.println("데이터 확인: " + status);
+			// status 적재
+			model.addAttribute("status", status);
+		
+		// 뷰 리턴
 		return "admin/main";
 	}
 	

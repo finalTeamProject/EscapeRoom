@@ -30,4 +30,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 		return manner;
 	}
+	
+	
 }
