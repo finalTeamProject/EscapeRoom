@@ -46,13 +46,13 @@ public class UserController {
 		return "user/findPw";
 	}
 
-	// 회원가입 폼 화면 (GET)
+	// 회원가입 폼
 	@GetMapping("/enroll")
 	public String enrollForm() {
 		return "user/enrollForm";
 	}
 
-	// 회원가입 처리 (POST)
+	// 회원가입 처리
 	@PostMapping("/enroll")
 	public String enroll(User user) {
 		try {
@@ -63,13 +63,13 @@ public class UserController {
 		return "redirect:/theme/list";
 	}
 
-	// 로그인 폼 화면 (GET)
+	// 로그인 폼
 	@GetMapping("/login")
 	public String loginForm() {
 		return "user/loginForm";
 	}
 
-	// 로그인 처리 (POST)
+	// 로그인 처리
 	@PostMapping("/login")
 	public String login(User user, HttpSession session, Model model) {
 

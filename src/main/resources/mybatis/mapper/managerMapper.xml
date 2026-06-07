@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.ManagerMapper">
+
+	<!-- 사장 소유 카페들의 활성 매니저 목록 (V_ACTIVE_MANAGER 뷰 사용) -->
+	<select id="selectActiveByOwnerUserId" parameterType="long" resultType="com.noexit.app.model.Manager">
+		SELECT *
+		  FROM V_ACTIVE_MANAGER
+		 WHERE OWNER_USER_ID = #{ownerUserId}
+		 ORDER BY CREATED_AT DESC
+	</select>
+
+	<!-- 매니저 등록 -->
+	<insert id="insertEnroll" parameterType="com.noexit.app.model.Manager">
+		INSERT INTO MANAGER_HISTORY (MANAGER_HISTORY_ID, CAFE_ID, USER_ID, REG_EVENT_ID)
+		VALUES (MANAGER_HISTORY_SEQ.NEXTVAL, #{cafeId}, #{userId}, 1)
+	</insert>
+
+	<!-- 매니저 해제 -->
+	<insert id="insertDeact" parameterType="com.noexit.app.model.Manager">
+		INSERT INTO MANAGER_HISTORY (MANAGER_HISTORY_ID, CAFE_ID, USER_ID, REG_EVENT_ID)
+		VALUES (MANAGER_HISTORY_SEQ.NEXTVAL, #{cafeId}, #{userId}, 2)
+	</insert>
+
+	<!-- USER가 활성 매니저인지 (V_ACTIVE_MANAGER 뷰 사용) -->
+	<select id="countActiveByUserId" parameterType="long" resultType="int">
+		SELECT COUNT(*) FROM V_ACTIVE_MANAGER WHERE USER_ID = #{userId}
+	</select>
+
+</mapper>
