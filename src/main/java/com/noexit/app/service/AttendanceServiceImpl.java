@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.noexit.app.mapper.AttendanceMapper;
 import com.noexit.app.model.AttendanceListDTO;
+import com.noexit.app.model.AttendCrew;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,27 +49,42 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	@Override
-	@Transactional
-	public AttendanceListDTO attend(AttendanceListDTO dto) throws Exception {
+	public List<AttendCrew> selectCrewByReservationId(Long reservationId) {
+
+		List<AttendCrew> list = null;
 
 		try {
-			mapper.insertAttendance(dto);
-			mapper.insertAttendDetail(dto);
-
-			if (dto.getAttendStatusId() == 2) {
-				dto.setStatusName("노쇼 처리 완료");
-			} else {
-				dto.setStatusName("출석 처리 완료");
-			}
+			list = mapper.selectCrewByReservationId(reservationId);
 		} catch (Exception e) {
-			log.info("attend : ", e);
-			throw e;
+			log.info("selectCrewByReservationId : ", e);
 		}
 
-		return dto;
+		return list;
 	}
 
-	
-	
+	@Override
+	@Transactional
+	public void attendAll(List<AttendanceListDTO> list, Long staffUserId) throws Exception {
+
+		try {
+			AttendanceListDTO head = null;
+			for (AttendanceListDTO dto : list) {
+				if (head == null || !head.getReservationId().equals(dto.getReservationId())) {
+					head = new AttendanceListDTO();
+					head.setReservationId(dto.getReservationId());
+					head.setUserId(staffUserId);
+					mapper.insertAttendance(head);
+				}
+				AttendanceListDTO det = new AttendanceListDTO();
+				det.setAttendanceId(head.getAttendanceId());
+				det.setLeaderId(dto.getUserId());
+				det.setAttendStatusId(dto.getAttendStatusId());
+				mapper.insertAttendDetail(det);
+			}
+		} catch (Exception e) {
+			log.info("attendAll : ", e);
+			throw e;
+		}
+	}
 
 }

@@ -9,21 +9,6 @@
 <link rel="stylesheet"
 	href='${pageContext.request.contextPath }/dist/css/attendance.css' />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-<script type="text/javascript">
-
-	function attendOk(formId){
-		if(confirm('출석 처리 하시겠습니까?')){
-			document.getElementById(formId).submit();
-		}
-	}
-
-	function noshowOk(formId){
-		if(confirm('노쇼 처리 하시겠습니까?')){
-			document.getElementById(formId).submit();
-		}
-	}
-
-</script>
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp"%>
@@ -69,27 +54,22 @@
 											<div class="col-2">-</div>
 										</c:when>
 										<c:otherwise>
-											<div class="col-2"><span class="status-wait">대기</span></div>
-											<div class="col-2">
-												<form id="attendForm-${r.reservationId}"
-												      action="${pageContext.request.contextPath}/owner/attendance/attend"
-												      method="post" style="display:inline">
-													<input type="hidden" name="reservationId"  value="${r.reservationId}">
-													<input type="hidden" name="leaderId"       value="${r.leaderId}">
-													<input type="hidden" name="attendStatusId" value="1">
-													<button type="button" class="btn btn-primary"
-													        onclick="attendOk('attendForm-${r.reservationId}')">출석</button>
-												</form>
-												<form id="noshowForm-${r.reservationId}"
-												      action="${pageContext.request.contextPath}/owner/attendance/attend"
-												      method="post" style="display:inline">
-													<input type="hidden" name="reservationId"  value="${r.reservationId}">
-													<input type="hidden" name="leaderId"       value="${r.leaderId}">
-													<input type="hidden" name="attendStatusId" value="2">
-													<button type="button" class="btn ne-btn-deact"
-													        onclick="noshowOk('noshowForm-${r.reservationId}')">노쇼</button>
-												</form>
-											</div>
+											<c:choose>
+												<c:when test="${doneList.contains(r.reservationId)}">
+													<div class="col-2"><span class="status-done">입력 완료</span></div>
+													<div class="col-2">
+														<a class="btn btn-sm btn-outline-secondary"
+														   href="${pageContext.request.contextPath}/owner/attendance/check?reservationId=${r.reservationId}">다시 입력</a>
+													</div>
+												</c:when>
+												<c:otherwise>
+													<div class="col-2"><span class="status-wait">대기</span></div>
+													<div class="col-2">
+														<a class="btn btn-primary"
+														   href="${pageContext.request.contextPath}/owner/attendance/check?reservationId=${r.reservationId}">출석체크확인</a>
+													</div>
+												</c:otherwise>
+											</c:choose>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -98,10 +78,20 @@
 								<div class="text-center py-3">조회된 예약이 없습니다.</div>
 							</c:if>
 						</div>
-						<div class="paginate">							
+
+						<c:if test="${not empty doneList}">
+							<form action="${pageContext.request.contextPath}/owner/attendance/finalize" method="post" class="text-end mt-3">
+								<button type="submit" class="btn btn-primary"
+								        onclick="return confirm('입력한 출석 내용을 최종 저장하시겠습니까?');">
+									최종 확인 (${doneList.size()}건)
+								</button>
+							</form>
+						</c:if>
+
+						<div class="paginate">
 							<span class="active">1</span>
 							<a href="#">2</a>
-							<a href="#">3</a>					
+							<a href="#">3</a>
 						</div>
 					</div>
 				</div>
