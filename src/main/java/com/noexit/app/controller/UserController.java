@@ -3,6 +3,7 @@ package com.noexit.app.controller;
 import java.io.IOException;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,13 +46,13 @@ public class UserController {
 		return "user/findPw";
 	}
 
-	// 회원가입 폼 화면 (GET)
+	// 회원가입 폼
 	@GetMapping("/enroll")
 	public String enrollForm() {
 		return "user/enrollForm";
 	}
 
-	// 회원가입 처리 (POST)
+	// 회원가입 처리
 	@PostMapping("/enroll")
 	public String enroll(User user) {
 		try {
@@ -62,34 +63,32 @@ public class UserController {
 		return "redirect:/theme/list";
 	}
 
-	// 로그인 폼 화면 (GET)
+	// 로그인 폼
 	@GetMapping("/login")
 	public String loginForm() {
 		return "user/loginForm";
 	}
 
-	// 로그인 처리 (POST)
+	// 로그인 처리
 	@PostMapping("/login")
-	public String login(User user, HttpSession session) {
+	public String login(User user, HttpSession session, Model model) {
 
-		User dto = null;
+	    User dto = null;
+	    try {
+	        dto = service.login(user);
+	    } catch (Exception e) {
+	        log.info("login : ", e);
+	    }
 
-		try {
-			dto = service.login(user);
-		} catch (Exception e) {
-			log.info("login : ", e);
-		}
+	    if (dto == null) {
+	        model.addAttribute("errorMessage", "아이디 또는 비밀번호가 올바르지 않습니다.");
+	        return "user/loginForm";
+	    }
 
-		if (dto == null) {
-			return "redirect:/user/login";
-		}
-
-		String role = service.findRole(dto.getUserId());
-
-		session.setAttribute("loginUser", dto);
-		session.setAttribute("role", role);
-
-		return "redirect:/";
+	    String role = service.findRole(dto.getUserId());
+	    session.setAttribute("loginUser", dto);
+	    session.setAttribute("role", role);
+	    return "redirect:/theme/list";
 	}
 
 	// 로그아웃

@@ -65,20 +65,21 @@
 					<form name="reservForm" method="post">
 						<div class="d-flex justify-content-between align-items-center mb-4">
 							<div>
+							<!-- 수정 불가 리드온리로 구성 이러면 예약자 목록?파티원 목록 뿌려주는거로 바꾸는것도 고려해보기  -->
 								<label for="name" class="label">이름 <span>*</span></label><br>
-								<input type="text" id="name" name="name" class="ne-box" maxlength="13"/>
+								<input type="text" id="name" name="name" class="ne-box" readonly="readonly"/>
 							</div>
 							<div>
 								<label for="phone" class="label">연락처 <span>*</span></label><br>
-								<input type="tel" id="phone" name="phone" class="ne-box" placeholder="하이픈 제외 입력 (ex. 01012345678)" maxlength="11"/>
+								<input type="tel" id="phone" name="phone" class="ne-box" readonly="readonly"/>
 							</div>
 						</div>
 						<div class="mb-2">
 							<p class="label">총 방문 인원</p>
 							<div class="d-flex justify-content-between align-items-center mt-1" style="width: 20%;">
-								<button type="button" class="circle" data-action="minus">-</button>
+								<!-- <button type="button" class="circle" data-action="minus">-</button> -->
 								<span class="personCount">4</span>
-								<button type="button" class="circle" data-action="plus">+</button>
+							<!-- 	<button type="button" class="circle" data-action="plus">+</button> -->
 								<span style="font-size: 14px; color: #666;">명</span>
 							</div>
 						</div>

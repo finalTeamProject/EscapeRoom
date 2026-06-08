@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
+	private final ManagerService managerService;
 
 	@Override
 	@Transactional
@@ -34,11 +35,8 @@ public class UserServiceImpl implements UserService {
 		User dto = null;
 
 		try {
-			dto = userMapper.selectByLoginId(user.getLoginId());
+			dto = userMapper.selectByLoginId(user);
 
-			if (dto != null && ! dto.getPassword().equals(user.getPassword())) {
-				dto = null;
-			}
 
 		} catch (Exception e) {
 			log.info("login : ", e);
@@ -48,19 +46,26 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public User selectByLoginId(String loginId) {
+		User dto = null;
+		try {
+			dto = userMapper.findByLoginId(loginId);
+		} catch (Exception e) {
+			log.info("selectByLoginId : ", e);
+		}
+		return dto;
+	}
+
+	@Override
 	public String findRole(Long userId) {
 
-		String role = "USER";
-
 		try {
-			int cafeCount = userMapper.countCafeByUserId(userId);
-			if (cafeCount > 0) {
-				role = "OWNER";
-			}
+			if (userMapper.countCafeByUserId(userId) > 0)        return "OWNER";
+			if (managerService.countActiveByUserId(userId) > 0)  return "MANAGER";
 		} catch (Exception e) {
 			log.info("findRole : ", e);
 		}
 
-		return role;
+		return "USER";
 	}
 }

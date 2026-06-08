@@ -8,6 +8,8 @@
 <title>themelist.jsp</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
+<c:set var="path" value="${pageContext.request.contextPath }" />
+
 <style type="text/css">
 
 .container
@@ -51,20 +53,17 @@
 	width: 60px;
 }
 
-.theme-list,
+.theme-list
+{
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
 .theme-item
 {
 	display: grid;
 	gap: 10px;
-}
-
-.theme-list
-{
-	grid-template-columns: 1fr 1fr;
-}
-
-.theme-item
-{
 	grid-template-columns: 3fr 2fr;
 	border: 1px solid black;
 	border-radius: 15px;
@@ -98,6 +97,138 @@
 
 </style>
 
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+	document.addEventListener("DOMContentLoaded",function()
+	{
+		const kwdInput = document.querySelector("[name='kwd']");
+		
+		kwdInput.addEventListener("keydown",(evt)=>
+		{
+			if(evt.key == "Enter")
+			{
+				evt.preventDefault();
+				
+				search();
+			}
+		});
+	})
+
+	let schType = "${schType}";
+	let kwd = "${kwd}";
+	let lastId = 0;
+	let minPrice = "${minPrice}";
+	let maxPrice = "${maxPrice}";
+	let minLevel = "${minLevel}";
+	let maxLevel = "${maxLevel}";
+	let minHorror = "${minHorror}";
+	let maxHorror = "${maxHorror}";
+	
+	function search()
+	{
+		const f = document.searchForm;
+		
+		if(!f.kwd.value.trim())
+		{
+			alert("키워드를 입력하세요");
+			f.kwd.focus();
+			return;
+		}
+		
+		f.action = '${path}/theme/list';
+		
+		f.submit();
+	}
+
+	$(function()
+	{
+		$("#addList").click(function()
+		{
+			//alert("확인");
+			
+			let params = new URLSearchParams(
+			{
+				kwd: kwd,
+				schType: schType,
+				lastId: lastId
+				
+			}).toString();
+			
+			$.ajax(
+			{
+				"type":"POST"
+				, "url":"${path}/theme/list"
+				, "data":params
+				, "dataType":"json"
+				, "success":function(data)
+				{
+					if(data.length == 0)
+					{
+						$("#addList").remove();
+						return;
+					}
+					
+					renderList(data);
+					
+					lastId = data[data.length-1].themeId;
+					
+					//console.log(typeof data, data);
+				}
+				, "error":function(e)
+				{
+					alert("에러 발생");
+					console.log(e.responseText);
+				}
+			});
+		});
+		
+		$("#addList").click();
+	});
+	
+	function renderList(list)
+	{
+		list.forEach(function(item)
+		{
+			$(".theme-list").append(renderTheme(item));
+		});
+	}
+
+	function renderTheme(item)
+	{
+		return "<a href='${path}/theme/info/" + item.themeId + "' class='theme-item'>" 
+			+ "<div class='theme-image'>" + "<span>" + item.imagePath + "</span></div>"
+			+ "<div class='theme-info'>" 
+			+ getItem('카페명',item.cafeName)
+			+ getItem('테마명',item.themeName)
+			+ getItem('테마 장르',item.genre)
+			+ getItem('테마 시간',item.duration + "분")
+			+ getItem('테마 가격',item.price + "￦")
+			+ getItem('난이도',showStart(item.difficulty))
+			+ getItem('공포도',showStart(item.horror))
+			+ "<div class='info-item'>"
+			+ "<span>인원</span>"
+			+ "<span>" + item.minPlayers + " ~ " + item.maxPlayers + "</span>"
+			+ "</div>" 
+			+ "</div>"
+			+ "</a>"
+	}		
+
+	function showStart(n)
+	{
+		n = Number(n);
+		
+		return "★".repeat(n) + "☆".repeat(5-n);
+	}
+	
+	function getItem(title,value)
+	{
+		return "<div class='info-item'>" + "<span>" + title + "</span>" + "<span>" + value + "</span>" + "</div>";
+	}
+	
+</script>
+
 </head>
 <body>
 	<%@ include file="/WEB-INF/views/common/header.jsp" %>
@@ -109,17 +240,17 @@
 				<div class="search-wrap">
 					
 					<div class="search-form">
-						<form action="" method="post" name="searchForm">
+						<form action="" method="get" name="searchForm">
 							
 							<select name="schType">
-								<option value="cafeName">카페명</option>
-								<option value="themeName">테마명</option>
+								<option value="C.CAFE_NAME" ${schType == 'C.CAFE_NAME' ? 'selected' : '' }>카페명</option>
+								<option value="A.ROOM_NAME" ${schType == 'A.ROOM_NAME' ? 'selected' : '' }>테마명</option>
 							</select>
 							
-							<input type="text" name="kwd" placeholder="검색 키워드">
+							<input type="text" name="kwd" placeholder="검색 키워드" value="${kwd }">
 							
-							<button type="button" onclick="" class="btn btn-primary">검색</button>
-							<button type="button" onclick="" class="btn btn-outline-primary">초기화</button>
+							<button type="button" onclick="search()" class="btn btn-primary">검색</button>
+							<button type="button" onclick="window.location.href='${path}/theme/list'" class="btn btn-outline-primary">초기화</button>
 							
 						</form>
 					</div>
@@ -129,16 +260,16 @@
 						
 						<div class="filter-item">
 							<span>가격</span>
-							<input type="text" name="minPirce" placeholder="최소 가격">
+							<input type="text" name="minPrice" placeholder="최소 가격">
 							~
 							<input type="text" name="maxPrice" placeholder="최대 가격"> 
 						</div>
 						
 						<div class="filter-item">
-							<span>평점</span>
-							<input type="text" name="minScore" placeholder="최소 평점">
+							<span>레벨</span>
+							<input type="text" name="minLevel" placeholder="최소 난이도">
 							~
-							<input type="text" name="maxScore" placeholder="최대 평점"> 
+							<input type="text" name="maxLevel" placeholder="최대 난이도"> 
 						</div>
 						
 						<div class="filter-item">
@@ -153,8 +284,8 @@
 				</div>
 				
 				<div class="theme-list">
-				
-					<a href="" class="theme-item">
+				<%-- 
+					<a href="${path }/theme/info/1" class="theme-item">
 					
 						<div class="theme-image">
 							<span>테마이미지</span>
@@ -183,7 +314,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							
@@ -201,7 +332,7 @@
 					
 					</a>
 				
-					<a href="" class="theme-item">
+					<a href="${path }/theme/info/1" class="theme-item">
 					
 						<div class="theme-image">
 							<span>테마이미지</span>
@@ -230,7 +361,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							
@@ -246,9 +377,9 @@
 							
 						</div>
 					
-					</a>
+					</a>  --%>
 				
-					<a href="" class="theme-item">
+					<%-- <a href="${path }/theme/info/1" class="theme-item">
 					
 						<div class="theme-image">
 							<span>테마이미지</span>
@@ -277,7 +408,7 @@
 							</div>
 							
 							<div class="info-item">
-								<span>평점</span>
+								<span>난이도</span>
 								<span>★★★★★</span>
 							</div>
 							
@@ -293,13 +424,13 @@
 							
 						</div>
 					
-					</a>
+					</a> --%>
 				
 				</div>
 				
 				<div class="theme-add">
 					
-					<button type="button" class="btn btn-primary">더보기</button>	
+					<button type="button" class="btn btn-primary" id="addList">더보기</button>	
 					
 				</div>
 				

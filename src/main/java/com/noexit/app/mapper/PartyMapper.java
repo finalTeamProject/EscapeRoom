@@ -1,0 +1,40 @@
+package com.noexit.app.mapper;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.noexit.app.model.PartyApplyDTO;
+import com.noexit.app.model.PartyCommentDTO;
+import com.noexit.app.model.PartyCrewDTO;
+import com.noexit.app.model.PartyDTO;
+import com.noexit.app.model.ThemeDTO;
+
+@Mapper
+public interface PartyMapper
+{
+	List<PartyDTO> getPartyList(Map<String, Object> map);
+	PartyDTO getPartyById(long partyId);
+	int partyApply(PartyApplyDTO dto);
+	
+	ThemeDTO getThemeById(long themeId);
+	
+	int partyInsert(PartyDTO dto);
+	
+	int partyUpdate(PartyDTO dto);
+	int partyDelete(long partyId);
+	
+	List<PartyCommentDTO> getPartyCommentList(long partyId);
+	int partyCommentInsert(PartyCommentDTO dto);
+	int partyCommentDelete(long commentId);
+	
+	List<PartyCrewDTO> getPartyCrewList(long partyId);
+	int partyReady(long partyId);
+	int partyOut(long applyId);
+	int partyKick(long applyId);
+	
+	List<PartyApplyDTO> getPartyApplyList(long partyId);
+	int aprvApply(long applyId);
+	int rejectApply(long applyId);
+}

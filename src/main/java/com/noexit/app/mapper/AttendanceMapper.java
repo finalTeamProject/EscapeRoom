@@ -1,0 +1,18 @@
+package com.noexit.app.mapper;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import com.noexit.app.model.AttendanceListDTO;
+
+@Mapper
+public interface AttendanceMapper {
+	
+	public List<AttendanceListDTO> selectListByOwnerUserId(Long ownerUserId);
+	public List<AttendanceListDTO> selectListByManagerUserId(Long managerUserId);
+
+	public void insertAttendance(AttendanceListDTO dto) throws SQLException;
+	public void insertAttendDetail(AttendanceListDTO dto) throws SQLException;
+}
