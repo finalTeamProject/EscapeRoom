@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 public class ThemeReviewDTO
 {
-	private String name;
+	private String nickName;
 	private int satisfaction;
 	private int difficulty;
 	private int horror;
 	private int activity;
 	private int immersion;
-	private String comment;
+	private String reviewComment;
 }

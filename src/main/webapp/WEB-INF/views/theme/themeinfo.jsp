@@ -170,7 +170,7 @@
 		});
 		
 	});
-
+	
 </script>
 
 </head>
@@ -184,69 +184,72 @@
 				<div class="theme-info-wrap">
 					
 					<div class="theme-image">
-						<span>테마이미지</span>
+						<span>${dto.imagePath }</span>
 					</div>
 					
 					<div class="theme-info">
 						
 						<div class="info-item">
 							<span>카페명</span>
-							<span>우주별</span>
+							<span>${dto.cafeName }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>카페위치</span>
-							<span>홍대입구 5분 거리</span>
+							<span>${dto.cafeLocation }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>카페전화번호</span>
-							<span>010-1234-11234</span>
+							<span>${dto.cafePhone }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>테마명</span>
-							<span>그레이</span>
+							<span>${dto.themeName }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>테마 장르</span>
-							<span>추리</span>
+							<span>${dto.genre }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>테마 시간</span>
-							<span>60분</span>
+							<span>${dto.duration }분</span>
 						</div>
 						
 						<div class="info-item">
 							<span>난이도</span>
-							<span>★★★★★</span>
+							<span><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1}" end="5">☆</c:forEach>
+							</span>
 						</div>
 						
 						<div class="info-item">
 							<span>공포도</span>
-							<span>★★★★☆</span>
+							<span><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1}" end="5">☆</c:forEach>
+							</span>
 						</div>
 						
 						<div class="info-item">
 							<span>활동도</span>
-							<span>★★★★☆</span>
+							<span><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach>
+							</span>
 						</div>
 						
 						<div class="info-item">
 							<span>테마 가격</span>
-							<span>30000</span>
+							<span>${dto.price }</span>
 						</div>
 						
 						<div class="info-item">
 							<span>테마 인원</span>
-							<span>2 ~ 4</span>
+							<span>${dto.minPlayers }명 ~ ${dto.maxPlayers }명</span>
 						</div>
 						
 						<div class="info-item">
 							<span>성인 전용</span>
-							<span>Y/N</span>
+							<span>${dto.adult == 1 ? 'Y' : 'N'}</span>
 						</div>
 						
 					</div>
@@ -254,13 +257,48 @@
 				
 				<div class="theme-description">
 					<span>테마 소개</span>
-					<p>1960년 대 뉴욕에서 당신은 탐정이 되어 사건의 실마리를 찾아 범인을 찾아내야 합니다. </p>
+					<p>${dto.description } </p>
 				</div>
 							
 				<div class="slot-list">
 					
 					<span>예약 목록</span>
 					
+					<c:forEach var="date" items="${slot }">
+						
+						<div class="slot">
+							
+							<div class="slot-date">
+								<span>${date.key }</span>
+							</div>
+							
+							<div class="slot-time">
+								
+							<c:forEach var="time" items="${date.value }">
+								
+								<c:choose>
+									<c:when test="${time.status == 1 }">
+										<button type="button" data-slot="${time.slotId }" class="slot-btn">
+											${time.resTime }
+										</button>
+									</c:when>
+									<c:otherwise>
+										<span class="ne-st ne-st-gray">
+											${time.resTime }
+										</span>
+									</c:otherwise>
+									
+								</c:choose>		
+								
+							</c:forEach>
+							
+							</div>
+														
+						</div>
+						
+					</c:forEach>
+					
+					<!-- 
 					<div class="slot">
 					
 						<div class="slot-date">
@@ -291,7 +329,7 @@
 							<button type="button" data-slot="9" class="slot-btn">18:00</button>
 						</div>
 						
-					</div>
+					</div> -->
 					
 				</div>							
 				
@@ -302,31 +340,32 @@
 					<div class="review-total">
 						
 						<div class="ne-sc item">
-							<div class="ne-sc-title">리뷰 통계 (1개)</div>
+							<div class="ne-sc-title">리뷰 통계 (${count }개)</div>
 							  	
 							 <div class="review">
 							 	<span>만족도</span>
-							 	<span>★★★☆☆</span>
+							 	<span><c:forEach begin="1" end="${total.satisfaction }">★</c:forEach><c:forEach begin="${total.satisfaction +1 }" end="5">☆</c:forEach>
+							 	</span>
 							 </div>	 
-							  
+							 
 							 <div class="review">
 							 	<span>체감난이도</span>
-							 	<span>★★★☆☆</span>
+							 	<span><c:forEach begin="1" end="${total.difficulty }">★</c:forEach><c:forEach begin="${total.difficulty +1 }" end="5">☆</c:forEach></span>
 							 </div>	
 							   
 							 <div class="review">
 							 	<span>체감공포도</span>
-							 	<span>★★★☆☆</span>
+							 	<span><c:forEach begin="1" end="${total.horror }">★</c:forEach><c:forEach begin="${total.horror +1 }" end="5">☆</c:forEach></span>
 							 </div>	 
 							  
 							 <div class="review">
 							 	<span>체감활동도</span>
-							 	<span>★★★☆☆</span>
+							 	<span><c:forEach begin="1" end="${total.activity }">★</c:forEach><c:forEach begin="${total.activity +1 }" end="5">☆</c:forEach></span>
 							 </div>	  
 							  
 							 <div class="review">
 							 	<span>몰입도</span>
-							 	<span>★★★☆☆</span>
+							 	<span><c:forEach begin="1" end="${total.satisfaction }">★</c:forEach><c:forEach begin="${total.immersion +1 }" end="5">☆</c:forEach></span>
 							 </div>	  
 							  
 						</div>
@@ -335,7 +374,50 @@
 					
 					<div class="review-list">
 						
-						<div class="ne-sc item">
+						<c:forEach var="dto" items="${review }">
+							
+							<div class="ne-sc item">
+								<div class="ne-sc-title">${dto.nickName }</div>
+								
+								<div class="review">
+									<span>만족도</span>
+									<span><c:forEach begin="1" end="${dto.satisfaction }">★</c:forEach><c:forEach begin="${dto.satisfaction +1 }" end="5">☆</c:forEach>
+									</span>
+								</div>
+								
+								<div class="review">
+									<span>체감난이도</span>
+									<span><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1 }" end="5">☆</c:forEach>
+									</span>
+								</div>
+								
+								<div class="review">
+									<span>체감공포도</span>
+									<span><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1 }" end="5">☆</c:forEach>
+									</span>
+								</div>
+								
+								<div class="review">
+									<span>체감활동도</span>
+									<span><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach>
+									</span>
+								</div>
+								
+								<div class="review">
+									<span>몰입도</span>
+									<span><c:forEach begin="1" end="${dto.immersion }">★</c:forEach><c:forEach begin="${dto.immersion +1 }" end="5">☆</c:forEach>
+									</span>
+								</div>
+								
+								<div class="comment">
+									<p>${dto.reviewComment }</p>
+								</div>
+								
+							</div>
+							
+						</c:forEach>
+						
+						<!-- <div class="ne-sc item">
 						  	<div class="ne-sc-title">윤주열</div>
 							
 							 <div class="review">
@@ -367,7 +449,7 @@
 								<p>장치가 다양하고 색다른 요소가 많이 있습니다. 방탈출 초보분들께 강추합니다.</p>
 							</div>
 							
-						</div>
+						</div> -->
 						
 					</div>
 					

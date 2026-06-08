@@ -14,5 +14,4 @@ public class PartyCrewDTO
 	private int temp;
 	private boolean ready;
 	private String position;
-	private String status;
 }

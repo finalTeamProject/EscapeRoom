@@ -86,9 +86,8 @@
  	</sql>
  	
  	
- 	<!--
- 	테마 정보 가져오기
- 	<select id="getThemeById" parameterType="long" resultType="com.noexit.app.model.ThemeDTO">
+ 	<!-- 테마 정보 가져오기 -->
+ 	<select id="getThemeInfoById" parameterType="long" resultType="com.noexit.app.model.ThemeDTO">
 		SELECT A.ROOM_ID themeId, A.ROOM_IMG imagePath, B.CAFE_NAME cafeName
 		, B.ADDRESS || ' ' || B.ADDRESS_DETAIL cafeLocation, B.PHONE cafePhone
 		, A.ROOM_NAME themeName, C.GENRE_NAME genre, A.DURATION duration
@@ -102,36 +101,42 @@
 		ON A.GENRE_ID = C.GENRE_ID
 		WHERE A.ROOM_ID = #{themeId}
  	</select>
-
- 	테마 목록 가져오기 (리스트)
+ 	
+ 	<!-- 테마 목록 가져오기 (리스트) -->
  	<select id="getThemeList" parameterType="map" resultType="com.noexit.app.model.ThemeDTO">
- 		SELECT A.ROOM_ID themeId, A.ROOM_IMG themeImage, A.ROOM_NAME name
- 		, B.GENRE_NAME genre, A.DURATION duration, A.DIFFICULTY difficulty
- 		, A.HORROR_GRADE horror, A.MIN_PLAYERS minPlayers, A.MAX_PLAYERS maxPlayers
+ 		SELECT A.ROOM_ID AS themeId, A.ROOM_IMG AS imagePath, A.ROOM_NAME AS themeName
+ 		, B.GENRE_NAME AS genre, A.DURATION AS duration, A.DIFFICULTY AS difficulty
+ 		, A.HORROR_GRADE AS horror, A.MIN_PLAYERS AS minPlayers, A.MAX_PLAYERS AS maxPlayers
+ 		, A.PRICE AS price, C.CAFE_NAME AS cafeName
 		FROM ROOM A
 		JOIN ROOM_GENRE B
 		ON A.GENRE_ID = B.GENRE_ID
+		JOIN CAFE C
+		ON A.CAFE_ID = C.CAFE_ID
  		<where>
 	 		<if test="kwd != null and kwd != ''">
 	 			<include refid="where-list"></include>
 	 		</if>
-	 		AND A.ROOM_ID > #{lastId}
+	 		<if test="lastId != 0">
+	 			AND A.ROOM_ID &lt; #{lastId}
+	 		</if>
  		</where>
  		ORDER BY A.ROOM_ID	DESC
+ 		FETCH FIRST 4 ROWS ONLY
  	</select>
 
- 	하나의 테마의 슬롯 현황 가져오기
+ 	<!-- 하나의 테마의 슬롯 현황 가져오기 -->
  	<select id="getThemeSlot" parameterType="long" resultType="com.noexit.app.model.ThemeSlotDTO">
- 		SELECT RES_OPEN_ID,TO_CHAR(OPEN_AT,'YYYY-MM-DD') as resDate, TO_CHAR(OPEN_AT, 'HH24:MI') as resTime , FN_RESERVATION_CHECK(RES_OPEN_ID) AS status
+ 		SELECT RES_OPEN_ID AS slotId,TO_CHAR(OPEN_AT,'YYYY-MM-DD') as resDate, TO_CHAR(OPEN_AT, 'HH24:MI') as resTime , FN_RESERVATION_CHECK(RES_OPEN_ID) AS status
 		FROM RES_OPEN
-		WHERE ROOM_ID = 1
+		WHERE ROOM_ID = #{themeId} AND OPEN_AT > SYSDATE + 1
 		ORDER BY OPEN_AT ASC
  	</select>
 
- 	하나의 테마의 리뷰 리스트 가져오기
+ 	<!-- 하나의 테마의 리뷰 리스트 가져오기 -->
  	<select id="getThemeReview" parameterType="long" resultType="com.noexit.app.model.ThemeReviewDTO">
- 		SELECT C.NICKNAME name, A.SATISFACTION satisfaction, A.DIFFICULTY difficulty
- 		, A.HORROR horror, A.ACTIVITY activity, A.IMMERSION immersion, A.REVIEW_COMMENT comment
+ 		SELECT C.NICKNAME nickName, A.SATISFACTION satisfaction, A.DIFFICULTY difficulty
+ 		, A.HORROR horror, A.ACTIVITY activity, A.IMMERSION immersion, A.REVIEW_COMMENT reviewComment
 		FROM REVIEW A
 		JOIN ATTENDANCE_DETAIL B
 		ON A.DETAIL_ID = B.DETAIL_ID
@@ -148,6 +153,29 @@
 		WHERE G.ROOM_ID = #{themeId}
 		ORDER BY A.REVIEW_ID DESC
  	</select>
- 	-->
+
+	<select id="getTotalReview" parameterType="long" resultType="com.noexit.app.model.ThemeReviewDTO">
+	
+		SELECT TRUNC(NVL(AVG(A.DIFFICULTY),0),0) AS DIFFICULTY
+		,TRUNC(NVL(AVG(A.HORROR),0),0) AS HORROR
+		,TRUNC(NVL(AVG(A.ACTIVITY),0),0) AS ACTIVITY
+		,TRUNC(NVL(AVG(A.IMMERSION),0),0) AS IMMERSION
+		,TRUNC(NVL(AVG(A.SATISFACTION),0),0) AS SATISFACTION
+		FROM REVIEW A
+		JOIN ATTENDANCE_DETAIL B
+		ON A.DETAIL_ID = B.DETAIL_ID
+		JOIN ATTENDANCE C
+		ON B.ATTENDANCE_ID = C.ATTENDANCE_ID
+		JOIN RESERVATION D
+		ON C.RESERVATION_ID = D.RESERVATION_ID
+		JOIN PARTY_ROOM E
+		ON D.PARTY_ID = E.PARTY_ID
+		JOIN RES_OPEN F
+		ON E.RES_OPEN_ID = F.RES_OPEN_ID
+		JOIN ROOM G
+		ON G.ROOM_ID = F.ROOM_ID
+		WHERE G.ROOM_ID = #{themeId}
+		
+	</select>
 
 </mapper>

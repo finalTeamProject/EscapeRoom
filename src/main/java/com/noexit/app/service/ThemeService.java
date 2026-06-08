@@ -19,8 +19,6 @@ public interface ThemeService
 	테마 삭제하는 메소드
 	*/
 	
-	// 장르목록 DTO 필요
-	/*장르목록DTO*/ void getGenreList();
 	List<Cafe> getCafeList(long userId);
 	int themeInsert(ThemeDTO dto) throws Exception;
 	ThemeDTO getThemeById(long themeId);
@@ -40,7 +38,9 @@ public interface ThemeService
 	 * 테마 리뷰 조회
 	 */
 	
+	ThemeDTO getThemeInfoById(long themeId);
 	List<ThemeDTO> getThemeList(Map<String, Object> map);
-	Map<String, List<ThemeSlotDTO>> getThemeSlot(long themeId);
+	Map<String,List<ThemeSlotDTO>> getThemeSlot(long themeId);
 	List<ThemeReviewDTO> getThemeReview(long themeId);
+	ThemeReviewDTO getTotalReview(long themeId);
 }
