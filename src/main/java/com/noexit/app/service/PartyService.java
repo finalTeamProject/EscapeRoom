@@ -7,7 +7,7 @@ import com.noexit.app.model.PartyApplyDTO;
 import com.noexit.app.model.PartyCommentDTO;
 import com.noexit.app.model.PartyCrewDTO;
 import com.noexit.app.model.PartyDTO;
-import com.noexit.app.model.ThemeDTO;
+import com.noexit.app.model.ThemeSlotDTO;
 
 public interface PartyService
 {
@@ -41,7 +41,7 @@ public interface PartyService
 	PartyDTO getPartyById(long partyId);
 	int partyApply(PartyApplyDTO dto);
 	
-	ThemeDTO getThemeById(long themeId);
+	ThemeSlotDTO getThemeById(long themeId);
 	
 	int partyInsert(PartyDTO dto);
 	

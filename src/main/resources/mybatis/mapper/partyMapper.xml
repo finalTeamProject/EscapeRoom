@@ -98,7 +98,7 @@
 	
 	<select id="getThemeById" parameterType="long" resultType="com.noexit.app.model.ThemeSlotDTO">
 		
-		SELECT A.RES_OPEN_ID AS slotId, C.CAFE_NAME AS cafeName, B.ROOM_NAME AS themeName
+		SELECT A.RES_OPEN_ID AS slotId, C.CAFE_NAME AS cafeName, B.ROOM_NAME AS themeName, B.ROOM_ID AS themeId
 		, TO_CHAR(A.OPEN_AT,'YYYY-MM-DD') AS resDate, TO_CHAR(A.OPEN_AT,'HH24:MI') AS resTime
 		, B.MIN_PLAYERS AS minPlayers, B.MAX_PLAYERS AS maxPlayers, B.PRICE AS price, FN_RESERVATION_CHECK(A.RES_OPEN_ID) AS status
 		FROM RES_OPEN A

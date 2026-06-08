@@ -8,11 +8,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.noexit.app.model.ThemeSlotDTO;
+import com.noexit.app.service.PartyService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/party/*")
 public class Party
 {
-
+	private final PartyService service;
+	
 	/*
 	 * 파티 개설 폼으로 이동
 	 */
@@ -43,6 +52,30 @@ public class Party
 		 * 최대 인원
 		 * 가격
 		 */
+		
+		// 로그인 검사
+		
+		try
+		{
+			ThemeSlotDTO dto = service.getThemeById(slotId);
+			
+			if(dto == null)
+			{
+				return "redirect:/theme/list";
+			}
+			
+			if(dto.getStatus() != 1)
+			{
+				return "redirect:/theme/list";
+			}
+			
+			model.addAttribute("dto", dto);
+			model.addAttribute("mode", "write");
+		} 
+		catch (Exception e)
+		{
+			log.info("partyWrite : ",e);
+		}
 		
 		return "party/partywrite";
 	}
