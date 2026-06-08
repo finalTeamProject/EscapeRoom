@@ -142,7 +142,7 @@
 				<div class="write-wrap">
 					<form action="" class="write-form" method="post" name="writeForm">
 						<span>파티명</span>
-						<input type="text" name="partyname" value="">
+						<input type="text" name="partyName" value="">
 						<label>
 						<span>동성만</span>
 						<input type="checkbox" name="genderCondition" value="1">

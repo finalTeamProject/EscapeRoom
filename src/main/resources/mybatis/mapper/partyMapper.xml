@@ -111,9 +111,14 @@
 	</select>
 	
 	<insert id="partyInsert" parameterType="com.noexit.app.model.PartyDTO">
+		
+		<selectKey keyProperty="partyId" resultType="long" order="BEFORE">
+			SELECT PARTY_SEQ.NEXTVAL
+			FROM DUAL
+		</selectKey>
 	
 		INSERT INTO PARTY (PARTY_ID,USER_ID,PARTY_NAME,GENDER_ID,MESSAGE,CREATED_AT)
-		VALUES(PARTY_SEQ.NEXTVAL,#{userId},#{partyName},#{genderCondition},#{partyComment},SYSDATE)
+		VALUES(#{partyId},#{userId},#{partyName},#{genderCondition},#{partyComment},SYSDATE)
 		
 	</insert>
 

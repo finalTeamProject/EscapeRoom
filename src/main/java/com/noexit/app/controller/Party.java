@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.noexit.app.model.PartyDTO;
 import com.noexit.app.model.ThemeSlotDTO;
 import com.noexit.app.service.PartyService;
 
@@ -35,7 +36,7 @@ public class Party
 		 * 
 		 * 존재하는 slotId 인가?
 		 * 
-		 * 예약되지 않은 slodId 인가?
+		 * 예약가능한 slodId 인가?
 		 * 
 		 * mode = "write" 전달
 		 * 
@@ -44,7 +45,9 @@ public class Party
 		/*
 		 * 가져와야 하는 데이터
 		 * 
+		 * 슬롯 아이디
 		 * 카페명
+		 * 테마아이디
 		 * 테마명
 		 * 날짜
 		 * 시간
@@ -59,12 +62,7 @@ public class Party
 		{
 			ThemeSlotDTO dto = service.getThemeById(slotId);
 			
-			if(dto == null)
-			{
-				return "redirect:/theme/list";
-			}
-			
-			if(dto.getStatus() != 1)
+			if(dto == null || dto.getStatus() != 1)
 			{
 				return "redirect:/theme/list";
 			}
@@ -85,7 +83,7 @@ public class Party
  	 * PartyDTO 를 파라미터로 받음 
  	 */
 	@PostMapping("write")
-	public String partyInsert()
+	public String partyInsert(PartyDTO dto)
 	{
 		// slotId, partyName, genderCondition, partyComment
 		
@@ -107,7 +105,33 @@ public class Party
 		 * 가져올 데이터 없음
 		 */
 		
-		return "redirect:/party/board/1";
+		try
+		{
+			// 로그인 체크
+			// dto 에 userId 세션에서 얻어서 넣어주기
+			
+			ThemeSlotDTO slot = service.getThemeById(dto.getSlotId());
+			
+			// 슬롯 유효성 체크
+			if(slot == null || slot.getStatus() != 1)
+			{
+				return "rediect:/theme/list";
+			}
+			
+			// 길이 체크
+			if(dto.getPartyComment().length() >= 30 || dto.getPartyName().length() >= 10)
+			{
+				return "redirect:/theme/list";
+			}
+			
+			service.partyInsert(dto);
+		} 
+		catch (Exception e)
+		{
+			log.info("partyInsert : ",e);
+		}
+			
+		return "redirect:/party/board/" + dto.getPartyId();
 	}
 	
 	/*
