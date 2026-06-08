@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.PartyMapper">
+
+<!-- 
+	List<PartyDTO> getPartyList(Map<String, Object> map);
+	PartyDTO getPartyById(long partyId);
+	int partyApply(PartyApplyDTO dto);
+	
+	ThemeDTO getThemeById(long themeId);
+	
+	int partyInsert(PartyDTO dto);
+	
+	int partyUpdate(PartyDTO dto);
+	int partyDelete(long partyId);
+	
+	List<PartyCommentDTO> getPartyCommentList(long part	yId);
+	int partyCommentInsert(PartyCommentDTO dto);
+	int partyCommentDelete(long commentId);
+	
+	List<PartyCrewDTO> getPartyCrewList(long partyId);
+	int partyReady(long partyId);
+	int partyOut(long applyId);
+	int partyKick(long applyId);
+	
+	List<PartyApplyDTO> getPartyApplyList(long partyId);
+	int aprvApply(long applyId);
+	int rejectApply(long applyId);
+ -->
+
+	<sql id="where-list">
+ 		<![CDATA[
+			(INSTR(${schType},#{kwd}) > 0) 			
+ 		]]>		 		
+ 	</sql>
+
+	<select id="getPartyList" parameterType="map" resultType="com.noexit.app.model.PartyDTO">
+	
+		SELECT A.PARTY_ID AS partyId ,D.ROOM_IMG AS themeImg, D.ROOM_NAME AS themeName
+		, TO_CHAR(C.OPEN_AT,'YYYY-MM-DD') AS themeDate, TO_CHAR(C.OPEN_AT,'HH24:MI') AS themeTime
+		, A.PARTY_NAME AS partyName, E.AGE AS avgAge, E.TEMP AS avgTemp, E.COUNT AS count
+		FROM PARTY A
+		JOIN PARTY_ROOM B
+		ON A.PARTY_ID = B.PARTY_ID
+		JOIN RES_OPEN C
+		ON B.RES_OPEN_ID = C.RES_OPEN_ID
+		JOIN ROOM D
+		ON C.ROOM_ID = D.ROOM_ID
+		JOIN 
+		(
+		    SELECT PARTY_ID,TRUNC(NVL(AVG(AGE),-1),1) AS AGE, TRUNC(NVL(AVG(TEMP),-1),1) AS TEMP, COUNT(*) AS COUNT
+		    FROM VW_PARTY_ACTIVE_MEMBER
+		    GROUP BY PARTY_ID
+		) E
+		ON A.PARTY_ID = E.PARTY_ID
+		
+		<where>
+		
+			A.PARRT_ID >=  #{}
+			
+		</where>
+		
+	</select>
+	
+	<select id="getPartyById" parameterType="long" resultType="com.noexit.app.model.PartyDTO">
+	
+		SELECT E.CAFE_NAME AS cafeName, D.ROOM_NAME AS themeName
+		, TO_CHAR(C.OPEN_AT,'YYYY-MM-DD') AS themeDate
+		, TO_CHAR(C.OPEN_AT,'HH24:MI') AS themeTime
+		, D.MIN_PLAYERS AS minPlayers, D.MAX_PLAYERS AS maxPlayers
+		, D.PRICE AS Price, FN_RESERVATION_CHECK(C.RES_OPEN_ID) AS slotStatus
+		, F.GENDER_NAME AS genderName, A.MESSAGE AS partyComment
+        , FN_GET_PARTY_CONDITION(A.PARTY_ID) AS partyStatus
+		FROM PARTY A
+		JOIN PARTY_ROOM B
+		ON A.PARTY_ID = B.PARTY_ID
+		JOIN RES_OPEN C
+		ON B.RES_OPEN_ID = C.RES_OPEN_ID
+		JOIN ROOM D
+		ON C.ROOM_ID = D.ROOM_ID
+		JOIN CAFE E
+		ON D.CAFE_ID = E.CAFE_ID
+		JOIN GENDER_CONDITION F
+		ON F.GENDER_ID = A.GENDER_ID
+		WHERE A.PARTY_ID = #{partyId}
+		
+	</select>
+
+	
+	<insert id="partyApply" parameterType="com.noexit.app.model.PartyApplyDTO">
+		
+		INSERT INTO PARTY_APPLY(APPLY_ID, PARTY_ID, USER_ID,APPLY_MESSAGE, CREATED_AT)
+		VALUES(PARTY_APPLY_SEQ.NEXTVAL,#{partyId},#{userId},#{applyComment},SYSDATE)
+		
+	</insert>
+	
+	<select id="getThemeById" parameterType="long" resultType="com.noexit.app.model.ThemeSlotDTO">
+		
+		SELECT A.RES_OPEN_ID AS slotId, C.CAFE_NAME AS cafeName, B.ROOM_NAME AS themeName
+		, TO_CHAR(A.OPEN_AT,'YYYY-MM-DD') AS resDate, TO_CHAR(A.OPEN_AT,'HH24:MI') AS resTime
+		, B.MIN_PLAYERS AS minPlayers, B.MAX_PLAYERS AS maxPlayers, B.PRICE AS price, FN_RESERVATION_CHECK(A.RES_OPEN_ID) AS status
+		FROM RES_OPEN A
+		JOIN ROOM B
+		ON A.ROOM_ID = B.ROOM_ID
+		JOIN CAFE C
+		On B.CAFE_ID = C.CAFE_ID
+		WHERE A.RES_OPEN_ID = #{slotId}
+		
+	</select>
+	
+	<insert id="partyInsert" parameterType="com.noexit.app.model.PartyDTO">
+	
+		INSERT INTO PARTY (PARTY_ID,USER_ID,PARTY_NAME,GENDER_ID,MESSAGE,CREATED_AT)
+		VALUES(PARTY_SEQ.NEXTVAL,#{userId},#{partyName},#{genderCondition},#{partyComment},SYSDATE)
+		
+	</insert>
+
+	<update id="partyUpdate" parameterType="com.noexit.app.model.PartyDTO">
+		
+		UPDATE PARTY
+		SET PARTY_NAME = #{partyName}, MESSAGE = #{partyComment};
+		WHERE PARTY_ID = #{partyId}
+		
+	</update>
+	
+	<insert id="partyDelete" parameterType="long">
+	
+		INSERT INTO PARTY_DROP(PARTY_DROP_ID, PARTY_ID, CREATED_AT)
+		VALUES(PARTY_DROP_ID_SEQ.NEXTVAL,#{partyId},SYSDATE)
+		
+	</insert>
+	
+	<select id="getPartyCommentList" parameterType="long" resultType="com.noexit.app.model.PartyCommentDTO">
+		
+		SELECT A.MESSAGE_ID AS commentId, B.NICKNAME AS name, A.CONTENT AS comment, A.USER_ID AS userId, A.CREATED_AT AS createdAt
+		FROM PARTY_MESSAGE A
+		JOIN USER_ACCOUNT B
+		ON A.USER_ID = B.USER_ID
+		WHERE A.PARTY_ID = #{partyId}
+		ORDER BY CREATED_AT
+		
+	</select>
+	
+	<insert id="partyCommentInsert" parameterType="com.noexit.app.model.PartyCommentDTO">
+	
+		INSERT INTO PARTY_MESSAGE(MESSAGE_ID,PARTY_ID,CONTENT,USER_ID,CREATED_AT)
+		VALUES(PARTY_MESSAGE_SEQ.NEXTVAL,#{partyId},#{commentId},#{userId},SYSDATE)
+		
+	</insert>	
+	
+	<insert id="partyCommentDelete" parameterType="long">
+	
+		INSERT INTO MESSAGE_DELETE(DELETE_ID, MESSAGE_ID, DELETED_AT)
+		VALUES(MESSAGE_DELETE_SEQ.NEXTVAL,#{commentId},SYSDATE)
+			
+	</insert>
+	
+	<select id="getPartyCrewList" parameterType="long" resultType="com.noexit.app.model.PartyCrewDTO">
+	
+		SELECT MEMBER_ID AS crewId, NICKNAME AS name, AGE AS age, GENDER AS gender, TEMP AS temp, READY AS ready, POSITION AS position
+		FROM VW_PARTY_ACTIVE_MEMBER
+		WHERE PARTY_ID = #{partyId}
+		ORDER BY JOINDT
+		
+	</select>
+		
+	<update id="partyReady" parameterType="long">
+		
+		UPDATE PARTY_MEMBER
+		SET READY_AT = SYSDATE
+		WHERE APPLY_ID = #{applyId}
+		
+	</update>
+	
+	<delete id="partyOut" parameterType="long">
+		
+		DELETE 
+		FROM PARTY_MEMBER
+		WHERE APPLY_ID = #{applyID}
+		
+		DELETE 
+		FROM PARTY_APPLY
+		WHERE APPLY_ID = #{applyID}
+		
+	</delete>
+	
+	<insert id="partyKick" parameterType="long">
+		
+		INSERT INTO PARTY_KICK(PARTY_KICK_ID,MEMBER_ID,CREATED_AT)
+		VALUES(PARTY_KICK_SEQ.NEXTVAL,#{memberId},SYSDATE)
+		
+	</insert>	
+	
+	<select id="getPartyApplyList" parameterType="long" resultType="com.noexit.app.model.PartyApplyDTO">
+	
+		SELECT A.APPLY_ID AS applyId, B.NICKNAME AS name, C.GENDER AS gender,FN_GET_USER_AGE(C.BIRTHDATE) AS age,FN_GET_MANNER(A.USER_ID) AS temp, A.APPLY_MESSAGE AS applyComment, A.CREATED_AT AS createdAt
+		FROM PARTY_APPLY A
+		JOIN USER_ACCOUNT B
+		ON A.USER_ID = B.USER_ID
+		JOIN USER_INFO C
+		ON A.USER_ID = C.USER_ID
+		WHERE NOT EXISTS 
+		(
+		    SELECT 1
+		    FROM PARTY_MEMBER D
+		    WHERE D.APPLY_ID = A.APPLY_ID
+		)
+		ORDER BY A.CREATED_AT DESC
+		
+	</select>
+	
+	<insert id="aprvApply" parameterType="long">
+		
+		INSERT INTO PARTY_MEMBER(MEMBER_ID,APPLY_ID,READY_AT,JOINED_AT)
+		VALUES(PARTY_MEMBER_SEQ.NEXTVAL,#{applyId},NULL,SYSDATE)
+		
+	</insert>
+	
+	<delete id="rejectApply" parameterType="long">
+		
+		DELETE
+		FROM PARTY_APPLY
+		WHERE APPLY_ID = #{applyId}
+		
+	</delete>
+	
+</mapper>

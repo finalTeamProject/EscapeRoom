@@ -1,7 +1,9 @@
-package com.noexit.app.service;
+package com.noexit.app.mapper;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.ibatis.annotations.Mapper;
 
 import com.noexit.app.model.PartyApplyDTO;
 import com.noexit.app.model.PartyCommentDTO;
@@ -9,34 +11,9 @@ import com.noexit.app.model.PartyCrewDTO;
 import com.noexit.app.model.PartyDTO;
 import com.noexit.app.model.ThemeDTO;
 
-public interface PartyService
+@Mapper
+public interface PartyMapper
 {
-	/*
-	파티 목록 조회
-	파티 정보 조회
-	파티 신청
-	
-	테마 정보 조회
-	
-	파티 등록
-	
-	파티 정보 수정
-	파티 해산
-	
-	파티 댓글 조회
-	파티 댓글 작성
-	파티 댓글 삭제
-	
-	파티원 조회
-	파티 레디
-	파티 탈퇴
-	파티 강퇴
-	
-	파티 신청 조회
-	파티 신청 승인
-	파티 신청 거절
-	*/
-	
 	List<PartyDTO> getPartyList(Map<String, Object> map);
 	PartyDTO getPartyById(long partyId);
 	int partyApply(PartyApplyDTO dto);
@@ -55,10 +32,9 @@ public interface PartyService
 	List<PartyCrewDTO> getPartyCrewList(long partyId);
 	int partyReady(long partyId);
 	int partyOut(long applyId);
-	int partyKick(long memberId);
+	int partyKick(long applyId);
 	
 	List<PartyApplyDTO> getPartyApplyList(long partyId);
 	int aprvApply(long applyId);
 	int rejectApply(long applyId);
-	
 }

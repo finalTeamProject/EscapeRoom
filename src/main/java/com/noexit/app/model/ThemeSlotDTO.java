@@ -10,5 +10,11 @@ public class ThemeSlotDTO
 	private long slotId;
 	private String resDate;
 	private String resTime;
-	private String status;
+
+	private String cafeName;
+	private String themeName;
+	private int minPlayers;
+	private int maxPlayers;
+	private int price;
+	private int status;
 }

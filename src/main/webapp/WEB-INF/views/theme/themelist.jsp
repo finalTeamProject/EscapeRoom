@@ -8,7 +8,7 @@
 <title>themelist.jsp</title>
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
-<c:set var="path" value="${pageContext.request.contextPath }"></c:set>
+<c:set var="path" value="${pageContext.request.contextPath }" />
 
 <style type="text/css">
 
@@ -97,8 +97,9 @@
 
 </style>
 
-<script type="text/javascript">
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 
+<script type="text/javascript">
 
 	document.addEventListener("DOMContentLoaded",function()
 	{
@@ -140,12 +141,92 @@
 		
 		f.submit();
 	}
-	
-	function addList()
+
+	$(function()
 	{
-		alert("schType : " + schType + " / kwd : " + kwd);
+		$("#addList").click(function()
+		{
+			//alert("확인");
+			
+			let params = new URLSearchParams(
+			{
+				kwd: kwd,
+				schType: schType,
+				lastId: lastId
+				
+			}).toString();
+			
+			$.ajax(
+			{
+				"type":"POST"
+				, "url":"${path}/theme/list"
+				, "data":params
+				, "dataType":"json"
+				, "success":function(data)
+				{
+					if(data.length == 0)
+					{
+						$("#addList").remove();
+						return;
+					}
+					
+					renderList(data);
+					
+					lastId = data[data.length-1].themeId;
+					
+					//console.log(typeof data, data);
+				}
+				, "error":function(e)
+				{
+					alert("에러 발생");
+					console.log(e.responseText);
+				}
+			});
+		});
+		
+		$("#addList").click();
+	});
+	
+	function renderList(list)
+	{
+		list.forEach(function(item)
+		{
+			$(".theme-list").append(renderTheme(item));
+		});
 	}
 
+	function renderTheme(item)
+	{
+		return "<a href='${path}/theme/info/" + item.themeId + "' class='theme-item'>" 
+			+ "<div class='theme-image'>" + "<span>" + item.imagePath + "</span></div>"
+			+ "<div class='theme-info'>" 
+			+ getItem('카페명',item.cafeName)
+			+ getItem('테마명',item.themeName)
+			+ getItem('테마 장르',item.genre)
+			+ getItem('테마 시간',item.duration + "분")
+			+ getItem('테마 가격',item.price + "￦")
+			+ getItem('난이도',showStart(item.difficulty))
+			+ getItem('공포도',showStart(item.horror))
+			+ "<div class='info-item'>"
+			+ "<span>인원</span>"
+			+ "<span>" + item.minPlayers + " ~ " + item.maxPlayers + "</span>"
+			+ "</div>" 
+			+ "</div>"
+			+ "</a>"
+	}		
+
+	function showStart(n)
+	{
+		n = Number(n);
+		
+		return "★".repeat(n) + "☆".repeat(5-n);
+	}
+	
+	function getItem(title,value)
+	{
+		return "<div class='info-item'>" + "<span>" + title + "</span>" + "<span>" + value + "</span>" + "</div>";
+	}
+	
 </script>
 
 </head>
@@ -162,8 +243,8 @@
 						<form action="" method="get" name="searchForm">
 							
 							<select name="schType">
-								<option value="cafeName" ${schType == 'cafeName' ? 'selected' : '' }>카페명</option>
-								<option value="themeName" ${schType == 'themeName' ? 'selected' : '' }>테마명</option>
+								<option value="C.CAFE_NAME" ${schType == 'C.CAFE_NAME' ? 'selected' : '' }>카페명</option>
+								<option value="A.ROOM_NAME" ${schType == 'A.ROOM_NAME' ? 'selected' : '' }>테마명</option>
 							</select>
 							
 							<input type="text" name="kwd" placeholder="검색 키워드" value="${kwd }">
@@ -179,7 +260,7 @@
 						
 						<div class="filter-item">
 							<span>가격</span>
-							<input type="text" name="minPirce" placeholder="최소 가격">
+							<input type="text" name="minPrice" placeholder="최소 가격">
 							~
 							<input type="text" name="maxPrice" placeholder="최대 가격"> 
 						</div>
@@ -203,7 +284,7 @@
 				</div>
 				
 				<div class="theme-list">
-				
+				<%-- 
 					<a href="${path }/theme/info/1" class="theme-item">
 					
 						<div class="theme-image">
@@ -296,9 +377,9 @@
 							
 						</div>
 					
-					</a>
+					</a>  --%>
 				
-					<a href="${path }/theme/info/1" class="theme-item">
+					<%-- <a href="${path }/theme/info/1" class="theme-item">
 					
 						<div class="theme-image">
 							<span>테마이미지</span>
@@ -343,13 +424,13 @@
 							
 						</div>
 					
-					</a>
+					</a> --%>
 				
 				</div>
 				
 				<div class="theme-add">
 					
-					<button type="button" class="btn btn-primary" onclick="addList()">더보기</button>	
+					<button type="button" class="btn btn-primary" id="addList">더보기</button>	
 					
 				</div>
 				

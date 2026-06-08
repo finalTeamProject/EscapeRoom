@@ -1,5 +1,9 @@
 package com.noexit.app.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,14 +11,30 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.noexit.app.mapper.ThemeMapper;
+import com.noexit.app.model.ThemeDTO;
+import com.noexit.app.model.ThemeReviewDTO;
+import com.noexit.app.model.ThemeSlotDTO;
+import com.noexit.app.service.ThemeService;
 
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Controller
 @RequestMapping("/theme/*")
 public class Theme
 {
+	private final ThemeService themeService;
+	
+    private final AdminController adminController;
+
+    Theme(AdminController adminController, ThemeService themeService) 
+    {
+        this.adminController = adminController;
+        this.themeService = themeService;
+    }
 
     /*
      * themelist 페이지로 이동하는 메소드
@@ -50,11 +70,11 @@ public class Theme
 	 * @param model
 	 * @return
 	 */
-	@PostMapping()
-	public String themeListData(@RequestParam(name="schType", defaultValue = "cafeName") String schType
+	@ResponseBody
+	@PostMapping("list")
+	public List<ThemeDTO> themeListData(@RequestParam(name="schType", defaultValue = "C.CAFE_NAME") String schType
 						  , @RequestParam(name="kwd", defaultValue = "") String kwd
-						  , @RequestParam(name="lastId", defaultValue = "0") long lastId
-						  , Model model)
+						  , @RequestParam(name="lastId", defaultValue = "0") long lastId)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -78,7 +98,28 @@ public class Theme
 		 * 
 		 */
 
-		return "";
+		Map<String, Object> map = new HashMap<>();
+		
+		map.put("lastId", lastId);
+		
+		try
+		{		
+			if(!kwd.isBlank())
+			{
+				map.put("kwd", kwd);
+				map.put("schType", schType);
+			}
+			
+			List<ThemeDTO> list = themeService.getThemeList(map);
+			
+			return list;
+		} 
+		catch (Exception e)
+		{
+			log.info("themeListData : ",e);
+		}
+		
+		return null;
 	}
 
 	/**
@@ -132,7 +173,39 @@ public class Theme
 		 * 몰입도
 		 * 코멘트
 		 */
-
+		
+		try
+		{
+			ThemeDTO dto = themeService.getThemeInfoById(themeId);
+			
+			if(dto == null)
+			{
+				return "redirect:/theme/list";
+			}
+			
+			Map<String, List<ThemeSlotDTO>> slot = themeService.getThemeSlot(themeId);
+			
+			List<ThemeReviewDTO> review = themeService.getThemeReview(themeId);
+			
+			int  count = 0;
+			
+			if(!review.isEmpty())
+			{
+				count = review.size();				
+			}
+			
+			ThemeReviewDTO total = themeService.getTotalReview(themeId);	
+			model.addAttribute("dto",dto);
+			model.addAttribute("slot",slot);
+			model.addAttribute("review",review);
+			model.addAttribute("total", total);
+			model.addAttribute("count", count);
+		} 
+		catch (Exception e)
+		{
+			log.info("themeDetail : ",e);
+		}
+		
 		return "theme/themeinfo";
 	}
 

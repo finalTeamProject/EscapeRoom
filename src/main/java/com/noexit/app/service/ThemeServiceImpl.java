@@ -1,9 +1,13 @@
 package com.noexit.app.service;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -132,10 +136,114 @@ public class ThemeServiceImpl implements ThemeService {
 		return saveFilename;
 	}
 
-	// 팀원 영역
-	@Override public void getGenreList() { }
-	@Override public List<Cafe> getCafeList(long userId) { return null; }
-	@Override public List<ThemeDTO> getThemeList(Map<String, Object> map) { return null; }
-	@Override public Map<String, List<ThemeSlotDTO>> getThemeSlot(long themeId) { return null; }
-	@Override public List<ThemeReviewDTO> getThemeReview(long themeId) { return null; }
+	@Override 
+	public List<Cafe> getCafeList(long userId)
+	{ 
+		return null;
+	}
+	
+	
+	
+	@Override 
+	public List<ThemeDTO> getThemeList(Map<String, Object> map) 
+	{ 
+		// map 에 들어있는 데이터
+		// schType, kwd, lastId
+		
+		List<ThemeDTO> result = null;
+		
+		try
+		{
+			result = themeMapper.getThemeList(map);
+		} 
+		catch (Exception e)
+		{
+			log.info("getThemeList : ",e);
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public ThemeDTO getThemeInfoById(long themeId)
+	{
+		ThemeDTO dto = null;
+		
+		try
+		{
+			dto = themeMapper.getThemeInfoById(themeId);
+		} 
+		catch (Exception e)
+		{
+			log.info("getThemeInfoById : ",e);
+		}
+		
+		return dto;
+	}
+	
+	@Override 
+	public Map<String,List<ThemeSlotDTO>> getThemeSlot(long themeId)
+	{
+		List<ThemeSlotDTO> result = null;
+		
+		Map<String,List<ThemeSlotDTO>> list = new HashMap<>();
+		
+		try
+		{
+			result = Objects.requireNonNull(themeMapper.getThemeSlot(themeId));
+			
+			
+			//list = result.stream().collect(Collectors.groupingBy(ThemeSlotDTO::getResDate));
+			
+			list = result.stream().collect(Collectors.groupingBy(
+			        ThemeSlotDTO::getResDate,
+			        TreeMap::new,
+			        Collectors.toList()));
+		}
+		catch(NullPointerException e)
+		{
+			log.info("getThemeSlot Null : ",e);
+		}
+		
+		catch (Exception e)
+		{
+			log.info("getThemeSlot : ",e);
+		}
+		
+		return list;
+	}
+	
+	@Override 
+	public List<ThemeReviewDTO> getThemeReview(long themeId)
+	{ 
+		List<ThemeReviewDTO> result = null;
+		
+		try
+		{
+			result = themeMapper.getThemeReview(themeId);
+		} 
+		catch (Exception e)
+		{
+			log.info("getThemeReview : ",e);
+		}
+		
+		return result;
+	}
+	
+	@Override
+	public ThemeReviewDTO getTotalReview(long themeId)
+	{
+		ThemeReviewDTO result = null;
+		
+		try
+		{
+			result = themeMapper.getTotalReview(themeId);
+		} 
+		catch (Exception e)
+		{
+			log.info("getTotalReview : ",e);
+		}
+		
+		return result;
+	}
 }

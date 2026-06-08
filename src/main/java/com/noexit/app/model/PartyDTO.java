@@ -9,15 +9,21 @@ public class PartyDTO
 {
 	private long partyId;
 	private String partyStatus;
+	private long userId;
 	private String partyName;
 	private String cafeName;
 	private String themeName;
-	private String date;
-	private String time;
+	private String themeImg;
+	private String themeDate;
+	private String themeTime;
+	private double avgAge;
+	private double avgTemp;
+	private int count;
 	private int minPlayers;
 	private int maxPlayers;
 	private int price;
-	private String slotStatus;
-	private int genderCondition;
+	private int slotStatus;
+	private int genderId;
+	private String genderName;
 	private String partyComment;
 }
