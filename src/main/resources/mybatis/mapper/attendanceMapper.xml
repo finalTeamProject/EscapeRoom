@@ -52,4 +52,27 @@
 		 ORDER BY VRA.OPEN_AT DESC
 	</select>
 
+	<select id="selectCrewByReservationId" parameterType="Long"
+	        resultType="com.noexit.app.model.AttendCrew">
+		SELECT USER_ID, NICKNAME, POSITION
+		  FROM (
+		    SELECT P.USER_ID, UA.NICKNAME, 'HOST' AS POSITION
+		      FROM PARTY P
+		      JOIN USER_ACCOUNT UA ON UA.USER_ID = P.USER_ID
+		      JOIN RESERVATION R   ON R.PARTY_ID = P.PARTY_ID
+		     WHERE R.RESERVATION_ID = #{reservationId}
+		    UNION ALL
+		    SELECT PA.USER_ID, UA.NICKNAME, 'MEMBER' AS POSITION
+		      FROM PARTY_MEMBER PM
+		      JOIN PARTY_APPLY  PA ON PA.APPLY_ID = PM.APPLY_ID
+		      JOIN USER_ACCOUNT UA ON UA.USER_ID = PA.USER_ID
+		      JOIN RESERVATION  R  ON R.PARTY_ID = PA.PARTY_ID
+		     WHERE R.RESERVATION_ID = #{reservationId}
+		       AND NOT EXISTS (
+		           SELECT 1 FROM PARTY_KICK PK WHERE PK.MEMBER_ID = PM.MEMBER_ID
+		       )
+		  )
+		 ORDER BY DECODE(POSITION, 'HOST', 0, 1), USER_ID
+	</select>
+
 </mapper>

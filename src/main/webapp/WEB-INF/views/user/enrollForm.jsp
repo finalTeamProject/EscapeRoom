@@ -69,6 +69,8 @@ $(function(){
 	// 회원가입 버튼
 	$("#signUpBtn").click(function(){
 		$("#error").css("display", "none");
+		$("#pwError").css("display", "none");
+		$("#pwConfirmError").css("display", "none");
 
 		if (!isIdChecked) {
 			$("#error").html("아이디 중복 확인은 필수입니다.")
@@ -80,16 +82,16 @@ $(function(){
 		// 비밀번호 8자 이상
 		let pw = $("#password").val();
 		if (pw.length < 8) {
-			$("#error").html("비밀번호는 8자 이상이어야 합니다.")
-			           .css({color: "red", display: "inline"});
+			$("#pwError").html("비밀번호는 8자 이상이어야 합니다.")
+			             .css({color: "red", display: "inline"});
 			$("#password").focus();
 			return;
 		}
 
 		// 비밀번호 확인 일치
 		if (pw !== $("#passwordConfirm").val()) {
-			$("#error").html("비밀번호가 일치하지 않습니다.")
-			           .css({color: "red", display: "inline"});
+			$("#pwConfirmError").html("비밀번호가 일치하지 않습니다.")
+			                    .css({color: "red", display: "inline"});
 			$("#passwordConfirm").focus();
 			return;
 		}
@@ -172,11 +174,13 @@ $(function(){
 			<div class="mb-3">
 				<label for="password" class="form-label">비밀번호<span class="form-required">*</span></label>
 				<input type="password" id="password" name="password" class="form-control" placeholder="8자 이상">
+				<span id="pwError" class="small" style="display: none;"></span>
 			</div>
 
 			<div class="mb-3">
 				<label for="passwordConfirm" class="form-label">비밀번호 확인<span class="form-required">*</span></label>
 				<input type="password" id="passwordConfirm" class="form-control" placeholder="비밀번호 한 번 더 입력">
+				<span id="pwConfirmError" class="small" style="display: none;"></span>
 			</div>
 
 			<div class="mb-3">

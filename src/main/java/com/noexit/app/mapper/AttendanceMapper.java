@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.noexit.app.model.AttendanceListDTO;
+import com.noexit.app.model.AttendCrew;
 
 @Mapper
 public interface AttendanceMapper {
@@ -15,4 +16,6 @@ public interface AttendanceMapper {
 
 	public void insertAttendance(AttendanceListDTO dto) throws SQLException;
 	public void insertAttendDetail(AttendanceListDTO dto) throws SQLException;
+
+	public List<AttendCrew> selectCrewByReservationId(Long reservationId);
 }
