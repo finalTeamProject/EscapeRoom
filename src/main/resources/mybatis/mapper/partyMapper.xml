@@ -165,12 +165,13 @@
 	
 	<select id="getPartyCommentList" parameterType="map" resultType="com.noexit.app.model.PartyCommentDTO">
 		
-		SELECT A.MESSAGE_ID AS commentId, B.NICKNAME AS name, A.CONTENT AS partyComment, A.USER_ID AS userId, A.CREATED_AT AS createdAt
+		SELECT A.MESSAGE_ID AS commentId,A.PARTY_ID, B.NICKNAME AS nickName, A.CONTENT AS partyComment, A.USER_ID AS userId, TO_CHAR(A.CREATED_AT,'MM-DD HH24:MI') AS createdAt
 		FROM PARTY_MESSAGE A
 		JOIN USER_ACCOUNT B
 		ON A.USER_ID = B.USER_ID
-		WHERE A.PARTY_ID = #{partyId} AND A.MESSAGE_ID > #{lastCommentId}  
+		WHERE A.PARTY_ID = #{partyId} AND A.MESSAGE_ID > #{lastCommentId} 
 		ORDER BY A.CREATED_AT
+
 		
 	</select>
 	

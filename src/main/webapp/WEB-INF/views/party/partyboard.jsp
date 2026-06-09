@@ -203,6 +203,11 @@
 	justify-content: space-between;
 }
 
+.crew-info span
+{
+	padding-right: 5px;
+}
+
 .crew-action
 {
 	justify-content: center;
@@ -278,6 +283,11 @@
 					crewList(data.crewList);
 					applyList(data.applyList);
 					commentList(data.commentList);
+					
+					if(data.commentList.length != null && data.commentList.length > 0)
+					{
+						lastCommentId = data.commentList[data.commentList.length-1].commentId;
+					}
 				}
 				,"error":function(e)
 				{
@@ -310,31 +320,31 @@
 		});
 		
 		// 댓글 삭제
-		$(".comment-delete").click(function()
+		$(".comment-list").on("click",".comment-delete",function()
 		{
 			alert(this.getAttribute("data-comment-id"));
 		});
 		
 		// 파티 승인
-		$(".aprv-apply").click(function()
+		$(".party-apply-list").on("click",".aprv-apply",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
 		
 		// 파티 거절
-		$(".reject-apply").click(function()
+		$(".party-apply-list").on("click",".reject-apply",function()
 		{
 			alert(this.getAttribute("data-apply-id"));	
 		});
 	
 		// 파티 탈퇴;
-		$(".btn-out").click(function()
+		$(".party-crew-list").on("click",".btn-out",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
 		
 		// 파티 강퇴
-		$(".btn-kick").click(function()
+		$(".party-crew-list").on("click",".btn-kick",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
@@ -348,6 +358,8 @@
 		genderName = document.querySelector("#genderName");
 		partyComment = document.querySelector("#partyComment");
 		partyCrewList = document.querySelector(".party-crew-list");
+		partyApplyList = document.querySelector(".party-apply-list");
+		partyCommentList = document.querySelector(".comment-list");
 	});
 	
 	let partyName;
@@ -379,20 +391,20 @@
 		 
 	    list.forEach(function(item)
 	    {
-	        partyCrewList.insertAdjacentHTML("beforeend", createCrew(item));
+	        partyCrewList.innerHTML += (createCrew(item));
 	    });
 	}
 	
 	function createCrew(item)
 	{
 		let html = "<div class='crew'>"
-			 + "<div class='crew-info'>"
-			 + "<span>" + item.nickName + "</span>"
-			 + "<span>" + item.age + "세</span>"
-			 + "<span>" + item.gender + "</span>"
-			 + "<span>🌡️" + item.temp + "</span>"
-			 + "</div>"
-			 +"<div class='crew-position'>";
+				 + "<div class='crew-info'>"
+				 + "<span>" + item.nickName + "</span>"
+				 + "<span>" + item.age + "세</span>"
+				 + "<span>" + item.gender + "</span>"
+				 + "<span>🌡️" + item.temp + "</span>"
+				 + "</div>"
+				 + "<div class='crew-position'>";
 			 
 		if(item.position == 'HOST')
 		{
@@ -426,17 +438,79 @@
 			html += "</div>";
 		}
 		
-		return item;
+		return html;
 	}
 	
-	function applyList(applyList)
+	let partyApplyList;
+	
+	function applyList(list)
 	{
+		partyApplyList.innerHTML = "";
 		
+		list.forEach(function(item)
+		{
+			partyApplyList.innerHTML += createApply(item);
+		});
 	}
 	
-	function commentList(commentList)
+	function createApply(item)
 	{
+		let html = "<div class='apply-item'>"
+				 + "<div class='apply-info'>"
+				 + "<span>" + item.nickName + "</span>"
+				 + "<span>" + item.age + "세</span>"
+				 + "<span>" + (item.gender == 'F' ? '여자' : '남자') + "</span>"
+				 + "<span>🌡️" + item.temp + "</span>"
+				 + "</div>" // .apply-info
+				 + "<div class='apply-comment'>"
+				 + "<p>" + item.applyComment + "</p>"
+				 + "</div>"; // .apply-comment
 		
+		if('${position}' == 'HOST')
+		{
+			html += "<div class='apply-action'>"
+				 +  "<button type='button' class='btn btn-primary aprv-apply' data-apply-id='" + item.applyId + "'>승인</button>" 
+				 +  "<button type='button' class='btn btn-outline-primary reject-apply' data-apply-id='" + item.applyId + "'>거절</button>"
+				 +  "</div>"; // .apply-action
+		}
+			
+		html += "</div>"; // .apply-item
+		
+		return html;
+	}
+	
+	let partyCommentList;
+	
+	function commentList(list)
+	{
+		list.forEach(function(item)
+		{
+			partyCommentList.innerHTML += createComment(item);
+		});
+	}
+	
+	function createComment(item)
+	{
+		let html = "";
+		
+		if(item.userId == '${userId}')
+		{
+			html += "<div class='comment-item mine'>"
+				 +  "<button type='button' class='comment-delete' data-comment-id='" + item.commentId + "'>삭제</button>"
+				 +  "<span class='comment' data-comment-id='" + item.commentId + "'>" + item.partyComment + "</span>"
+				 +  "<span class='writer'>" + item.nickName + "</span>";
+		}
+		else
+		{
+			html += "<div class='comment-item other'>"
+				 +  "<span class='writer'>" + item.nickName + "</span>"
+				 +  "<span class='comment' data-comment-id='" + item.commentId + "'>" + item.partyComment + "</span>";
+		}
+		
+		html += "<span class='write-date' data-comment-id='" + item.commentId + "' style='font-size: small;'>" + item.createdAt + "</span>"
+		 	 +  "</div>";
+		 		
+		return html;
 	}
 	
 	function commentWrite()
@@ -516,31 +590,30 @@
 						<hr>
 						
 						<div class="party-name">
-							<span id="partyName">주열룸</span>
+							<span id="partyName">파티명</span>
 						</div>
 						
 						<div class="theme-info">
-							<span id="cafeName">우주별&nbsp;&nbsp;</span>
-							<span id="themeName">그레이&nbsp;&nbsp;</span>
-							<span id="themeDate">2026-06-01&nbsp;&nbsp;</span>
-							<span id="themeTime">18:00&nbsp;&nbsp;</span>
-							<span id="themePlayers">2명 ~ 4명</span>
+							<span id="cafeName">카페명&nbsp;&nbsp;</span>
+							<span id="themeName">테마명&nbsp;&nbsp;</span>
+							<span id="themeDate">날짜&nbsp;&nbsp;</span>
+							<span id="themeTime">시간&nbsp;&nbsp;</span>
+							<span id="themePlayers">인원수</span>
 							<span id="themeStatus">예약 가능/예약 불가</span>
 						</div>
 						
 						<div class="party-condition">
 							<span id="genderName">성별 동성/무관</span>
-							<span id="partyComment">미쿠 좋아하는 사람만 오셈</span>						
+							<span id="partyComment">파티 코멘트</span>						
 						</div> 
 						
-						<div class="party-action">
-							
-							<button type="button" class="btn btn-primary" onclick="reservation()">예약하기</button>
-							<button type="button" class="btn btn-outline-primary" onclick="partyUpdate()">파티 수정</button>
-							<button type="button" class="btn ne-btn-deact" onclick="partyDelete()">파티 해산</button>
-							
-						</div>
-						
+						<c:if test="${position == 'HOST' }">
+							<div class="party-action">
+								<button type="button" class="btn btn-primary" onclick="reservation()">예약하기</button>
+								<button type="button" class="btn btn-outline-primary" onclick="partyUpdate()">파티 수정</button>
+								<button type="button" class="btn ne-btn-deact" onclick="partyDelete()">파티 해산</button>								
+							</div>
+						</c:if>
 					</div>
 					
 					
@@ -551,14 +624,15 @@
 					
 						<div class="comment-list">
 							
-							<div class="comment-item other">
+							<!-- <div class="comment-item other">
 								<span class="writer">윤주열</span>
-								<span class="comment">미쿠 티셔츠 샀음</span>
+								<span class="comment" data-comment-id="1">미쿠 티셔츠 샀음</span>
+								<span class="write-date" data-comment-id="1" style="font-size: small;">2026-06-01 14:00:00</span>
 							</div>
 							
 							<div class="comment-item mine">
-								<button type="button" class="comment-delete" data-comment-id="1">삭제</button>
-								<span class="comment">오 얼마임?</span>
+								<button type="button" class="comment-delete" data-comment-id="2">삭제</button>
+								<span class="comment" data-comment-id="2">오 얼마임?</span>
 								<span class="writer">김주열</span>
 							</div>
 							
@@ -581,7 +655,7 @@
 								<button type="button" class="comment-delete" data-comment-id="2" >삭제</button>
 								<span class="comment">제 정신임?</span>
 								<span class="writer">김주열</span>
-							</div>
+							</div> -->
 							
 						</div>
 					
@@ -657,11 +731,15 @@
 							
 						</div> 
 						
-						<div class="crew-action">
+						<c:if test="${position == 'CREW' }">
+						
+							<div class="crew-action">
+								
+								<button type="button" class="btn btn-primary" onclick="onReady()">레디</button>
+								
+							</div>
 							
-							<button type="button" class="btn btn-primary" onclick="onReady()">레디</button>
-							
-						</div>
+						</c:if>
 						
 					</div>
 										
@@ -672,7 +750,7 @@
 						
 						<div class="party-apply-list">
 							
-							<div class="apply-item">
+							<!-- <div class="apply-item">
 								
 								<div class="apply-info">
 									
@@ -696,7 +774,7 @@
 									
 								</div>
 								
-							</div>
+							</div> -->
 							
 						</div>
 						
