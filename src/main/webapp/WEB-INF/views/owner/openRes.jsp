@@ -175,7 +175,7 @@
 						<form method="post" name="resOpenForm">
 							<div class="form-label">카페 선택</div>
 							<select name="cafe" class="selectBox ne-box" id="cafeSelect">
-								<option value="" disabled selected>-- 카페 선택 --</option>
+								<option disabled selected>-- 카페 선택 --</option>
 								<c:forEach var="list" items="${cafeList }">
 									<option value="${list.cafeId }">${list.cafeName }</option>
 								</c:forEach>

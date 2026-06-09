@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.noexit.app.model.CafeReservationDTO;
 import com.noexit.app.model.OpenReservationDTO;
+import com.noexit.app.service.CafeReservationService;
 import com.noexit.app.service.OpenReservationService;
 
 import jakarta.servlet.http.HttpSession;
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OwnerReservationController {
 
 	private final OpenReservationService service;
+	private final CafeReservationService cafeService;
 	
 	@GetMapping("/owner/openRes")
 	public String openRes(@RequestParam(name="page", defaultValue="1") int currentPage
@@ -61,17 +64,6 @@ public class OwnerReservationController {
 			
 			List<OpenReservationDTO> openList = service.getOpenReservationList(map);
 			
-//			
-//			// 페이징 처리를 위한 map 구성
-//			//-- currentPage, schDate, schCafe
-//			Map<String, Object> map = new HashMap<>();
-//			map.put("schCafe", schCafe);
-//			map.put("schDate", schDate);
-//			map.put("currentPage", currentPage);
-//						
-//			// 로그인한 사용자의 오픈 등록 목록 가져오기(페이징처리해서)
-//			//-- list, dataCount, totalPage, paging 
-//			Map<String, Object> openList = service.getListPaging(map);
 			
 			model.addAttribute("schDate", schDate);
 			model.addAttribute("cafeList", cafeList);
@@ -211,15 +203,90 @@ public class OwnerReservationController {
 
 	@GetMapping("/owner/resList")
 	public String resList(
-			 HttpSession session
+			@RequestParam(name="schDate", required = false) String schDate
+			, @RequestParam(name = "schCafe", required = false) Long cafeId
+			, @RequestParam(name="schTheme", required = false) Long roomId
+			, HttpSession session
 			, Model model) {
 		
+		//long userId = (long) session.getAttribute("userId");
+		long userId = 15L;
+		
+		try {
+			
+			// 로그인한 사용자의 카페 목록 가져오기
+			List<OpenReservationDTO> cafeList = service.getCafeList(userId);
+
+			// cafeId 없으면 첫 번째 카페로 세팅
+			if (cafeId == null && !cafeList.isEmpty()) {
+			    cafeId = cafeList.get(0).getCafeId();
+			}
+			
+			// 첫 진입시 
+			// 오늘날짜 담아주기 YYYY-MM-DD 형태의 문자열로 출력
+			if(schDate==null) {
+				schDate = LocalDate.now().toString();
+			}
+			
+			// 로그인한 사용자의 예약 현황 목록 가져오기
+			//-- userId, schDate, cafeId, userId, offset, limit
+			int offset = 0;
+			int limit = 10;
+			Map<String, Object> map = new HashMap<>();
+			map.put("userId", userId);
+			map.put("openAt", schDate);
+			map.put("cafeId", cafeId);
+			if(roomId!=null)
+				map.put("roomId", roomId);
+			map.put("offset", offset);
+			map.put("limit", limit);
+			
+			List<CafeReservationDTO> resList = cafeService.resList(map);
+			
+			model.addAttribute("schDate", schDate);
+			model.addAttribute("cafeList", cafeList);
+			model.addAttribute("resList", resList);
+			
+			
+			
+		} catch (Exception e) {
+			log.error("resList: ",e );
+		}
 
 		
 		return "owner/resList";
 		
 	}
 	
+	
+	@GetMapping("/owner/resList/list")
+	@ResponseBody
+	public List<CafeReservationDTO> getResList(
+	        @RequestParam(name="schDate") String schDate,
+	        @RequestParam(name="cafeId") Long cafeId,
+	        @RequestParam(name="roomId", required=false) Long roomId,
+	        @RequestParam(name="offset", defaultValue="0") int offset,
+	        HttpSession session) {
+
+	    long userId = 15L;
+
+
+	    Map<String, Object> map = new HashMap<>();
+	    try {
+	    	map.put("userId", userId);
+	    	map.put("openAt", schDate);
+	    	map.put("cafeId", cafeId);
+	    	if(roomId != null) map.put("roomId", roomId);
+	    	map.put("offset", offset);
+	    	map.put("limit", 10);
+			
+		} catch (Exception e) {
+			log.error("getResList: ",e);
+		}
+	    
+
+	    return cafeService.resList(map);
+	}
 	
 	
 }

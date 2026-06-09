@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.CafeReservationMapper">
+
+	
+	<!--  예약 목록 조회   -->
+	<select id="resList" resultType="com.noexit.app.model.CafeReservationDTO" parameterType="map">
+	
+		<!-- SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, 
+		RES_OPEN_ID, OPEN_AT, RESERVATION_ID
+		FROM VW_RES_OPEN_BOOKED
+		WHERE	
+			 CAFE_ID IN (
+			
+			    SELECT CAFE_ID FROM CAFE
+			    WHERE USER_ID = #{userId}
+			    
+			    UNION
+			
+			    SELECT CAFE_ID
+			    FROM (
+			        SELECT CAFE_ID, REG_EVENT_ID,
+			               ROW_NUMBER() OVER (
+			                   PARTITION BY CAFE_ID, USER_ID
+			                   ORDER BY CREATED_AT DESC
+			               ) AS RN
+			        FROM MANAGER_HISTORY
+			        WHERE USER_ID = #{userId}
+			    )
+			    WHERE RN = 1
+			      AND REG_EVENT_ID = 1
+			)
+			AND TO_CHAR(OPEN_AT, 'YYYY-MM-DD') = #{openAt}
+			AND (#{cafeId} IS NULL OR CAFE_ID = #{cafeId})
+			<if test="roomId != null">
+			    AND ROOM_ID = #{roomId}
+			</if>
+		ORDER BY ROOM_NAME, OPEN_AT -->
+		
+		<!-- 10개만 뿌려주고 더보기 버튼 누르면 10개 더 보여주기 반복 -->
+		 SELECT * FROM (
+        SELECT ROWNUM AS RN, A.*
+        FROM (
+            SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME,
+                   RES_OPEN_ID, OPEN_AT, RESERVATION_ID
+            FROM VW_RES_OPEN_BOOKED
+            WHERE CAFE_ID IN (
+                SELECT CAFE_ID FROM CAFE
+                WHERE USER_ID = #{userId}
+                UNION
+                SELECT CAFE_ID
+                FROM (
+                    SELECT CAFE_ID, REG_EVENT_ID,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY CAFE_ID, USER_ID
+                               ORDER BY CREATED_AT DESC
+                           ) AS RN
+                    FROM MANAGER_HISTORY
+                    WHERE USER_ID = #{userId}
+                )
+                WHERE RN = 1
+                  AND REG_EVENT_ID = 1
+            )
+            AND TO_CHAR(OPEN_AT, 'YYYY-MM-DD') = #{openAt}
+            AND CAFE_ID = #{cafeId}
+            <if test="roomId != null">
+                AND ROOM_ID = #{roomId}
+            </if>
+            ORDER BY ROOM_NAME, OPEN_AT
+        ) A
+    )
+    WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+	
+	</select>
+	
+	<!--  예약 상세 조회   -->
+	<select id="resDetail" resultType="com.noexit.app.model.CafeReservationDTO" parameterType="Long">
+	
+		SELECT PARTY_ID, PARTY_NAME
+		, LEADER_ID AS BOOKER_ID, LEADER_NAME AS BOOKER_NAME
+		, LEADER_PHONE AS BOOKER_TEL, TOTAL_MEMBER
+		, RESERVATION_ID
+		FROM VW_RES_OPEN_BOOKED
+		WHERE RESERVATION_ID = #{reservationId}
+	
+	</select>
+
+	
+
+</mapper> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

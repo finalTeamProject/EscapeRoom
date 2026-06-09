@@ -3,52 +3,6 @@ FROM DUAL;
 
 
 
--- 로그인한 유저의 예약 목록 뽑아오기 
--- 사용자예약아이디, 카페아이디, 카페명, 테마아이디, 테마명, 예약인원, 파티장/파티장, 예약상태(예약중/플레이완료/예약취소)
--- 예약오픈아이디, 예약오픈일시, 예약한날짜, 출석여부(출석완료/노쇼/출석미등록), 취소타입(취소완료/매장취소), 취소 일자
-/*
-SELECT VRA.RESERVATION_ID, VRA.CAFE_ID, VRA.CAFE_NAME, VRA.ROOM_ID, VRA.ROOM_NAME, VRA.TOTAL_MEMBER
-, CASE WHEN VRA.LEADER_ID = :USER_ID  -- 로그인 한 사용자 아이디 
-        THEN '파티장' ELSE '파티원' 
-      END AS PARTY_ROLE
-, CASE 
-    WHEN RC.RESERVATION_ID IS NOT NULL THEN '예약 취소' 
-    WHEN VRA.OPEN_AT < SYSDATE THEN  '플레이 완료'
-    ELSE '예약 중' 
-  END AS RES_STATUS
-, VRA.RES_OPEN_ID, VRA.OPEN_AT, VRA.BOOKED_AT
-, FN_GET_ATTEND_STATUS(VRA.RESERVATION_ID, :USER_ID) AS ATTEND_STATUS
-, CASE
-    WHEN RC.RESERVATION_ID IS NULL THEN NULL
-    WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) = 'USER' 
-        THEN '취소 완료'
-    WHEN FN_GET_USER_ROLE(VRA.RES_OPEN_ID, RC.USER_ID, RC.CANCEL_AT) IN ('OWNER', 'MANAGER')
-        THEN '매장 취소'       
-    ELSE '알 수 없음' 
-        END AS CANCEL_TYPE
-, RC.CANCEL_AT AS CANCELED_AT
-FROM VW_RESERVATION_ALL VRA
-    LEFT JOIN RESERVATION_CANCEL RC
-    ON VRA.RESERVATION_ID = RC.RESERVATION_ID
-WHERE VRA.LEADER_ID = :USER_ID --로그인 한 사용자아이디
-    OR VRA.PARTY_ID IN (
-        SELECT PA.PARTY_ID
-        FROM PARTY_MEMBER PM 
-            JOIN PARTY_APPLY PA
-            ON PM.APPLY_ID = PA.APPLY_ID
-        WHERE PA.USER_ID = :USER_ID -- 로그인 한 사용자 아이디
-            AND NOT EXISTS(
-                            SELECT PK.MEMBER_ID
-                            FROM PARTY_KICK PK
-                            WHERE PK.MEMBER_ID = PM.MEMBER_ID
-                            )
-    );
-
-
-*/
-
-
-
 -- 예약 중/예약취소/플레이완료인 목록 가져오기
 SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, TOTAL_MEMBER
     , PARTY_ID, PARTY_NAME
@@ -317,7 +271,10 @@ ORDER BY OPEN_AT
 SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, RES_OPEN_ID, OPEN_AT
 , RESERVATION_ID
 FROM VW_RES_OPEN_BOOKED
-WHERE ROOM_ID = 11
+WHERE 
+TO_CHAR(OPEN_AT,'YYYY-MM-DD') = '2026-03-22' 
+AND CAFE_ID = 2
+AND ROOM_ID = 3
 ORDER BY OPEN_AT
 ;
 
@@ -332,6 +289,103 @@ WHERE RESERVATION_ID = 13
 
 SELECT *
 FROM VW_RES_OPEN_BOOKED;
+
+SELECT FN_GET_RESERVATION_ROLE()
+FROM DUAL;
+
+
+-- 유저아이디로 관리가능한 카페 목록 조회
+SELECT CAFE_ID
+FROM CAFE 
+WHERE USER_ID=8;
+
+SELECT *
+FROM MANAGER_HISTORY
+ORDER BY CAFE_ID ASC, USER_ID ASC, CREATED_AT DESC;
+
+
+
+-- 카페ID + 유저ID 기준으로 가장 최근 이벤트가 1(등록)인지 확인
+SELECT USER_ID, CAFE_ID, REG_EVENT_ID
+FROM (
+    SELECT USER_ID, CAFE_ID, REG_EVENT_ID,
+           ROW_NUMBER() OVER (
+               PARTITION BY CAFE_ID, USER_ID 
+               ORDER BY CREATED_AT DESC
+           ) AS RN
+    FROM MANAGER_HISTORY
+)
+WHERE RN = 1
+  AND REG_EVENT_ID = 1  -- 가장 최근 이벤트가 등록
+
+
+
+-- 카페아이디랑 유저아이디를 받아올거임, 룸아이디일수도?
+-- 카페아이디이거나 룸아이디
+SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, 
+       RES_OPEN_ID, OPEN_AT, RESERVATION_ID
+FROM VW_RES_OPEN_BOOKED
+WHERE CAFE_ID IN (
+    -- 사장인 카페
+    SELECT CAFE_ID FROM CAFE
+    WHERE USER_ID = #{loginId}
+    
+    UNION
+    
+    -- 현재 활성 매니저인 카페
+    SELECT CAFE_ID
+    FROM (
+        SELECT CAFE_ID, REG_EVENT_ID,
+               ROW_NUMBER() OVER (
+                   PARTITION BY CAFE_ID, USER_ID
+                   ORDER BY CREATED_AT DESC
+               ) AS RN
+        FROM MANAGER_HISTORY
+        WHERE USER_ID = #{loginId}
+    )
+    WHERE RN = 1
+      AND REG_EVENT_ID = 1
+)
+AND (#{cafeId} IS NULL OR CAFE_ID = #{cafeId})
+AND (#{roomId} IS NULL OR ROOM_ID = #{roomId})
+AND (#{date} IS NULL OR TO_CHAR(OPEN_AT, 'YYYY-MM-DD') = #{date})
+ORDER BY OPEN_AT
+
+-- 더보기 방식으로 구현 시도(예약 목록 조회)
+SELECT * FROM (
+        SELECT ROWNUM AS RN, A.*
+        FROM (
+            SELECT CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME,
+                   RES_OPEN_ID, OPEN_AT, RESERVATION_ID
+            FROM VW_RES_OPEN_BOOKED
+            WHERE CAFE_ID IN (
+                SELECT CAFE_ID FROM CAFE
+                WHERE USER_ID = #{userId}
+                UNION
+                SELECT CAFE_ID
+                FROM (
+                    SELECT CAFE_ID, REG_EVENT_ID,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY CAFE_ID, USER_ID
+                               ORDER BY CREATED_AT DESC
+                           ) AS RN
+                    FROM MANAGER_HISTORY
+                    WHERE USER_ID = #{userId}
+                )
+                WHERE RN = 1
+                  AND REG_EVENT_ID = 1
+            )
+            AND TO_CHAR(OPEN_AT, 'YYYY-MM-DD') = #{openAt}
+            AND CAFE_ID = #{cafeId}
+            <if test="roomId != null">
+                AND ROOM_ID = #{roomId}
+            </if>
+            ORDER BY ROOM_NAME, OPEN_AT
+        ) A
+    )
+    WHERE RN BETWEEN #{offset} + 1 AND #{offset} + #{limit}
+
+
 
 
 
