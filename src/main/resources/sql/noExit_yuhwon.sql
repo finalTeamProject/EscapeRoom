@@ -39,14 +39,8 @@ BEGIN
 END;
 /
 
-DESC PARTY_KICK;
 
-
-DESC PARTY_MEMBER;
-
-
-
--- 2. 예약오픈아이디로 유저아이디를 보고 사장인지, 매니저인지, 일반사용자인지 판별하는 함수
+-- 2. 예약오픈아이디 유저아이디를 보고 사장인지, 매니저인지, 일반사용자인지 판별하는 함수
 -- 취소일자도 넘겨줘야함 
 CREATE OR REPLACE FUNCTION FN_GET_USER_ROLE
 (
@@ -114,9 +108,6 @@ END;
 
 
 
-DESC MANAGER_HISTORY;
-
-
 -- 3. 출석상태 판별함수(사용자예약아이디, 사용자아이디)
 CREATE OR REPLACE FUNCTION FN_GET_ATTEND_STATUS
 (
@@ -167,12 +158,6 @@ BEGIN
     
 END;
 /
-
-DESC ATTENDANCE;
-DESC ATTENDANCE_DETAIL;
-
-SELECT *
-FROM ATTEND_STATUS;
 
 
 -- 4. 사용자예약번호와 사용자아이디로 사장/매니저/예약자/해당없음 판별하는 함수
@@ -257,9 +242,6 @@ END;
 
 
 
-
-
-
 --==============================================================================
 -- VIEW 생성
 --==============================================================================
@@ -301,7 +283,6 @@ WHERE NOT EXISTS (
     WHERE RO.RES_OPEN_ID = RD.RES_OPEN_ID
 );
 
-desc res_open;
 
 
 
@@ -356,8 +337,7 @@ FROM RESERVATION_CANCEL RC
         ON R.CAFE_ID = C.CAFE_ID
 ORDER BY RV.RESERVATION_ID;
         
-select *
-from cafe;
+
 
 
 -- 4. 예약 된 오픈(슬롯) 뷰

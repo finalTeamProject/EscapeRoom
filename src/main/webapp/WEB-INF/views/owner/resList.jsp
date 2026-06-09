@@ -9,14 +9,120 @@
 <link rel="stylesheet"
 	href='${pageContext.request.contextPath }/dist/css/resList.css' />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript">
 
-	function deleteOk(){
+	$(function(){
 		
-		if(confirm('정말 예약을 취소하시겠습니까?')){
-			//const url = "${pageContext.request.contextPath}/owner/res/delete/${dto.num}?;
-			location.href=url;
-		}
+		 // 카페 셀렉트 변경 시 테마 목록 갱신
+	    $("#schCafe").on("change", function(){
+	        loadTheme($(this).val());
+	    });
+		
+	    // 페이지 진입 시 첫 번째 카페 자동 선택 + 테마/목록 로드
+	    const firstCafe = $("#schCafe option:first").val();
+	    if(firstCafe){
+	        $("#schCafe").val(firstCafe);
+	        loadTheme(firstCafe);
+	    }
+		
+	});
+
+	
+	// 테마 목록 AJAX
+	function loadTheme(cafeId){
+
+	    $("#schTheme").empty().append('<option value="">전체 테마</option>');
+
+	    if(!cafeId) return;
+
+	    $.ajax({
+	          url: '/owner/openRes/theme'
+	        , type: 'GET'
+	        , data: {cafeId: cafeId}
+	        , success: function(res){
+	            res.forEach(function(room){
+	                $("#schTheme").append(
+	                    '<option value="' + room.roomId + '">' + room.roomName + '</option>'
+	                );
+	            });
+	        }
+	    });
+	}
+
+	// 예약 현황 목록 AJAX
+	/* function loadList(schDate, cafeId, roomId){
+		
+		$.ajax({
+			  url: '/owner/resList/list'
+			, type: 'GET'
+			, data: {schDate: schDate, cafeId: cafeId, roomId:roomId}
+			, success: function(res){
+				const tbody = $('tbody');
+				tbody.empty();
+				
+				res.forEach(function(item){
+					tbody.append(
+						'<tr>' +
+		                '<td>' + item.cafeName + '</td>' +
+		                '<td>' + item.roomName + '</td>' +
+		                '<td>' + item.openAt + '</td>' +
+		                '<td><button type="button" class="btn btn-outline-primary" >예약 상세</button></td>' +
+		                '<td><button type="button" class="btn ne-btn-deact" onclick="deleteOk('+item.reservationId+')">예약 취소</button></td>' +
+		                '</tr>'	
+					);
+				});
+			}
+		}); */
+function loadList(offset){
+
+    const schDate = $("input[type=date]").val();
+    const cafeId  = $("#schCafe").val();
+    const roomId  = $("#schTheme").val();
+
+    if(!schDate || !cafeId) return;
+
+    $.ajax({
+          url: '/owner/resList/list'
+        , type: 'GET'
+        , data: {schDate: schDate, cafeId: cafeId, roomId: roomId, offset: offset}
+        , success: function(res){
+
+            const tbody = $('tbody');
+
+            if(offset === 0) tbody.empty();  // 초기화 or 필터 변경
+
+            if(res.length === 0 && offset === 0){
+                tbody.append('<tr><td colspan="5" class="text-center">예약 내역이 없습니다.</td></tr>');
+                $('#moreBtn').hide();
+                return;
+            }
+
+            res.forEach(function(item){
+                tbody.append(
+                    '<tr>' +
+                    '<td>' + item.cafeName + '</td>' +
+                    '<td>' + item.roomName + '</td>' +
+                    '<td>' + item.openAt + '</td>' +
+                    '<td><button type="button" class="btn btn-outline-primary">예약 상세</button></td>' +
+                    '<td><button type="button" class="btn ne-btn-deact" ' +
+                        'onclick="deleteOk(' + item.reservationId + ')">예약 취소</button></td>' +
+                    '</tr>'
+                );
+            });
+
+            // 10개 미만이면 더보기 숨김
+            if(res.length < 10){
+                $('#moreBtn').hide();
+            } else {
+                $('#moreBtn').show();
+            }
+        }
+    });
+}
+
+		
+		
 	}
 
 </script>
@@ -34,16 +140,14 @@
 				<div class="d-flex justify-content-between">
 					<div class="resList">
 						<div class="inputBox d-flex">
-							<input type="date" class="ne-box" value="2026-06-01" />
-							<select name="" id="" class="ne-box">
-								<option>전체 카페</option>
-								<option>지구별</option>
-								<option>우주별</option>
+							<input type="date" class="ne-box" value="${schDate }" />
+							<select name="schCafe" id="schCafe" class="ne-box">
+								<c:forEach var="list" items="${cafeList }">
+									<option value="${list.cafeId }"  <c:if test="${list.cafeId == schCafe}">selected</c:if>>${list.cafeName }</option>
+								</c:forEach>
 							</select>
-							<select name="" id="" class="ne-box">
-								<option>전체 테마</option>
-								<option>어둠의 저택</option>
-								<option>바이러스 연구소</option>
+							<select name="schTheme" id="schTheme" class="ne-box">
+								
 							</select>
 						</div>
 						<table class="ne-table">
@@ -53,14 +157,34 @@
 									<th>카페</th>
 									<th>테마</th>
 									<th>예약일</th>
-									<!-- <th>예약자</th>
-									<th>연락처</th>
-									<th>인원</th> -->
 									<th colspan="2"></th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
+								 <c:choose>
+							        <c:when test="${empty resList}">
+							            <tr>
+							                <td colspan="5" class="text-center">예약 내역이 없습니다.</td>
+							            </tr>
+							        </c:when>
+							        <c:otherwise>
+							            <c:forEach var="res" items="${resList}" varStatus="vs">
+							                <tr>
+							                    <td>${vs.count}</td>
+							                    <td>${res.cafeName}</td>
+							                    <td>${res.roomName}</td>
+							                    <td>${res.openAt}</td>
+							                    <td>
+							                        <button type="button" class="btn btn-outline-primary">예약 상세</button>
+							                        <button type="button" class="btn ne-btn-deact"
+							                                onclick="deleteOk(${res.reservationId})">예약 취소</button>
+							                    </td>
+							                </tr>
+							            </c:forEach>
+							        </c:otherwise>
+							    </c:choose>
+							
+								<!-- <tr>
 									<td>1</td>
 									<td>지구별</td>
 									<td>어둠의 저택</td>
@@ -69,83 +193,18 @@
 										<button type="button" class="btn btn-outline-primary">예약 상세</button>
 										 <button type="button" class="btn ne-btn-deact" onclick="deleteOk()">예약취소</button>
 									</td>
-									<!-- <td>홍길동</td>
-									<td>010-4544-4544</td>
-									<td>4명</td> -->
-								</tr>
-		<!-- 						<tr class="cancle">
-									<td>우주별</td>
-									<td>바이러스 연구소</td>
-									<td>2026-06-01 12:00</td>
-									<td>윤주열</td>
-									<td>010-1111-1111</td>
-									<td>2명</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact">예약취소</button>
-									</td>
-								</tr>
-								<tr>
-									<td>지구별</td>
-									<td>어둠의 저택</td>
-									<td>2026-06-01 10:00</td>
-									<td>김민준</td>
-									<td>010-1234-1234</td>
-									<td>3명</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact">예약취소</button>
-									</td>
 								</tr> -->
-								
 							</tbody>
 						</table>
-						<div class="paginate">
-							<a href="#"> 1 </a>
-							<a href="#"> 2 </a>
-							<span class="active">3</span>
-							<a href="#"> 4 </a>
-							<a href="#"> 5 </a>
-						</div>
+						<div id="noRes" class="text-center" style="display: none;">등록된 예약이 없습니다.</div>
+						<button type="button" id="moreBtn" class="btn ne-btn" >더보기</button>
+						
 					</div>
 				</div>
 			</div>
 		</div>
 
 	</main>
-<!-- <div class="modal fade" id="recordDetailModal" tabindex="-1">
-	<div class="modal-dialog modal-dialog-centered"> 
-		<div class="modal-content">
-		
-			<div class="modal-header">
-				<h5 class="modal-title" id="md-record-theme">예약 상 </h5>
-				<span id="md-record-status" class="ms-3"></span>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			
-			<div class="modal-body p-4" style="font-size: 14px;">
-				
-				<div class="ne-price-box mb-4">
-					<div class="ne-price-row">
-						<span class="ne-text-muted">예약자명</span>
-						<strong id="md-record-time" class="text-dark"></strong>
-					</div>
-					<div class="ne-price-row">
-						<span class="ne-text-muted">전화번호</span>
-						<strong id="md-record-hint" class="text-dark"></strong>
-					</div>
-					<div class="ne-price-row total">
-						<span>인원</span>
-						<span id="md-record-players" class="ne-price-total-amount"></span>
-					</div>
-				</div>
-				
-			</div>
-			
-			<div class="modal-footer py-2">
-				<button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">닫기</button>
-			</div>
-		</div>
-	</div>
-</div> -->
 	
 
 	<%@ include file="/WEB-INF/views/common/footer.jsp"%>
