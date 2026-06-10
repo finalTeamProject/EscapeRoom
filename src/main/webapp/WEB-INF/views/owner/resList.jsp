@@ -14,24 +14,50 @@
 
 	$(function(){
 		
-		 // 카페 셀렉트 변경 시 테마 목록 갱신
-	    $("#schCafe").on("change", function(){
-	        loadTheme($(this).val());
-	    });
-		
 	    // 페이지 진입 시 첫 번째 카페 자동 선택 + 테마/목록 로드
 	    const firstCafe = $("#schCafe option:first").val();
+	    
 	    if(firstCafe){
 	        $("#schCafe").val(firstCafe);
 	        loadTheme(firstCafe);
 	    }
 		
+	    
+	    // 목록 로드
+	    loadList(0);
+	    
+	    // 카페 셀렉트 변경 시 테마 목록/예약 현황 목록 갱신
+	    $("#schCafe").on("change", function(){
+	        loadTheme($(this).val());
+	        // 카페 변경 시 예약 목록 초기화
+	        loadList(0);
+	    });
+	    
+	    // 날짜 변경 시 예약 현황 목록 갱신
+		$("#schDate").on("change", function(){
+			loadList(0);
+		});
+	    
+	    // 테마 변경 시 예약 현황 목록 갱신 
+	    $("#schTheme").on("change", function(){
+			loadList(0);	    	
+	    });
+	    
+	    
+	    // 더보기 버튼 컨트롤
+	    let currentOffset = 0;
+	    $("#moreBtn").on("click", function(){
+	    	currentOffset += 10;
+	    	loadList(currentOffset);
+	    });
+	    
+	    
 	});
 
 	
 	// 테마 목록 AJAX
 	function loadTheme(cafeId){
-
+		
 	    $("#schTheme").empty().append('<option value="">전체 테마</option>');
 
 	    if(!cafeId) return;
@@ -50,80 +76,58 @@
 	    });
 	}
 
-	// 예약 현황 목록 AJAX
-	/* function loadList(schDate, cafeId, roomId){
-		
-		$.ajax({
-			  url: '/owner/resList/list'
-			, type: 'GET'
-			, data: {schDate: schDate, cafeId: cafeId, roomId:roomId}
-			, success: function(res){
-				const tbody = $('tbody');
-				tbody.empty();
-				
-				res.forEach(function(item){
-					tbody.append(
-						'<tr>' +
-		                '<td>' + item.cafeName + '</td>' +
-		                '<td>' + item.roomName + '</td>' +
-		                '<td>' + item.openAt + '</td>' +
-		                '<td><button type="button" class="btn btn-outline-primary" >예약 상세</button></td>' +
-		                '<td><button type="button" class="btn ne-btn-deact" onclick="deleteOk('+item.reservationId+')">예약 취소</button></td>' +
-		                '</tr>'	
-					);
-				});
-			}
-		}); */
-function loadList(offset){
-
-    const schDate = $("input[type=date]").val();
-    const cafeId  = $("#schCafe").val();
-    const roomId  = $("#schTheme").val();
-
-    if(!schDate || !cafeId) return;
-
-    $.ajax({
-          url: '/owner/resList/list'
-        , type: 'GET'
-        , data: {schDate: schDate, cafeId: cafeId, roomId: roomId, offset: offset}
-        , success: function(res){
-
-            const tbody = $('tbody');
-
-            if(offset === 0) tbody.empty();  // 초기화 or 필터 변경
-
-            if(res.length === 0 && offset === 0){
-                tbody.append('<tr><td colspan="5" class="text-center">예약 내역이 없습니다.</td></tr>');
-                $('#moreBtn').hide();
-                return;
-            }
-
-            res.forEach(function(item){
-                tbody.append(
-                    '<tr>' +
-                    '<td>' + item.cafeName + '</td>' +
-                    '<td>' + item.roomName + '</td>' +
-                    '<td>' + item.openAt + '</td>' +
-                    '<td><button type="button" class="btn btn-outline-primary">예약 상세</button></td>' +
-                    '<td><button type="button" class="btn ne-btn-deact" ' +
-                        'onclick="deleteOk(' + item.reservationId + ')">예약 취소</button></td>' +
-                    '</tr>'
-                );
-            });
-
-            // 10개 미만이면 더보기 숨김
-            if(res.length < 10){
-                $('#moreBtn').hide();
-            } else {
-                $('#moreBtn').show();
-            }
-        }
-    });
-}
-
-		
-		
+	function loadList(offset){
+	
+	    const schDate = $("#schDate").val();
+	    const cafeId  = $("#schCafe").val();
+	    const roomId  = $("#schTheme").val();
+	
+	    if(!schDate || !cafeId) 
+	    	return;
+	
+	    
+	    $.ajax({
+	          url: '/owner/resList/list'
+	        , type: 'GET'
+	        , data: {schDate: schDate, cafeId: cafeId
+	        	, roomId: roomId, offset: offset}
+	        , success: function(res){
+	
+	            const tbody = $("tbody");
+	
+	            if(offset === 0) 
+	            	tbody.empty();  
+	
+	            if(res.length == 0 && offset == 0){
+	                tbody.append('<tr><td colspan="5" class="text-center">예약 내역이 없습니다.</td></tr>');
+	                $('#moreBtn').hide();
+	                return;
+	            }
+	
+	            res.forEach(function(item){
+	                tbody.append(
+	                    '<tr>' +
+	                    '<td>' + item.cafeName + '</td>' +
+	                    '<td>' + item.roomName + '</td>' +
+	                    '<td>' + item.openAt + '</td>' +
+	                    '<td><button type="button" class="btn btn-outline-primary">예약 상세</button></td>' +
+	                    '<td><button type="button" class="btn ne-btn-deact" ' +
+	                        'onclick="deleteOk(' + item.reservationId + ')">예약 취소</button></td>' +
+	                    '</tr>'
+	                );
+	            });
+	
+	            // 10개 미만이면 더보기 숨김
+	            if(res.length < 10){
+	                $('#moreBtn').hide();
+	            } else {
+	                $('#moreBtn').show();
+	            }
+	        }
+	    });
 	}
+
+		
 
 </script>
 </head>
@@ -140,14 +144,14 @@ function loadList(offset){
 				<div class="d-flex justify-content-between">
 					<div class="resList">
 						<div class="inputBox d-flex">
-							<input type="date" class="ne-box" value="${schDate }" />
+							<input type="date" class="ne-box" value="${schDate }" id="schDate" />
 							<select name="schCafe" id="schCafe" class="ne-box">
 								<c:forEach var="list" items="${cafeList }">
 									<option value="${list.cafeId }"  <c:if test="${list.cafeId == schCafe}">selected</c:if>>${list.cafeName }</option>
 								</c:forEach>
 							</select>
 							<select name="schTheme" id="schTheme" class="ne-box">
-								
+								<option></option>
 							</select>
 						</div>
 						<table class="ne-table">
@@ -197,7 +201,7 @@ function loadList(offset){
 							</tbody>
 						</table>
 						<div id="noRes" class="text-center" style="display: none;">등록된 예약이 없습니다.</div>
-						<button type="button" id="moreBtn" class="btn ne-btn" >더보기</button>
+						<button type="button" id="moreBtn" class="btn ne-btn" style="display: none;">더보기</button>
 						
 					</div>
 				</div>

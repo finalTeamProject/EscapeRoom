@@ -258,7 +258,7 @@ public class OwnerReservationController {
 		
 	}
 	
-	
+	// 예약 현황 목록 조회 AJAX 엔드포인드
 	@GetMapping("/owner/resList/list")
 	@ResponseBody
 	public List<CafeReservationDTO> getResList(
@@ -276,7 +276,8 @@ public class OwnerReservationController {
 	    	map.put("userId", userId);
 	    	map.put("openAt", schDate);
 	    	map.put("cafeId", cafeId);
-	    	if(roomId != null) map.put("roomId", roomId);
+	    	if(roomId != null) 
+	    		map.put("roomId", roomId);
 	    	map.put("offset", offset);
 	    	map.put("limit", 10);
 			
@@ -284,8 +285,8 @@ public class OwnerReservationController {
 			log.error("getResList: ",e);
 		}
 	    
-
 	    return cafeService.resList(map);
+
 	}
 	
 	
