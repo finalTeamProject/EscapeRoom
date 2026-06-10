@@ -176,8 +176,18 @@ public class PartyServiceImpl implements PartyService
 	@Override
 	public int partyCommentInsert(PartyCommentDTO dto)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		
+		try
+		{
+			result = mapper.partyCommentInsert(dto);
+		}
+		catch (Exception e)
+		{
+			log.info("partyCommentInsert : ",e);
+		}
+		
+		return result;
 	}
 
 	@Override

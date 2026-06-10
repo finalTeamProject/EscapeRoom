@@ -187,7 +187,7 @@
 	<insert id="partyCommentInsert" parameterType="com.noexit.app.model.PartyCommentDTO">
 	
 		INSERT INTO PARTY_MESSAGE(MESSAGE_ID,PARTY_ID,CONTENT,USER_ID,CREATED_AT)
-		VALUES(PARTY_MESSAGE_SEQ.NEXTVAL,#{partyId},#{commentId},#{userId},SYSDATE)
+		VALUES(PARTY_MESSAGE_SEQ.NEXTVAL,#{partyId},#{partyComment},#{userId},SYSDATE)
 		
 	</insert>	
 	

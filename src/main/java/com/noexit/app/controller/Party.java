@@ -1,5 +1,6 @@
 package com.noexit.app.controller;
 
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,7 +133,8 @@ public class Party
 			}
 
 			service.partyInsert(dto);
-		} catch (Exception e)
+		} 
+		catch (Exception e)
 		{
 			log.info("partyInsert : ", e);
 		}
@@ -490,9 +493,11 @@ public class Party
 	/*
 	 * 댓글 insert 액션 처리 AJAX 처리
 	 */
+	@ResponseBody
 	@PostMapping("comment/insert")
-	public String commentInsert(@RequestParam(name = "partyId") long partyId,
-			@RequestParam(name = "partyComment") String partyComment)
+	public Map<String, Object> commentInsert(@RequestParam(name = "partyId") long partyId,
+			@RequestParam(name = "partyComment") String partyComment
+			, HttpSession session)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -501,7 +506,7 @@ public class Party
 		 * 
 		 * 존재하는 파티 인가?
 		 * 
-		 * active/close/fix 상태인 파티인가?
+		 * close 상태가 아닌 파티인가?
 		 * 
 		 * 파티장/파티원 인가?
 		 */
@@ -509,8 +514,52 @@ public class Party
 		/*
 		 * 받아올 데이터 없음
 		 */
+		
+		Map<String, Object> result = new HashMap<>();
+		result.put("status", "false");
+		
+		try
+		{
+			User user = (User)session.getAttribute("loginUser");
+			
+			// 로그인 검사
+			if(user == null)
+			{
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+			}
 
-		return "";
+			long userId = user.getUserId();
+			
+			PartyDTO party = service.getPartyById(partyId);
+			
+			// 파티 존재 / 파티 상태 검사
+			if(party == null || "close".equals(party.getPartyStatus()))
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			List<PartyCrewDTO> crewList = service.getPartyCrewList(partyId);
+			
+			Optional<PartyCrewDTO> crew = crewList.stream().filter(c->c.getUserId() == userId).findFirst();
+			
+			// 파티장 / 파티원 검사
+			if(crew.isEmpty())
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+			
+			PartyCommentDTO comment = new PartyCommentDTO();
+			comment.setPartyId(partyId);
+			comment.setPartyComment(URLDecoder.decode(partyComment, "UTF-8"));
+			
+			int num = service.partyCommentInsert(null);		
+		} 
+		catch (Exception e)
+		{
+			log.info("commentInsert : ",e);
+		}
+
+		return result;
 	}
 
 	/*

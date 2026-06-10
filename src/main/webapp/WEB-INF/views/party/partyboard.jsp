@@ -533,7 +533,8 @@
 
 		return html;
 	}
-
+	
+	// 삭제 댓글 목록 함수
 	function commentsRemove(list)
 	{
 		list.forEach(function(item)
@@ -542,6 +543,7 @@
 		});
 	}
 
+	// 개별 댓글 삭제 함수
 	function removeComment(item)
 	{
 		let commentItem = document.querySelector(".comment[data-comment-id='" + item.commentId + "']");
@@ -558,6 +560,7 @@
 		}
 	}
 
+	// 댓글 작성 함수
 	function commentWrite()
 	{
 		let comment = document.querySelector("[name='partyComment']");
@@ -569,10 +572,15 @@
 			return;
 		}
 
-		alert("댓글 작성");
+		// alert("댓글 작성");
 		comment.value = "";
 
 		// ajax 댓글 작성
+		
+		$.ajax(
+		{
+			
+		});
 	}
 
 	function deleteComment(commentId)
