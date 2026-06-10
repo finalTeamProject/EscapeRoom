@@ -51,6 +51,28 @@
 	    	loadList(currentOffset);
 	    });
 	    
+	    // 예약 상세 버튼 
+		// 처음 로드될 때는 .detailBtn이 존재하지 않기 때문에(동적으로 생성)
+	    // 도큐먼트에 클릭 이벤트를 주고 .detailBtn인거를 찾기?
+	    $(document).on("click",".detailBtn",function(){
+	    	const btn = $(this);
+	    	const resId = btn.data("reservation-id");
+	    	
+	    	$.ajax({
+	    		  url: "/owner/resList/detail"
+	    		, type: "POST"
+	    		, data: {resId: resId}
+	    		, success: function(item){
+	    			$("#modal-name").text(item.bookerName);
+	    			$("#modal-tel").text(item.bookerTel);
+	    			$("#modal-member").text(item.totalMember);
+	    		}
+	    	});
+	    	
+	    	
+	    	$("#detailModal").modal("show");
+	    });
+	    
 	    
 	});
 
@@ -104,17 +126,24 @@
 	                return;
 	            }
 	
+	            	let i = 1;
 	            res.forEach(function(item){
+	            	
+	            	
 	                tbody.append(
 	                    '<tr>' +
+	                    '<td>' +  i + '</td>' +
 	                    '<td>' + item.cafeName + '</td>' +
 	                    '<td>' + item.roomName + '</td>' +
-	                    '<td>' + item.openAt + '</td>' +
-	                    '<td><button type="button" class="btn btn-outline-primary">예약 상세</button></td>' +
+	                    '<td style="font-size: 16px; font-weight: bold;">' + item.openAt + '</td>' +
+	                    '<td><button type="button" class="btn btn-outline-primary detailBtn" data-reservation-id='
+	                    + item.reservationId +
+	                    '>예약자 상세</button></td>' +
 	                    '<td><button type="button" class="btn ne-btn-deact" ' +
 	                        'onclick="deleteOk(' + item.reservationId + ')">예약 취소</button></td>' +
 	                    '</tr>'
 	                );
+	                i++;
 	            });
 	
 	            // 10개 미만이면 더보기 숨김
@@ -126,12 +155,50 @@
 	        }
 	    });
 	}
+	
+	function deleteOk(resId){
+	
+		if(confirm('정말 예약을 취소하시겠습니까?')){
+			
+			$.ajax({
+				url: "/owner/resList/delete"
+				, type: "POST"
+				, data: {resId, resId}
+				, success: function(res){
+					
+				}
+			
+			});
+		}
+		
+		
+	}
 
 		
 
 </script>
 </head>
 <body>
+	<div class="modal fade" id="detailModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">예약 상세</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					     <p><span class="text-muted">예약자 이름</span> &nbsp; <strong id="modal-name"></strong></p>
+		                <p><span class="text-muted">예약자 연락처</span> &nbsp; <strong id="modal-tel"></strong></p>
+		                <p><span class="text-muted">예약 인원</span> &nbsp; <strong id="modal-member"></strong>명</p>
+				</div>
+				<div class="modal-footer">
+                	<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
+            	</div>
+			</div>
+		</div>
+	</div>
+
+
 	<%@ include file="/WEB-INF/views/common/header.jsp"%>
 
 	<main class="ne-main-content ne-body-offset">

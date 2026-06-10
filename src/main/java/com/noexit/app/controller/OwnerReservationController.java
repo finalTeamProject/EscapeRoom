@@ -2,6 +2,7 @@ package com.noexit.app.controller;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +13,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.noexit.app.model.CafeReservationDTO;
 import com.noexit.app.model.OpenReservationDTO;
+import com.noexit.app.model.User;
 import com.noexit.app.service.CafeReservationService;
+import com.noexit.app.service.MyReservationService;
 import com.noexit.app.service.OpenReservationService;
 
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +35,7 @@ public class OwnerReservationController {
 
 	private final OpenReservationService service;
 	private final CafeReservationService cafeService;
+	private final MyReservationService myService;
 	
 	@GetMapping("/owner/openRes")
 	public String openRes(@RequestParam(name="page", defaultValue="1") int currentPage
@@ -41,8 +46,11 @@ public class OwnerReservationController {
 		
 		// 세션에서 userId 받아오기
 		//long userId = (long) session.getAttribute("userId");
-		long userId = 15L;
-
+		//long userId = 15L;
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
+		
+		
 		try {
 			
 			// 로그인한 사용자의 카페 목록 가져오기
@@ -96,7 +104,9 @@ public class OwnerReservationController {
 			, @RequestParam(name="min") String min
 			, HttpSession session) {
 	
-		long userId = 15L;
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
+		
 		
 		Map<String, Object> result = new HashMap<>();
 		
@@ -152,10 +162,11 @@ public class OwnerReservationController {
 	        @RequestParam(name="schDate") String schDate,
 	        HttpSession session) {
 	    
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
 		
-		//long userId = (long)session.getAttribute("userId");
-		
-	     long userId = 15L;
+	     //long userId = 15L;
 	    
 	    Map<String, Object> map = new HashMap<>();
 	    map.put("userId", userId);
@@ -171,8 +182,10 @@ public class OwnerReservationController {
 	@ResponseBody
 	public Map<String, Object> delete(@RequestParam (name="resOpen") long resOpenId
 									, HttpSession session) {
-		//long userId = (long)session.getAttribute("userId");
-		long userId = 15L;
+
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
+		
 		
 		Map<String, Object> result = new HashMap<>();
 		
@@ -209,8 +222,8 @@ public class OwnerReservationController {
 			, HttpSession session
 			, Model model) {
 		
-		//long userId = (long) session.getAttribute("userId");
-		long userId = 15L;
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
 		
 		try {
 			
@@ -268,7 +281,8 @@ public class OwnerReservationController {
 	        @RequestParam(name="offset", defaultValue="0") int offset,
 	        HttpSession session) {
 
-	    long userId = 15L;
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
 
 
 	    Map<String, Object> map = new HashMap<>();
@@ -286,8 +300,67 @@ public class OwnerReservationController {
 		}
 	    
 	    return cafeService.resList(map);
-
 	}
+	
+	
+	// 예약 상세 목록 조회 AJAX 엔드 포인트
+	@PostMapping("/owner/resList/detail")
+	@ResponseBody
+	public CafeReservationDTO getDetail(
+			@RequestParam(name="resId") Long resId
+			, HttpSession session){
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
+		
+		CafeReservationDTO result = new CafeReservationDTO();
+		try {
+			result = cafeService.resDetail(resId);
+			
+		} catch (Exception e) {
+			log.error("getDetail: ",e);
+		}
+		return result;
+		
+	}
+	
+	// 예약 취소 AJAX 엔드포인트
+	@PostMapping("/owner/resList/delete")
+	@ResponseBody
+	public Map<String, Object> resDelete(
+			@RequestParam(name="redId") Long resId
+			, HttpSession session){
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
+
+		Map<String, Object> result = new HashMap<>();
+		
+		try {
+			
+			myService.cancelReservation(resId, userId);
+			result.put("success", true);
+			result.put("message", "예약이 성공적으로 취소되었습니다.");
+			
+		} catch (DataAccessException e) {
+			
+		   String fullMsg = e.getCause().getMessage();
+		   String msg = fullMsg.split("\n")[0];  // 첫 줄만
+		   msg = msg.replaceAll("ORA-\\d+: ", "").trim();
+					
+			result.put("success", false);
+			result.put("message", msg);
+		}		
+		catch (Exception e) {
+			result.put("success", false);
+			result.put("message", "오류가 발생했습니다.");
+			log.error("resDelete: ", e);
+		}
+		
+		return result;
+		
+	}
+	
 	
 	
 }

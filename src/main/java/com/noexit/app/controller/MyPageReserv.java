@@ -3,6 +3,7 @@ package com.noexit.app.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,9 +75,17 @@ public class MyPageReserv {
 			result.put("message", "예약이 성공적으로 취소되었습니다.");
 			
 			
-		} catch (Exception e) {
+		}  catch (DataAccessException e) {
+			
+			   String fullMsg = e.getCause().getMessage();
+			   String msg = fullMsg.split("\n")[0];  
+			   msg = msg.replaceAll("ORA-\\d+: ", "").trim();
+						
+			   result.put("success", false);
+			   result.put("message", msg);
+		}catch (Exception e) {
 			result.put("success", false);
-			result.put("message", e.getMessage());
+			result.put("message", "오류가 발생했습니다.");
 			
 			log.error("cancel: ",e);
 		}
