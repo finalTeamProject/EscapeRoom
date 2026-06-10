@@ -335,7 +335,7 @@ public class Party
 			List<PartyCrewDTO> crew = service.getPartyCrewList(partyId);
 			
 			Optional<PartyCrewDTO> me = crew.stream()
-					                        .filter(c->c.getUserId()== userId)
+					                        .filter(c->c.getUserId() == userId)
 					                        .findFirst();
 			
 			// 파티장 / 파티원인지 검사
@@ -392,7 +392,7 @@ public class Party
 		 */
 
 		/*
-		 * 파티 신청 insert 이후 파티 정보창으로 redirect
+		 * 파티 신청 insert 이후 마이 페이지 파티 내역으로
 		 */
 
 		try
@@ -429,7 +429,7 @@ public class Party
 			log.info("partyApplyInsert : ", e);
 		}
 
-		return "redirect:/party/list";
+		return "redirect:/mypage/myparty";
 	}
 
 	/*
@@ -516,44 +516,52 @@ public class Party
 		 */
 		
 		Map<String, Object> result = new HashMap<>();
-		result.put("status", "false");
+		result.put("status", false);
+		
+		User user = (User)session.getAttribute("loginUser");
+		
+		// 로그인 검사
+		if(user == null)
+		{
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		}
+
+		long userId = user.getUserId();
+		
+		PartyDTO party = service.getPartyById(partyId);
+		
+		// 파티 존재 / 파티 상태 검사
+		if(party == null || "close".equals(party.getPartyStatus()))
+		{
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		
+		List<PartyCrewDTO> crewList = service.getPartyCrewList(partyId);
+		
+		Optional<PartyCrewDTO> crew = crewList.stream().filter(c->c.getUserId() == userId).findFirst();
+		
+		// 파티장 / 파티원 검사
+		if(crew.isEmpty())
+		{
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+		}
+		
+		PartyCommentDTO comment = new PartyCommentDTO();
+		comment.setPartyId(partyId);
+		comment.setUserId(userId);
 		
 		try
 		{
-			User user = (User)session.getAttribute("loginUser");
+			comment.setPartyComment(partyComment);
 			
-			// 로그인 검사
-			if(user == null)
+			// 댓글 insert 액션
+			int num = service.partyCommentInsert(comment);
+				
+			if(num > 0)
 			{
-				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+				result.put("status", true);
 			}
-
-			long userId = user.getUserId();
-			
-			PartyDTO party = service.getPartyById(partyId);
-			
-			// 파티 존재 / 파티 상태 검사
-			if(party == null || "close".equals(party.getPartyStatus()))
-			{
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			}
-			
-			List<PartyCrewDTO> crewList = service.getPartyCrewList(partyId);
-			
-			Optional<PartyCrewDTO> crew = crewList.stream().filter(c->c.getUserId() == userId).findFirst();
-			
-			// 파티장 / 파티원 검사
-			if(crew.isEmpty())
-			{
-				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-			}
-			
-			PartyCommentDTO comment = new PartyCommentDTO();
-			comment.setPartyId(partyId);
-			comment.setPartyComment(URLDecoder.decode(partyComment, "UTF-8"));
-			
-			int num = service.partyCommentInsert(null);		
-		} 
+		}
 		catch (Exception e)
 		{
 			log.info("commentInsert : ",e);
@@ -565,8 +573,9 @@ public class Party
 	/*
 	 * 댓글 삭제 메소드 AJAX 처리
 	 */
+	@ResponseBody
 	@PostMapping("comment/delete/{commentid}")
-	public String commentDelete(@PathVariable(name = "commentid") long commentId)
+	public Map<String, Object> commentDelete(@PathVariable(name = "commentid") long commentId, HttpSession session)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -584,7 +593,50 @@ public class Party
 		 * 받아올 데이터 없음
 		 */
 
-		return "";
+		Map<String, Object> result = new HashMap<>();
+		
+		result.put("status", false);
+		
+		User user = (User)session.getAttribute("loginUser");
+		
+		// 로그인 확인
+		if(user == null)
+		{
+			 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		}
+		
+		try
+		{
+			PartyCommentDTO comment = service.getCommentById(commentId);
+			
+			// 댓글 존재 및 삭제 여부 확인
+			if(comment == null)
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			// 작성자 확인
+			if(user.getUserId() != comment.getUserId())
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+				
+			if(service.partyCommentDelete(commentId) > 0)
+			{
+				result.put("status", true);
+			}
+		} 
+		catch (ResponseStatusException e)
+		{
+			log.info("commentDelete : ",e);
+			throw e;
+		}
+		catch (Exception e)
+		{
+			log.info("commentDelete : ",e);
+		}
+		
+		return result;
 	}
 
 	/*
@@ -617,15 +669,16 @@ public class Party
 	/*
 	 * 파티 강퇴 액션 처리 AJAX 처리
 	 */
-	@PostMapping("kick/{applyid}")
-	public String crewKick(@PathVariable(name = "applyid") long applyId)
+	@ResponseBody
+	@PostMapping("kick/{crewid}")
+	public Map<String, Object> crewKick(@PathVariable(name = "crewid") long crewId, HttpSession session)
 	{
 		/*
 		 * 유효성 검사 목록
 		 * 
 		 * 로그인 했는가?
 		 * 
-		 * 존재하는 신청 id 인가?
+		 * 존재하는 멤버 id 인가?
 		 * 
 		 * active/close 상태인 파티인가?
 		 * 
@@ -638,7 +691,33 @@ public class Party
 		 * 받아올 데이터 없음
 		 */
 
-		return "";
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", false);
+		
+		try
+		{
+			User user = (User)session.getAttribute("loginUser");
+			
+			// 로그인 확인
+			if(user == null)
+			{
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+			}
+			
+			
+			
+		}
+		catch(ResponseStatusException e)
+		{
+			log.info("crewKick : ",e);
+			throw e;
+		}
+		catch (Exception e)
+		{
+			log.info("crewKick : ",e);
+		}
+		
+		return map;
 	}
 
 	/*
@@ -679,8 +758,9 @@ public class Party
 	 * 
 	 * AJAX 처리
 	 */
+	@ResponseBody
 	@PostMapping("aprvapply/{applyid}")
-	public String aprvApply(@PathVariable(name = "applyid") long applyId)
+	public Map<String, Object> aprvApply(@PathVariable(name = "applyid") long applyId, HttpSession session)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -689,7 +769,7 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * active 상태인 파티인가?
+		 * open 상태인 파티인가?
 		 * 
 		 * 현재 파티원이 아닌가?
 		 * 
@@ -700,7 +780,67 @@ public class Party
 		 * 받아올 데이터 없음
 		 */
 		
-		return "";
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", false);
+		
+		try
+		{
+			User user = (User)session.getAttribute("loginUser");
+			
+			// 로그인 확인
+			if(user == null)
+			{
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+			}
+			
+			PartyApplyDTO apply = service.getPartyApplyById(applyId);
+			
+			// 존재하는 신청 id 확인
+			if(apply == null )
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			PartyDTO party = service.getPartyById(apply.getPartyId());
+			
+			// 존재하는 파티 / 파티 상태 확인
+			if(party == null || !"open".equals(party.getPartyStatus()))
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			List<PartyCrewDTO> crewList = service.getPartyCrewList(apply.getPartyId());
+			
+			// 현재 파티장 / 파티원 여부 확인
+			if(crewList.stream().anyMatch(c->c.getUserId() == apply.getUserId()))
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+			
+			// 내가 파티장 인지 확인
+			Optional<PartyCrewDTO> crew = crewList.stream().filter(c->"HOST".equals(c.getPosition())).findFirst(); 
+			
+			if(crew.get().getUserId() != user.getUserId())
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+			
+			if(service.aprvApply(applyId) > 0)
+			{
+				map.put("status", true);
+			}
+		}
+		catch(ResponseStatusException e)
+		{
+			log.info("aprvApply : ",e);
+			throw e;
+		}
+		catch (Exception e)
+		{
+			log.info("aprvApply : ",e);
+		}
+		
+		return map;
 	}
 
 	/*
@@ -710,8 +850,9 @@ public class Party
 	 * 
 	 * AJAX 처리
 	 */
+	@ResponseBody
 	@PostMapping("rejectapply/{applyid}")
-	public String rejectApply(@PathVariable(name = "applyid") long applyId)
+	public Map<String, Object> rejectApply(@PathVariable(name = "applyid") long applyId, HttpSession session)
 	{
 		/*
 		 * 유효성 검사 목록
@@ -720,7 +861,6 @@ public class Party
 		 * 
 		 * 존재하는 신청 id 인가?
 		 * 
-		 * active/close/fix 상태인 파티인가?
 		 * 
 		 * 현재 파티원이 아닌가?
 		 * 
@@ -731,7 +871,67 @@ public class Party
 		 * 받아올 데이터 없음
 		 */
 
-		return "";
+		Map<String, Object> map = new HashMap<>();
+		map.put("status", false);
+		
+		try
+		{
+			User user = (User)session.getAttribute("loginUser");
+			
+			// 로그인 확인
+			if(user == null)
+			{
+				throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+			}
+			
+			PartyApplyDTO apply = service.getPartyApplyById(applyId);
+			
+			// 존재하는 신청 id 확인
+			if(apply == null )
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			PartyDTO party = service.getPartyById(apply.getPartyId());
+			
+			// 존재하는 파티 확인
+			if(party == null)
+			{
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			
+			List<PartyCrewDTO> crewList = service.getPartyCrewList(apply.getPartyId());
+			
+			// 현재 파티장 / 파티원 여부 확인
+			if(crewList.stream().anyMatch(c->c.getUserId() == apply.getUserId()))
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+			
+			// 내가 파티장 인지 확인
+			Optional<PartyCrewDTO> crew = crewList.stream().filter(c->"HOST".equals(c.getPosition())).findFirst(); 
+			
+			if(crew.get().getUserId() != user.getUserId())
+			{
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			}
+			
+			if(service.rejectApply(applyId) > 0)
+			{
+				map.put("status", true);
+			}
+		}
+		catch(ResponseStatusException e)
+		{
+			log.info("rejectApply : ",e);
+			throw e;
+		}
+		catch (Exception e)
+		{
+			log.info("rejectApply : ",e);
+		}
+		
+		return map;
 	}
 
 	/*
