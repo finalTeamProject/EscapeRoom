@@ -10,238 +10,249 @@
 
 <style type="text/css">
 
-.container
-{
+/* ── 레이아웃 ──────────────────────────────────── */
+.container {
 	display: grid;
 	grid-template-columns: 3fr 2fr;
-	padding-top: 20px;	
-	padding-bottom: 20px;
-	gap: 20px;
+	gap: 1.25rem;
+	padding: 1.5rem 0;
+	align-items: start;
 }
 
-.left-wrap
-{
+.left-wrap,
+.right-wrap {
 	display: flex;
-	flex-direction: column;;
-	gap: 10px;
-}
-
-.left-wrap > div
-{
-	border: 1px solid black;
-	border-radius: 5px;
-	
-	 display: flex;
-	 flex-direction: column;
-	 gap: 5px;
-	 margin: 5px;
-	 padding: 5px;
-	 overflow-y: auto;
-}
-
-.title
-{
-	font-weight: bold;
-	font-size: 15px;
-}
-
-.title + hr
-{
-	margin: 0;
-	border-top: 1px solid black;
-}
-
-
-/* 파티 정보 */
-.party-info-wrap 
-{
-  height: 250px;
-}
-
-.party-info-wrap span
-{
-	background: #f5f5f5;
-}
-
-.party-name 
-{
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.theme-info,
-.party-condition,
-.party-action
-{
-	display: flex;
-  	flex-wrap: wrap;
-  	gap: 5px;
-}
-
-.party-condition 
-{
-  	flex-direction: column;
-}
-
-.party-action
-{
-	justify-content: center;
-}
-
-
-/* comment */
-.party-comment
-{
-	height: 450px;
-}
-
-.comment-list,
-.comment-item,
-.comment-write-form
-{
-	margin: 5px;
-	padding: 5px;
-	display: flex;
-	gap: 5px;
-}
-
-.comment-list
-{
 	flex-direction: column;
-	height: 400px;
-	overflow-y: auto; 
-	border: 1px solid #ddd;
-	border-radius: 5px;
+	gap: 1.25rem;
 }
 
-.comment-item
-{
-	align-items: center;
+/* 공통 패널 (ne-sc 위에 영역별 높이만 부여) */
+.left-wrap > div,
+.right-wrap > div {
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+}
+.panel-title {
+	font-weight: 700;
+	font-size: .9rem;
+	color: var(--ne-text);
+	padding-bottom: .5rem;
+	margin-bottom: .25rem;
+	border-bottom: 2px solid var(--ne-primary);
+}
+
+/* ── 파티 정보 ─────────────────────────────────── */
+.party-name {
+	font-size: 1.3rem;
+	font-weight: 800;
+	margin-bottom: .25rem;
+}
+.theme-info {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .35rem;
+	margin-bottom: .25rem;
+}
+.theme-info span {
+	font-size: .82rem;
+	font-weight: 600;
+	color: var(--ne-text-2);
+	background: var(--ne-bg);
+	border: 1px solid var(--ne-border-dark);
+	border-radius: 20px;
+	padding: .2em .7em;
+}
+.party-condition {
+	display: flex;
+	flex-direction: column;
+	gap: .4rem;
+	margin-bottom: .25rem;
+}
+.party-condition #genderName {
+	align-self: flex-start;
+	font-size: .82rem;
+	font-weight: 600;
+	color: var(--ne-primary-dark);
+	background: var(--ne-primary-light);
+	border: 1px solid var(--ne-primary-mid);
+	border-radius: 20px;
+	padding: .2em .7em;
+}
+.party-condition #partyComment {
+	font-size: .88rem;
+	color: var(--ne-text-2);
+	line-height: 1.6;
+	background: var(--ne-bg);
+	border-radius: var(--ne-radius-sm);
+	padding: .6rem .8rem;
+}
+.party-action {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+	justify-content: center;
+	margin-top: .5rem;
+}
+
+/* ── 댓글 (채팅) ───────────────────────────────── */
+.comment-list {
+	display: flex;
+	flex-direction: column;
+	gap: .6rem;
+	height: 400px;
+	overflow-y: auto;
+	background: var(--ne-bg);
+	border: 1px solid var(--ne-border);
+	border-radius: var(--ne-radius-md);
+	padding: .85rem;
+}
+.comment-item {
+	display: flex;
+	align-items: flex-end;
+	gap: .4rem;
 	max-width: 80%;
 }
+.comment-item.other { margin-right: auto; }
+.comment-item.mine  { margin-left: auto; flex-direction: row; }
 
-.comment-write-form
-{
-	justify-content: center;
+.writer {
+	font-size: .72rem;
+	font-weight: 700;
+	color: var(--ne-text-2);
+	flex-shrink: 0;
+	padding-bottom: .15rem;
 }
-
-.other
-{
-	margin-right: auto;
+.comment {
+	font-size: .88rem;
+	line-height: 1.45;
+	padding: .5rem .8rem;
+	border-radius: 14px;
+	background: #ffffff;
+	border: 1px solid var(--ne-border-dark);
+	word-break: break-all;
 }
-
-.mine
-{
-	margin-left: auto;
+.comment-item.mine .comment {
+	background: var(--ne-primary);
+	border-color: var(--ne-primary);
+	color: #111;
 }
-
-.writer
-{
-	font-size: 12px;
-	
-	padding: 2px 8px;
-	border-radius: 15px;
-	
-	background: orange;
+.write-date {
+	font-size: .68rem !important;
+	color: var(--ne-text-3);
+	flex-shrink: 0;
+	padding-bottom: .15rem;
 }
-
-.comment
-{
-	font-size: 15px;
-	padding: 6px 10px;	
-	border: 1px solid #f5f5f5;
-	border-radius: 10px;
-	background: #f5f5f5;
-}
-
-.comment-delete
-{
-	font-size: 10px;
+.comment-delete {
+	font-size: .68rem;
 	border: none;
 	background: none;
-	color: #999;
+	color: var(--ne-text-3);
+	cursor: pointer;
+	flex-shrink: 0;
+	padding-bottom: .15rem;
+}
+.comment-delete:hover { color: var(--ne-red); }
+
+.comment-write-form {
+	display: flex;
+	gap: .5rem;
+	margin-top: .5rem;
+}
+.comment-write-form input {
+	flex: 1;
+	padding: .5rem .8rem;
+	border: 1.5px solid var(--ne-border-dark);
+	border-radius: var(--ne-radius-sm);
+	font-size: .9rem;
+	color: var(--ne-text);
+}
+.comment-write-form input:focus {
+	outline: none;
+	border-color: var(--ne-primary);
+	box-shadow: 0 0 0 .2rem rgba(253, 180, 0, .2);
 }
 
-
-.right-wrap > div
-{
+/* ── 파티원 ────────────────────────────────────── */
+.party-crew-list {
 	display: flex;
-	flex-direction: column;		
-	gap: 5px;
-	padding: 5px;
-	margin: 5px;
-	border: 1px solid black;
-	border-radius: 5px;
+	flex-direction: column;
+	gap: .5rem;
+	max-height: 240px;
 	overflow-y: auto;
 }
-
-/* crew */
-.party-crew
-{
-	font-size: 15px;
-	height: 300px;
-}
-
-.party-crew-list,
-.crew,
-.crew-action
-{
-	margin: 5px;
+.crew {
 	display: flex;
-	gap: 5px;
-}
-
-.party-crew-list
-{
-	flex-direction: column;
-	height: 200px;
-	overflow-y: auto; 
-}
-
-.crew
-{
 	justify-content: space-between;
+	align-items: center;
+	gap: .5rem;
+	padding: .6rem .85rem;
+	background: #ffffff;
+	border: 1px solid var(--ne-border);
+	border-radius: var(--ne-radius-sm);
 }
-
-.crew-action
-{
-	justify-content: center;
-}
-
-
-/* 파티 신청 */
-.party-apply
-{
-	height: 400px;
-}
-
-.party-apply-list,
-.apply-item,
-.apply-info,
-.apply-action
-{
+.crew-info {
 	display: flex;
-	gap: 5px;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .3rem .55rem;
+	font-size: .84rem;
 }
-
-.party-apply-list,
-.apply-item
-{
-	flex-direction: column;
+.crew-info span:first-child { font-weight: 700; }
+.crew-info span { color: var(--ne-text-2); }
+.crew-position {
+	display: flex;
+	align-items: center;
+	gap: .35rem;
+	flex-shrink: 0;
 }
-
-.apply-item
-{
-	border: 1px solid black;
-	border-radius: 5px;
-	margin: 5px;
-	padding: 5px;
-}
-
-.apply-action
-{
+.crew-action {
+	display: flex;
 	justify-content: center;
+	margin-top: .5rem;
 }
+
+/* ── 파티 신청 ─────────────────────────────────── */
+.party-apply-list {
+	display: flex;
+	flex-direction: column;
+	gap: .6rem;
+	max-height: 340px;
+	overflow-y: auto;
+}
+.apply-item {
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
+	padding: .8rem .9rem;
+	background: #ffffff;
+	border: 1px solid var(--ne-border);
+	border-radius: var(--ne-radius-md);
+}
+.apply-info {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .3rem .55rem;
+	font-size: .84rem;
+}
+.apply-info span:first-child { font-weight: 700; }
+.apply-info span { color: var(--ne-text-2); }
+.apply-comment p {
+	margin: 0;
+	font-size: .86rem;
+	line-height: 1.55;
+	color: var(--ne-text-2);
+	background: var(--ne-bg);
+	border-radius: var(--ne-radius-sm);
+	padding: .5rem .75rem;
+}
+.apply-action {
+	display: flex;
+	justify-content: center;
+	gap: .5rem;
+}
+.apply-action .btn { flex: 1; }
 
 </style>
 
@@ -250,22 +261,24 @@
 <c:set var="path" value="${pageContext.request.contextPath }"></c:set>
 
 <script type="text/javascript">
-	
+
 	let lastCommentId = 0;
+	let lastDeleteCommentId = 0;
 	let partyId = '${partyId}';
 	let userId = '${userId}';
 	let position = '${position}';
 	let status = '${status}';
-	
+
+	// AJAX 딜레이
+	let delay = 5000;
+
 	$(function()
 	{
+		// 데이터 AJAX 로 바인딩
 		let interval = setInterval(function()
 		{
-			//alert("1초");		
-			//alert(partyId + " | " + position + " | " + status);
-			
-			let param = "lastCommentId=" + lastCommentId;
-			
+			let param = "lastCommentId=" + lastCommentId + "&lastDeleteCommentId=" + lastDeleteCommentId;
+
 			$.ajax(
 			{
 				"type":"POST"
@@ -278,67 +291,78 @@
 					crewList(data.crewList);
 					applyList(data.applyList);
 					commentList(data.commentList);
+					commentsRemove(data.commentDeleteList);
+
+					if(data.commentList != null && data.commentList.length > 0)
+					{
+						lastCommentId = data.commentList[data.commentList.length-1].commentId;
+					}
+
+					if(data.commentDeleteList != null && data.commentDeleteList.length > 0)
+					{
+						lastDeleteCommentId = data.commentDeleteList[data.commentDeleteList.length-1].deleteId;
+					}
 				}
 				,"error":function(e)
 				{
-					clearInterval(interval);  
-		            if (e.status === 401) 
+					clearInterval(interval);
+		            if (e.status === 401)
 		            {
 		                location.href = "/user/login";
-		            } 
-		            else if (e.status === 403 || e.status === 404) 
+		            }
+		            else if (e.status === 403 || e.status === 404)
 		            {
 		                location.href = "/party/list";
-		            } 
-		            else 
+		            }
+		            else
 		            {
-		                console.log(e.responseText);   
+		                console.log(e.responseText);
 		            }
 				}
-			}); 
-			
-		},5000);
-		
+			});
+
+		},delay);
+
 		$("[name='partyComment']").on("keydown",function(evt)
 		{
 			if(evt.key == "Enter")
 			{
 				evt.preventDefault();
-				
+
 				commentWrite();
 			}
 		});
-		
+
 		// 댓글 삭제
-		$(".comment-delete").click(function()
+		$(".comment-list").on("click",".comment-delete",function()
 		{
 			alert(this.getAttribute("data-comment-id"));
 		});
-		
+
 		// 파티 승인
-		$(".aprv-apply").click(function()
+		$(".party-apply-list").on("click",".aprv-apply",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
-		
+
 		// 파티 거절
-		$(".reject-apply").click(function()
+		$(".party-apply-list").on("click",".reject-apply",function()
 		{
-			alert(this.getAttribute("data-apply-id"));	
+			alert(this.getAttribute("data-apply-id"));
 		});
-	
+
 		// 파티 탈퇴;
-		$(".btn-out").click(function()
+		$(".party-crew-list").on("click",".btn-out",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
-		
+
 		// 파티 강퇴
-		$(".btn-kick").click(function()
+		$(".party-crew-list").on("click",".btn-kick",function()
 		{
 			alert(this.getAttribute("data-apply-id"));
 		});
-		
+
 		partyName = document.querySelector("#partyName");
 		cafeName = document.querySelector("#cafeName");
 		themeDate = document.querySelector("#themeDate");
@@ -348,8 +372,10 @@
 		genderName = document.querySelector("#genderName");
 		partyComment = document.querySelector("#partyComment");
 		partyCrewList = document.querySelector(".party-crew-list");
+		partyApplyList = document.querySelector(".party-apply-list");
+		partyCommentList = document.querySelector(".comment-list");
 	});
-	
+
 	let partyName;
 	let cafeName;
 	let themeDate;
@@ -358,7 +384,8 @@
 	let themeStatus;
 	let genderName;
 	let partyComment;
-	
+
+	// 파티 정보 바인딩 함수
 	function partyInfo(data)
 	{
 		partyName.innerText= data.partyName;
@@ -370,134 +397,226 @@
 		genderName.innerText = data.genderName;
 		partyComment.innerText = data.partyComment;
 	}
-	
+
 	let partyCrewList;
-	
+
+	// 파티원 목록 생성 함수
 	function crewList(list)
 	{
 		 partyCrewList.innerHTML = "";
-		 
+
 	    list.forEach(function(item)
 	    {
-	        partyCrewList.insertAdjacentHTML("beforeend", createCrew(item));
+	        partyCrewList.innerHTML += (createCrew(item));
 	    });
 	}
-	
+
+	// 개별 파티원 HTML 생성 함수
 	function createCrew(item)
 	{
 		let html = "<div class='crew'>"
-			 + "<div class='crew-info'>"
-			 + "<span>" + item.nickName + "</span>"
-			 + "<span>" + item.age + "세</span>"
-			 + "<span>" + item.gender + "</span>"
-			 + "<span>🌡️" + item.temp + "</span>"
-			 + "</div>"
-			 +"<div class='crew-position'>";
-			 
+				 + "<div class='crew-info'>"
+				 + "<span>" + item.nickName + "</span>"
+				 + "<span>" + item.age + "세</span>"
+				 + "<span>" + item.gender + "</span>"
+				 + "<span class='ne-mannero'>🌡️ " + item.temp + "</span>"
+				 + "</div>"
+				 + "<div class='crew-position'>";
+
 		if(item.position == 'HOST')
 		{
-			html += "<span class='ne-st ne-st-green'>" + "파티장" + "</span>";
+			html += "<span class='ne-st ne-st-sm ne-st-dark'>파티장</span>";
 		}
 		else
 		{
 			if(item.ready == 'READY')
 			{
-				html += "<span class='ne-st ne-st-amber'>준비 완료</span>";
+				html += "<span class='ne-st ne-st-sm ne-st-amber'>준비 완료</span>";
 			}
 			else
 			{
-				html += "<span class='ne-st ne-st-red'>준비 중</span>";
+				html += "<span class='ne-st ne-st-sm ne-st-red'>준비 중</span>";
 			}
-			
-			html += "<span class='ne-st ne-st-blue'>파티원</span>";
-			
+
+			html += "<span class='ne-st ne-st-sm ne-st-primary'>파티원</span>";
+
 			// 방장이면
 			if(position=="HOST")
 			{
-				html += "<button class='btn ne-btn-deact btn-kick' data-apply-id='" + item.crewId + "'>강퇴</button>"; 
+				html += "<button class='ne-btn-deact btn-kick' data-apply-id='" + item.crewId + "'>강퇴</button>";
 			}
 			// 자기 자신이면
 			else if(item.userId == userId)
 			{
-				html += "<button class='btn ne-btn-deact btn-out' data-apply-id='" + item.applyId + "'>탈퇴</button>";
+				html += "<button class='ne-btn-deact btn-out' data-apply-id='" + item.applyId + "'>탈퇴</button>";
 			}
-			
-			html += "</div>";
-			html += "</div>";
 		}
-		
-		return item;
+
+		html += "</div>";
+		html += "</div>";
+
+		return html;
 	}
-	
-	function applyList(applyList)
+
+	let partyApplyList;
+
+	// 신청 목록 생성 함수
+	function applyList(list)
 	{
-		
+		partyApplyList.innerHTML = "";
+
+		list.forEach(function(item)
+		{
+			partyApplyList.innerHTML += createApply(item);
+		});
 	}
-	
-	function commentList(commentList)
+
+	// 개별 신청 HTML 생성 함수
+	function createApply(item)
 	{
-		
+		let html = "<div class='apply-item'>"
+				 + "<div class='apply-info'>"
+				 + "<span>" + item.nickName + "</span>"
+				 + "<span>" + item.age + "세</span>"
+				 + "<span>" + (item.gender == 'F' ? '여자' : '남자') + "</span>"
+				 + "<span class='ne-mannero'>🌡️ " + item.temp + "</span>"
+				 + "</div>" // .apply-info
+				 + "<div class='apply-comment'>"
+				 + "<p>" + item.applyComment + "</p>"
+				 + "</div>"; // .apply-comment
+
+		if('${position}' == 'HOST')
+		{
+			html += "<div class='apply-action'>"
+				 +  "<button type='button' class='btn btn-primary aprv-apply' data-apply-id='" + item.applyId + "'>승인</button>"
+				 +  "<button type='button' class='btn btn-outline-primary reject-apply' data-apply-id='" + item.applyId + "'>거절</button>"
+				 +  "</div>"; // .apply-action
+		}
+
+		html += "</div>"; // .apply-item
+
+		return html;
 	}
-	
+
+	let partyCommentList;
+
+	// 댓글 목록 생성 함수
+	function commentList(list)
+	{
+		list.forEach(function(item)
+		{
+			partyCommentList.innerHTML += createComment(item);
+		});
+	}
+
+	// 개별 댓글 HTML 생성 함수
+	function createComment(item)
+	{
+		let html = "";
+
+		if(item.userId == '${userId}')
+		{
+			html += "<div class='comment-item mine'>"
+				 +  "<button type='button' class='comment-delete' data-comment-id='" + item.commentId + "'>삭제</button>"
+				 +  "<span class='comment' data-comment-id='" + item.commentId + "'>" + item.partyComment + "</span>"
+				 +  "<span class='writer'>" + item.nickName + "</span>";
+		}
+		else
+		{
+			html += "<div class='comment-item other'>"
+				 +  "<span class='writer'>" + item.nickName + "</span>"
+				 +  "<span class='comment' data-comment-id='" + item.commentId + "'>" + item.partyComment + "</span>";
+		}
+
+		html += "<span class='write-date' data-comment-id='" + item.commentId + "'>" + item.createdAt + "</span>"
+		 	 +  "</div>";
+
+		return html;
+	}
+
+	function commentsRemove(list)
+	{
+		list.forEach(function(item)
+		{
+			removeComment(item);
+		});
+	}
+
+	function removeComment(item)
+	{
+		let commentItem = document.querySelector(".comment[data-comment-id='" + item.commentId + "']");
+		let deleteBtn = document.querySelector(".comment-delete[data-comment-id='" + item.commentId + "']");
+
+		if(deleteBtn != null)
+		{
+			deleteBtn.remove();
+		}
+
+		if(commentItem != null)
+		{
+			commentItem.innerText = "삭제된 메세지 입니다";
+		}
+	}
+
 	function commentWrite()
 	{
 		let comment = document.querySelector("[name='partyComment']");
-		
+
 		if(!comment.value.trim())
 		{
 			alert("메시지가 없습니다.");
 			comment.focus();
 			return;
 		}
-		
+
 		alert("댓글 작성");
 		comment.value = "";
-		
+
 		// ajax 댓글 작성
 	}
-			
+
 	function deleteComment(commentId)
 	{
 		// ajax 삭제 요청
 	}
-	
+
 	function onReady()
 	{
 		alert("레디");
 		// ajax 레디 요청
 	}
-	
+
 	function approveApply(applyId)
 	{
 		alert("승인");
 		// ajax 승인 요청
 	}
-	
+
 	function rejectApply(applyId)
 	{
 		alert("거절");
 		// ajax 거절 요청
 	}
-	
+
 	function reservation()
 	{
 		alert("예약");
 		// 예약 페이지 이동
 	}
-	
+
 	function partyUpdate()
 	{
 		alert("파티 수정");
 		// 파티 수정 페이지 이동
 	}
-	
+
 	function partyDelete()
 	{
 		alert("파티 해산");
 		// confirm 만 물어보고 바로 delete 처리
 		// 이후 마이 페이지로
 	}
-	
+
 </script>
 
 </head>
@@ -507,203 +626,88 @@
 	<main class="ne-main-content ne-body-offset">
 		<div class="ne-container">
 			<div class="container">
-				
+
+				<!-- 좌측 -->
 				<div class="left-wrap">
-					
-					<div class="party-info-wrap">
-						
-						<span class="title">파티 정보</span>
-						<hr>
-						
+
+					<!-- 파티 정보 -->
+					<div class="party-info-wrap ne-sc">
+
+						<div class="panel-title">파티 정보</div>
+
 						<div class="party-name">
-							<span id="partyName">주열룸</span>
+							<span id="partyName">파티명</span>
 						</div>
-						
+
 						<div class="theme-info">
-							<span id="cafeName">우주별&nbsp;&nbsp;</span>
-							<span id="themeName">그레이&nbsp;&nbsp;</span>
-							<span id="themeDate">2026-06-01&nbsp;&nbsp;</span>
-							<span id="themeTime">18:00&nbsp;&nbsp;</span>
-							<span id="themePlayers">2명 ~ 4명</span>
+							<span id="cafeName">카페명</span>
+							<span id="themeName">테마명</span>
+							<span id="themeDate">날짜</span>
+							<span id="themeTime">시간</span>
+							<span id="themePlayers">인원수</span>
 							<span id="themeStatus">예약 가능/예약 불가</span>
 						</div>
-						
+
 						<div class="party-condition">
 							<span id="genderName">성별 동성/무관</span>
-							<span id="partyComment">미쿠 좋아하는 사람만 오셈</span>						
-						</div> 
-						
-						<div class="party-action">
-							
-							<button type="button" class="btn btn-primary" onclick="reservation()">예약하기</button>
-							<button type="button" class="btn btn-outline-primary" onclick="partyUpdate()">파티 수정</button>
-							<button type="button" class="btn ne-btn-deact" onclick="partyDelete()">파티 해산</button>
-							
+							<span id="partyComment">파티 코멘트</span>
 						</div>
-						
+
+						<c:if test="${position == 'HOST' }">
+							<div class="party-action">
+								<button type="button" class="btn btn-primary" onclick="reservation()">예약하기</button>
+								<button type="button" class="btn btn-outline-primary" onclick="partyUpdate()">파티 수정</button>
+								<button type="button" class="ne-btn-deact" onclick="partyDelete()">파티 해산</button>
+							</div>
+						</c:if>
 					</div>
-					
-					
-					<div class="party-comment">
-					
-						<span class="title">파티 댓글</span>
-						<hr>
-					
-						<div class="comment-list">
-							
-							<div class="comment-item other">
-								<span class="writer">윤주열</span>
-								<span class="comment">미쿠 티셔츠 샀음</span>
-							</div>
-							
-							<div class="comment-item mine">
-								<button type="button" class="comment-delete" data-comment-id="1">삭제</button>
-								<span class="comment">오 얼마임?</span>
-								<span class="writer">김주열</span>
-							</div>
-							
-							<div class="comment-item other">
-								<span class="writer">윤주열</span>
-								<span class="comment">삭제된 댓글입니다</span>
-							</div>
-							
-							<div class="comment-item other">
-								<span class="writer">윤주열</span>
-								<span class="comment">5억</span>
-							</div>
-							
-							<div class="comment-item mine">
-								<span class="comment">삭제된 댓글입니다</span>
-								<span class="writer">김주열</span>
-							</div>
-							
-							<div class="comment-item mine">
-								<button type="button" class="comment-delete" data-comment-id="2" >삭제</button>
-								<span class="comment">제 정신임?</span>
-								<span class="writer">김주열</span>
-							</div>
-							
-						</div>
-					
+
+					<!-- 파티 댓글 -->
+					<div class="party-comment ne-sc">
+
+						<div class="panel-title">파티 댓글</div>
+
+						<div class="comment-list"></div>
+
 						<div class="comment-write-form">
-						
 							<input type="text" name="partyComment" placeholder="댓글">
-							<button type="button" class="btn btn-primary" onclick="commentWrite()">작성</button>		
-						
+							<button type="button" class="btn btn-primary" onclick="commentWrite()">작성</button>
 						</div>
-								
+
 					</div>
-										
+
 				</div>
-				 
-				 
+
+
+				<!-- 우측 -->
 				<div class="right-wrap">
-					
-					<div class="party-crew">
-						
-						<span class="title">파티원</span>
-						<hr>
-						
-						<div class="party-crew-list">
-						
-							<!-- <div class="crew">
-								
-								<div class="crew-info">
-									<span>윤주열</span>
-									<span>29세</span>
-									<span>남자</span>
-									<span>🌡️36.5</span>
-								</div>
-								
-								<div class="crew-position">
-									<span class="ne-st ne-st-green">파티장</span>
-								</div>
-								
+
+					<!-- 파티원 -->
+					<div class="party-crew ne-sc">
+
+						<div class="panel-title">파티원</div>
+
+						<div class="party-crew-list"></div>
+
+						<c:if test="${position == 'CREW' }">
+							<div class="crew-action">
+								<button type="button" class="btn btn-primary" onclick="onReady()">레디</button>
 							</div>
-							
-							<div class="crew">
-							
-								<div class="crew-info">
-									<span>김주열</span>
-									<span>29세</span>
-									<span>남자</span>
-									<span>🌡️36.5</span>
-								</div>
-								
-								<div class="crew-position">
-									<span class="ne-st ne-st-amber">준비 완료</span>
-									<span class="ne-st ne-st-blue">파티원</span>
-									<button class="btn ne-btn-deact btn-out" data-apply-id="1">탈퇴</button>
-								</div>
-								
-							</div>
-							
-							<div class="crew">
-							
-								<div class="crew-info">
-									<span>김주열</span>
-									<span>29세</span>
-									<span>남자</span>
-									<span>🌡️36.5</span>
-								</div>
-								
-								<div class="crew-position">
-									<span class="ne-st ne-st-red">준비 중</span>
-									<span class="ne-st ne-st-blue">파티원</span>
-									<button class="btn ne-btn-deact btn-kick" data-apply-id="2">강퇴</button>
-								</div>
-								
-							</div> -->
-							
-						</div> 
-						
-						<div class="crew-action">
-							
-							<button type="button" class="btn btn-primary" onclick="onReady()">레디</button>
-							
-						</div>
-						
+						</c:if>
+
 					</div>
-										
-					<div class="party-apply">
-						
-						<span class="title">파티 신청</span>
-						<hr>
-						
-						<div class="party-apply-list">
-							
-							<div class="apply-item">
-								
-								<div class="apply-info">
-									
-									<span>최주열</span>
-									<span>15세</span>
-									<span>여자</span>
-									<span>🌡️47.2</span>
-									
-								</div>
-								
-								<div class="apply-comment">
-									
-									<p>안녕하세요!</p>
-																	
-								</div>
-								
-								<div class="apply-action">
-									
-									<button type="button" class="btn btn-primary aprv-apply" data-apply-id="1">승인</button>
-									<button type="button" class="btn btn-outline-primary reject-apply" data-apply-id="1">거절</button>
-									
-								</div>
-								
-							</div>
-							
-						</div>
-						
+
+					<!-- 파티 신청 -->
+					<div class="party-apply ne-sc">
+
+						<div class="panel-title">파티 신청</div>
+
+						<div class="party-apply-list"></div>
+
 					</div>
-					
+
 				</div>
-				 
+
 			</div>
 		</div>
 	</main>
