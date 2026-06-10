@@ -320,8 +320,8 @@ END AS PHONE
 , UI.PHONE AS LEADER_PHONE
 , FN_MEMBER_COUNT(RV.PARTY_ID) AS TOTAL_MEMBER
 , RV.CREATED_AT AS BOOKED_AT
-FROM RESERVATION_CANCEL RC
-    RIGHT JOIN RESERVATION RV
+FROM RESERVATION RV
+    LEFT JOIN RESERVATION_CANCEL RC
         ON RV.RESERVATION_ID = RC.RESERVATION_ID
     JOIN PARTY_ROOM PR
         ON PR.PARTY_ID = RV.PARTY_ID
@@ -338,6 +338,9 @@ FROM RESERVATION_CANCEL RC
 ORDER BY RV.RESERVATION_ID;
         
 
+SELECT *
+FROM VW_RESERVATION_ALL
+ORDER BY BOOKED_AT DESC;
 
 
 -- 4. 예약 된 오픈(슬롯) 뷰
@@ -371,8 +374,11 @@ WHERE CANCEL_ID IS NOT NULL
 AND OPEN_AT>SYSDATE;
 
 
+
+
 SELECT *
-FROM VW_RES_OPEN_BOOKED;
+FROM VW_RES_OPEN_BOOKED
+ORDER BY BOOKED_AT DESC;
 
 SELECT USER_ID
 FROM CAFE
@@ -798,6 +804,27 @@ BEGIN
             RAISE_APPLICATION_ERROR(-20010, '진행 중인 예약 건이 있어 삭제할 수 없습니다. 예약 취소 처리 후 다시 시도해 주세요.'); 
 END;
 /
+
+
+-- 예약 등록 프로시저
+-- PARTY, PARTY_ROOM 조회해서
+-- 파라미터 존재 확인
+-- 파라미터로 받은 파티아이디랑 유저아이디 검증
+-- 파티 활성화 조회
+-- 예약오픈아이디 예약 가능한지 조회
+-- 인원수 체크
+-- 동시 등록 시도 차단
+-- 유저아이디가 동시간대에 예약이 잡힌 것이 있는 지 확인?
+-- 파티원이 동시간대에 예약이 잡힌게 있는지 확인 ? 
+-- 파티조회해서 파티 활성화되어있는지 확인(이 유저가 파티장인지 확인, 파티 아이디 매칭 확인)
+-- PARTY_MEMBER 테이블 조회해서 모두 레디 상태인지 체크
+-- 인원수 체크해서 파티아이디에 묶여있는 RES_OPEN_ID로 테마 찾아서 최소인원, 최대인원 비교
+-- 파티아이디로 RES_OPEN_ID가 예약 가능한 상태인지 체크
+-- 여러 사람이 동시에 예약 시도시 처리할 방법(묶어두기)
+-- 
+
+--RESERVATION INSERT(P_PARTY_ID, P_USER_ID)
+
 
 
 

@@ -11,8 +11,6 @@ public interface CafeReservationService {
 	public List<CafeReservationDTO> resList(Map<String, Object> map);
 	
 	// 예약 상세 조회
-	public List<CafeReservationDTO> resDetail(long reservationId);
+	public CafeReservationDTO resDetail(long reservationId);
 	
-	// 예약 취소 프로시저
-	public void resDelete(long reservationId) throws Exception;
 }

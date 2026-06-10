@@ -43,9 +43,9 @@ public class CafeReservatopmServiceImpl implements CafeReservationService{
 	
 	
 	@Override
-	public List<CafeReservationDTO> resDetail(long reservationId) {
+	public CafeReservationDTO resDetail(long reservationId) {
 		
-		List<CafeReservationDTO> result = new ArrayList<>();
+		CafeReservationDTO result = new CafeReservationDTO();
 		
 		try {
 			
@@ -57,12 +57,6 @@ public class CafeReservatopmServiceImpl implements CafeReservationService{
 		return result;
 	}
 	
-	@Override
-	public void resDelete(long reservationId) throws Exception {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
+
 	
 }
