@@ -11,7 +11,7 @@ import com.noexit.app.service.PartyService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+/*
 @Slf4j
 @RequiredArgsConstructor
 @Controller
@@ -54,3 +54,4 @@ public class Test {
 		return "redirect:/err/error";
 	}
 }
+*/

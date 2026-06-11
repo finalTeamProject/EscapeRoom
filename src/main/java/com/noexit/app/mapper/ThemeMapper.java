@@ -17,7 +17,8 @@ public interface ThemeMapper
 	public int themeUpdate(ThemeDTO dto);
 	public int themeDelete(long themeId);
 
-	public List<ThemeDTO> selectListByOwnerUserId(long ownerUserId);
+	public List<ThemeDTO> selectListByOwnerUserId(Map<String, Object> map);
+	public int dataCount(Map<String, Object> map);
 		
 		
 	/*

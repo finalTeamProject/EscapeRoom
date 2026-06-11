@@ -1,6 +1,7 @@
 package com.noexit.app.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -17,15 +18,28 @@ public class ManagerServiceImpl implements ManagerService {
 
 	private final ManagerMapper mapper;
 
+	// 매니저 리스트 조회 (페이징 포함)
 	@Override
-	public List<Manager> selectActiveByOwnerUserId(Long ownerUserId) {
+	public List<Manager> selectActiveByOwnerUserId(Map<String, Object> map) {
 		List<Manager> list = null;
 		try {
-			list = mapper.selectActiveByOwnerUserId(ownerUserId);
+			list = mapper.selectActiveByOwnerUserId(map);
 		} catch (Exception e) {
 			log.info("selectActiveByOwnerUserId : ", e);
 		}
 		return list;
+	}
+
+	// 매니저 갯수 확인
+	@Override
+	public int dataCount(Map<String, Object> map) {
+		int result = 0;
+		try {
+			result = mapper.dataCount(map);
+		} catch (Exception e) {
+			log.info("dataCount : ", e);
+		}
+		return result;
 	}
 
 	@Override

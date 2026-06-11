@@ -11,7 +11,7 @@ public interface UserService {
 	public int countByLoginId(String loginId); // 중복 확인
 	public User login(User user);
 	public String findRole(Long userId);
-	public User selectByLoginId(String loginId);
+	public User findByLoginId(String loginId);
 	public User findByNameAndEmail(User user);
 
 	// 비밀번호 찾기 인증번호 발송

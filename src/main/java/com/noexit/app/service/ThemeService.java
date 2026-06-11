@@ -24,7 +24,8 @@ public interface ThemeService
 	ThemeDTO getThemeById(long themeId);
 	int themeUpdate(ThemeDTO dto) throws Exception;
 	int themeDelete(long themeId);
-	List<ThemeDTO> selectListByOwnerUserId(long ownerUserId);
+	List<ThemeDTO> selectListByOwnerUserId(Map<String, Object> map);
+	int dataCount(Map<String, Object> map);
 	
 	/*
 	 * ↑ 위 메소드는 명철님이 사용함 

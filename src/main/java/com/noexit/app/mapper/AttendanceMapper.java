@@ -1,6 +1,7 @@
 package com.noexit.app.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,22 +13,18 @@ import com.noexit.app.model.Manner;
 @Mapper
 public interface AttendanceMapper {
 	
-	public List<AttendanceListDTO> selectListByOwnerUserId(Long ownerUserId);
-	public List<AttendanceListDTO> selectListByManagerUserId(Long managerUserId);
+	public List<AttendanceListDTO> selectListByOwnerUserId(Map<String, Object> map);
+	public List<AttendanceListDTO> selectListByManagerUserId(Map<String, Object> map);
+	public int dataCountByOwnerUserId(Map<String, Object> map);
+	public int dataCountByManagerUserId(Map<String, Object> map);
 
 	// 한 예약의 파티원 리스트
 	public List<AttendCrew> selectCrewByReservationId(Long reservationId);
 	
-    public void mergeAttendance(Long reservationId, Long staffId);
-    public void mergeAttendDetail(AttendItemDTO item);
-
     public int selectAttendanceExists(Long reservationId);
     public void insertAttendance(AttendItemDTO item);
-    public void updateAttendanceStaff(AttendItemDTO item);
 
-    public int selectAttendDetailExists(AttendItemDTO item);
     public void insertAttendDetail(AttendItemDTO item);
-    public void updateAttendDetail(AttendItemDTO item);
 
 	// 파티원 1명당 출석 상태 INSERT
 	public void insertAttendDetailByUser(AttendItemDTO item);
@@ -36,5 +33,11 @@ public interface AttendanceMapper {
 	public void callInsertNoshow(Manner manner);
 	
 	public Long selectAttendanceIdByReservationId(Long reservationId);
+
+	// 출석기록 페이지용
+	public List<AttendanceListDTO> selectHistoryByOwnerUserId(Map<String, Object> map);
+	public List<AttendanceListDTO> selectHistoryByManagerUserId(Map<String, Object> map);
+	public int dataCountHistoryByOwnerUserId(Map<String, Object> map);
+	public int dataCountHistoryByManagerUserId(Map<String, Object> map);
 
 }

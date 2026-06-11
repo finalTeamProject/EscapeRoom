@@ -1,14 +1,17 @@
 package com.noexit.app.controller;
 
 import com.noexit.app.common.AuthUtil;
+import com.noexit.app.common.PaginateUtil;
 import com.noexit.app.model.AttendCrew;
 import com.noexit.app.model.AttendForm;
 import com.noexit.app.model.AttendItemDTO;
 import com.noexit.app.model.AttendanceListDTO;
 import com.noexit.app.model.User;
 import com.noexit.app.service.AttendanceService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,24 +28,66 @@ import org.springframework.web.bind.annotation.*;
 public class OwnerAttendanceController {
 
     private final AttendanceService attendanceService;
+    private final PaginateUtil paginateUtil;
 
     @GetMapping("") // 출석체크
-    public String attendance(HttpSession session, Model model) {
+    public String attendance(@RequestParam(name = "page", defaultValue = "1") int currentPage,
+                             HttpSession session, HttpServletRequest req, Model model) {
         String redirect = AuthUtil.checkStaff(session);
-        if (redirect != null) 
+        if (redirect != null)
         	return redirect;
 
         User loginUser = (User) session.getAttribute("loginUser");
         String role = (String) session.getAttribute("role");
-      
-        List<AttendanceListDTO> attendList = attendanceService.selectAttendListByRole(loginUser.getUserId(), role);
-        
-        Map<String, List<Long>> status = attendanceService.checkStatus(session, attendList);
-        
-        model.addAttribute("doneList", status.get("done"));
-        model.addAttribute("partialList", status.get("partial"));
-        model.addAttribute("attendList", attendList);
-        
+
+        try {
+            int size = 10; // 한 화면에 보여주는 예약 수
+            int totalPage = 0;
+            int dataCount = 0;
+
+            Map<String, Object> map = new HashMap<>();
+            Long userId = loginUser.getUserId();
+            map.put("ownerUserId", userId);
+            map.put("managerUserId", userId);
+
+            // 데이터 개수 파악
+            dataCount = attendanceService.dataCountByRole(map, role);
+            if (dataCount != 0) {
+                // 전체 페이지 수 계산
+                totalPage = paginateUtil.pageCount(dataCount, size);
+            }
+
+            // 페이지 번호 보정
+            currentPage = Math.min(currentPage, totalPage);
+
+            // 시작점 계산
+            int offset = (currentPage - 1) * size;
+            if (offset < 0) offset = 0;
+            map.put("offset", offset);
+            map.put("size", size);
+
+            // 리스트 가져오기
+            List<AttendanceListDTO> attendList = attendanceService.selectAttendListByRole(map, role);
+
+            // 페이징 처리 및 URL 생성
+            String cp = req.getContextPath();
+            String listUrl = cp + "/owner/attendance";
+            String paging = paginateUtil.paging(currentPage, totalPage, listUrl);
+
+            Map<String, List<Long>> status = attendanceService.checkStatus(session, attendList);
+
+            model.addAttribute("doneList", status.get("done"));
+            model.addAttribute("partialList", status.get("partial"));
+            model.addAttribute("attendList", attendList);
+            model.addAttribute("paging", paging);
+            model.addAttribute("dataCount", dataCount);
+            model.addAttribute("currentPage", currentPage);
+            model.addAttribute("size", size);
+
+        } catch (Exception e) {
+            log.info("attendance : ", e);
+        }
+
         return "owner/attendance";
     }
 
@@ -107,6 +152,63 @@ public class OwnerAttendanceController {
             log.info("finalize : ", e);
         }
         return "redirect:/owner/attendance";
+    }
+
+    @GetMapping("/history") // 출석기록
+    public String history(@RequestParam(name = "page", defaultValue = "1") int currentPage,
+                          HttpSession session, HttpServletRequest req, Model model) {
+        String redirect = AuthUtil.checkStaff(session);
+        if (redirect != null)
+        	return redirect;
+
+        User loginUser = (User) session.getAttribute("loginUser");
+        String role = (String) session.getAttribute("role");
+
+        try {
+            int size = 10; // 한 화면에 보여주는 기록 수
+            int totalPage = 0;
+            int dataCount = 0;
+
+            Map<String, Object> map = new HashMap<>();
+            Long userId = loginUser.getUserId();
+            map.put("ownerUserId", userId);
+            map.put("managerUserId", userId);
+
+            // 데이터 개수 파악
+            dataCount = attendanceService.dataCountHistoryByRole(map, role);
+            if (dataCount != 0) {
+                // 전체 페이지 수 계산
+                totalPage = paginateUtil.pageCount(dataCount, size);
+            }
+
+            // 페이지 번호 보정
+            currentPage = Math.min(currentPage, totalPage);
+
+            // 시작점 계산
+            int offset = (currentPage - 1) * size;
+            if (offset < 0) offset = 0;
+            map.put("offset", offset);
+            map.put("size", size);
+
+            // 리스트 가져오기
+            List<AttendanceListDTO> historyList = attendanceService.selectHistoryByRole(map, role);
+
+            // 페이징 처리 및 URL 생성
+            String cp = req.getContextPath();
+            String listUrl = cp + "/owner/attendance/history";
+            String paging = paginateUtil.paging(currentPage, totalPage, listUrl);
+
+            model.addAttribute("historyList", historyList);
+            model.addAttribute("paging", paging);
+            model.addAttribute("dataCount", dataCount);
+            model.addAttribute("currentPage", currentPage);
+            model.addAttribute("size", size);
+
+        } catch (Exception e) {
+            log.info("history : ", e);
+        }
+
+        return "owner/attendanceHistory";
     }
 
 }

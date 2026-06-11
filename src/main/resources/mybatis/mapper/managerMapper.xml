@@ -5,11 +5,19 @@
 <mapper namespace="com.noexit.app.mapper.ManagerMapper">
 
 	<!-- 사장 소유 카페들의 활성 매니저 목록 (V_ACTIVE_MANAGER 뷰 사용) -->
-	<select id="selectActiveByOwnerUserId" parameterType="long" resultType="com.noexit.app.model.Manager">
+	<select id="selectActiveByOwnerUserId" parameterType="map" resultType="com.noexit.app.model.Manager">
 		SELECT *
 		  FROM V_ACTIVE_MANAGER
 		 WHERE OWNER_USER_ID = #{ownerUserId}
 		 ORDER BY CREATED_AT DESC
+		 OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+	</select>
+
+	<!-- 매니저 갯수 (페이징용) -->
+	<select id="dataCount" parameterType="map" resultType="int">
+		SELECT NVL(COUNT(*), 0)
+		  FROM V_ACTIVE_MANAGER
+		 WHERE OWNER_USER_ID = #{ownerUserId}
 	</select>
 
 	<!-- 매니저 등록 -->

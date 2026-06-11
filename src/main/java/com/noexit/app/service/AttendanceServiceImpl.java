@@ -27,13 +27,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 	private final AttendanceMapper mapper;
 
 
+	// 사장 출석 목록 (페이징 포함)
 	@Override
-	public List<AttendanceListDTO> selectListByOwnerUserId(Long ownerUserId) {
+	public List<AttendanceListDTO> selectListByOwnerUserId(Map<String, Object> map) {
 
 		List<AttendanceListDTO> list = null;
 
 		try {
-			list = mapper.selectListByOwnerUserId(ownerUserId);
+			list = mapper.selectListByOwnerUserId(map);
 		} catch (Exception e) {
 			log.info("selectListByOwnerUserId : ", e);
 		}
@@ -41,18 +42,38 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return list;
 	}
 
+	// 매니저 출석 목록 (페이징 포함)
 	@Override
-	public List<AttendanceListDTO> selectListByManagerUserId(Long managerUserId) {
+	public List<AttendanceListDTO> selectListByManagerUserId(Map<String, Object> map) {
 
 		List<AttendanceListDTO> list = null;
 
 		try {
-			list = mapper.selectListByManagerUserId(managerUserId);
+			list = mapper.selectListByManagerUserId(map);
 		} catch (Exception e) {
 			log.info("selectListByManagerUserId : ", e);
 		}
 
 		return list;
+	}
+
+	// 역할별 출석 목록 갯수
+	@Override
+	public int dataCountByRole(Map<String, Object> map, String role) {
+
+		int result = 0;
+
+		try {
+			if ("OWNER".equals(role)) {
+				result = mapper.dataCountByOwnerUserId(map);
+			} else {
+				result = mapper.dataCountByManagerUserId(map);
+			}
+		} catch (Exception e) {
+			log.info("dataCountByRole : ", e);
+		}
+
+		return result;
 	}
 
 	@Override
@@ -159,20 +180,20 @@ public class AttendanceServiceImpl implements AttendanceService {
 			        }			  
 			    }
 			}
-						session.removeAttribute("attendDraft");
-					}catch (Exception e) {                      
-					log.info("finalizeAttendance : ", e);
-					throw e;
-		   }
+			session.removeAttribute("attendDraft");
+		} catch (Exception e) {
+			log.info("finalizeAttendance : ", e);
+			throw e;
 		}
+	}
 	
 	
 	@Override
-	public List<AttendanceListDTO> selectAttendListByRole(Long userId, String role) {
+	public List<AttendanceListDTO> selectAttendListByRole(Map<String, Object> map, String role) {
 	    if ("OWNER".equals(role)) {
-	        return selectListByOwnerUserId(userId);
+	        return selectListByOwnerUserId(map);
 	    } else {
-	        return selectListByManagerUserId(userId);
+	        return selectListByManagerUserId(map);
 	    }
 	}
 
@@ -221,10 +242,47 @@ public class AttendanceServiceImpl implements AttendanceService {
 	    Map<String, List<Long>> result = new HashMap<>();
 	    result.put("done", doneList);
 	    result.put("partial", partialList);
-	   
+
 	    return result;
 	}
-	
-	
+
+
+	// 출석기록 목록 (역할별)
+	@Override
+	public List<AttendanceListDTO> selectHistoryByRole(Map<String, Object> map, String role) {
+
+		List<AttendanceListDTO> list = null;
+
+		try {
+			if ("OWNER".equals(role)) {
+				list = mapper.selectHistoryByOwnerUserId(map);
+			} else {
+				list = mapper.selectHistoryByManagerUserId(map);
+			}
+		} catch (Exception e) {
+			log.info("selectHistoryByRole : ", e);
+		}
+
+		return list;
+	}
+
+	// 출석기록 갯수 (역할별)
+	@Override
+	public int dataCountHistoryByRole(Map<String, Object> map, String role) {
+
+		int result = 0;
+
+		try {
+			if ("OWNER".equals(role)) {
+				result = mapper.dataCountHistoryByOwnerUserId(map);
+			} else {
+				result = mapper.dataCountHistoryByManagerUserId(map);
+			}
+		} catch (Exception e) {
+			log.info("dataCountHistoryByRole : ", e);
+		}
+
+		return result;
+	}
 
 }
