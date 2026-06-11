@@ -27,7 +27,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 	private final MailService mailService;
 
 	@Override
-	public int bookedCount(long userId) {
+	public int bookedCount(Long userId) {
 
 		int result = 0;	
 		
@@ -43,7 +43,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 
 
 	@Override
-	public int doneCount(long userId) {
+	public int doneCount(Long userId) {
 		int result = 0;	
 		
 		try {
@@ -57,7 +57,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 	}
 
 	@Override
-	public int canceledCount(long userId) {
+	public int canceledCount(Long userId) {
 		int result = 0;	
 		
 		try {
@@ -114,7 +114,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 
 
 	@Override
-	public Map<String, Object> getReservationPageData(long userId, int currentTab, int currentPage, int size) {
+	public Map<String, Object> getReservationPageData(Long userId, int currentTab, int currentPage, int size) {
 		
 		Map<String, Object> result = new HashMap<>();
 		
@@ -174,7 +174,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 
 
 	@Override
-	public void cancelReservation(long reservationId, long userId) throws Exception {
+	public void cancelReservation(Long reservationId, Long userId) throws Exception {
 		
 		try {
 			
@@ -206,7 +206,7 @@ public class MyReservationServiceImpl implements MyReservationService {
 
 
 	@Override
-	public List<CancelMailDTO> mailList(long reservationId) {
+	public List<CancelMailDTO> mailList(Long reservationId) {
 		List<CancelMailDTO> list = new ArrayList<>();
 		
 		try {

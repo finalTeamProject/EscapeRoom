@@ -2,7 +2,6 @@ package com.noexit.app.controller;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -45,8 +43,8 @@ public class OwnerReservationController {
 			, Model model) {
 		
 		// 세션에서 userId 받아오기
-		//long userId = (long) session.getAttribute("userId");
-		//long userId = 15L;
+		//Long userId = (Long) session.getAttribute("userId");
+		//Long userId = 15L;
 		User loginUser = (User) session.getAttribute("loginUser");
 		Long userId = loginUser.getUserId();
 		
@@ -89,7 +87,7 @@ public class OwnerReservationController {
 	// AJAX 연동을 위한 테마 목록 조회
 	@GetMapping("/owner/openRes/theme")
 	@ResponseBody
-	public List<OpenReservationDTO> getThemeList(@RequestParam(name="cafeId") long cafeId) {
+	public List<OpenReservationDTO> getThemeList(@RequestParam(name="cafeId") Long cafeId) {
 		return service.getThemeList(cafeId);
 		
 	}
@@ -97,8 +95,8 @@ public class OwnerReservationController {
 	// 예약 슬롯 오픈 등록 폼에서 넘어와서 등록 처리
 	@PostMapping("/owner/openRes/open")
 	@ResponseBody
-	public Map<String, Object> open(@RequestParam(name="cafe") long cafeId
-			, @RequestParam(name="theme") long roomId
+	public Map<String, Object> open(@RequestParam(name="cafe") Long cafeId
+			, @RequestParam(name="theme") Long roomId
 			, @RequestParam(name="date") String openDate
 			, @RequestParam(name="hour") String hour
 			, @RequestParam(name="min") String min
@@ -166,7 +164,7 @@ public class OwnerReservationController {
 		User loginUser = (User) session.getAttribute("loginUser");
 		Long userId = loginUser.getUserId();
 		
-	     //long userId = 15L;
+	     //Long userId = 15L;
 	    
 	    Map<String, Object> map = new HashMap<>();
 	    map.put("userId", userId);
@@ -180,7 +178,7 @@ public class OwnerReservationController {
 	// 예약 슬롯 비활성화
 	@PostMapping("/owner/openRes/delete")
 	@ResponseBody
-	public Map<String, Object> delete(@RequestParam (name="resOpen") long resOpenId
+	public Map<String, Object> delete(@RequestParam (name="resOpen") Long resOpenId
 									, HttpSession session) {
 
 		User loginUser = (User) session.getAttribute("loginUser");

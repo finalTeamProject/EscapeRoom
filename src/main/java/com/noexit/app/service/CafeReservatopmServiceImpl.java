@@ -43,7 +43,7 @@ public class CafeReservatopmServiceImpl implements CafeReservationService{
 	
 	
 	@Override
-	public CafeReservationDTO resDetail(long reservationId) {
+	public CafeReservationDTO resDetail(Long reservationId) {
 		
 		CafeReservationDTO result = new CafeReservationDTO();
 		

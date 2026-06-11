@@ -25,7 +25,7 @@ public class Test {
 		return "testCss";
 	}
 	
-	@GetMapping("/mypage/myparty")
+	//@GetMapping("/mypage/myparty")
 	public String myParty(Model model, HttpSession session, RedirectAttributes reModel)
 	{
 		try

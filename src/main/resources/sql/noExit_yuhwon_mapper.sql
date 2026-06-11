@@ -532,8 +532,14 @@ COMMIT;
 -- cafeid, cafenaem, room_id, room_name, open_at,
 -- leader_id, leader_name, leader_tel, total_member
 -- room_img, room_price
-
-SELECT
+SELECT p.party_id, C.CAFE_ID, C.CAFE_NAME
+, R.ROOM_ID, R.ROOM_NAME
+, RO.OPEN_AT
+, P.USER_ID AS BOOKER_ID
+, UI.NAME AS BOOKER_NAME
+, UI.PHONE AS BOOKER_TEL
+, R.ROOM_IMG, R.PRICE
+, FN_MEMBER_COUNT(16) AS TOTAL_MEMBER
 FROM PARTY P 
     JOIN PARTY_ROOM PR
     ON P.PARTY_ID = PR.PARTY_ID
@@ -544,14 +550,22 @@ FROM PARTY P
     JOIN CAFE C
     ON R.CAFE_ID = C.CAFE_ID
     JOIN USER_INFO UI
-    ON C.USER_ID = UI.USER_INFO
-WHERE P.PARTY_ID = P_PARTY_ID;
+    ON C.USER_ID = UI.USER_ID
+WHERE P.PARTY_ID = 16
+AND P.USER_ID = 20
+;
 
 
 
-SELECT *
-FROM USER_INFO;
+SELECT ROOM_ID, ROOM_IMG
+FROM ROOM
+WHERE ROOM_IMG LIKE '/images/%';
 
+UPDATE ROOM
+SET ROOM_IMG='room_12.jpg'
+WHERE ROOM_ID = 12;
+
+commit;
 
 
 

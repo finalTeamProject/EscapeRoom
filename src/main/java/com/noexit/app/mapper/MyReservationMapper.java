@@ -13,13 +13,13 @@ import com.noexit.app.model.MyReservationDTO;
 public interface MyReservationMapper {
 
 		// 예약 중 데이터 카운트 조회
-		public int bookedCount(long userId);
+		public int bookedCount(Long userId);
 	
 		// 플레이 완료 데이터 카운트 조회 
-		public int doneCount(long userId);
+		public int doneCount(Long userId);
 		
 		// 예약 취소 데이터 카운트 조회
-		public int canceledCount(long userId);
+		public int canceledCount(Long userId);
 		
 		// 예약 중인 목록 조회
 		public List<MyReservationDTO> bookedList(Map<String, Object> map);
@@ -31,10 +31,10 @@ public interface MyReservationMapper {
 		public List<MyReservationDTO> canceledList(Map<String, Object> map);
 		
 		// 사용자 예약 취소 프로시저
-		public void cancelReservation(@Param("reservationId") long reservationId
-									, @Param("userId") long userId) throws Exception;
+		public void cancelReservation(@Param("reservationId") Long reservationId
+									, @Param("userId") Long userId) throws Exception;
 		
 		// 예약 취소 메일 보낼 파티원 목록 조회
-		public List<CancelMailDTO> mailList(@Param("reservationId") long reservationId);
+		public List<CancelMailDTO> mailList(@Param("reservationId") Long reservationId);
 		
 }

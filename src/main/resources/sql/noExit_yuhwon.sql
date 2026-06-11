@@ -975,6 +975,7 @@ IS
     V_NEW_START     DATE;
     V_NEW_END       DATE;
     V_IS_ADULT      NUMBER;
+    V_UNDERAGE      NUMBER;
     
     ERR_INVALID_USER    EXCEPTION;
     ERR_INVALID_PARTY   EXCEPTION;
@@ -982,7 +983,8 @@ IS
     ERR_INVALID_CNT     EXCEPTION;  
     ERR_NOT_READY       EXCEPTION;  
     ERR_OVERLAP         EXCEPTION;  
-    ERR_ALREADY_RES       EXCEPTION;  
+    ERR_ALREADY_RES     EXCEPTION;  
+    ERR_UNDERAGE        EXCEPTION;
     
 BEGIN
 
@@ -1079,16 +1081,21 @@ BEGIN
     
     
     -- 성인테마인지 확인 후 파티원의 나이 조회해서 모두 성인인지 확인
-    IF (V_IS_ADULT = (SELECT COMMON_ID FROM COMMON WHERE COMMON_NAME ='Y')) THEN
+    IF (V_IS_ADULT = 1) THEN
     
        -- 파티장과 파티원의 생년월일 받아서 FN_GET_USER_AGE에 담아서 나이 판별하기
-       
-       
+       SELECT COUNT(*) INTO V_UNDERAGE
+       FROM VW_PARTY_ACTIVE_MEMBER VPAM
+        JOIN USER_INFO UI
+        ON VPAM.USER_ID = UI.USER_ID
+       WHERE PARTY_ID = P_PARTY_ID
+        AND FN_GET_USER_AGE(UI.BIRTHDATE) < 19;
         
+        IF (V_UNDERAGE > 0) THEN
+            RAISE ERR_UNDERAGE;
+        END IF;
     END IF;
-    
-    
-    
+        
    -- 파티아이디의 모든 멤버가 레디 상태인지 확인
    SELECT COUNT(*) INTO V_NOT_READY
    FROM VW_PARTY_ACTIVE_MEMBER
@@ -1153,6 +1160,9 @@ BEGIN
         WHEN ERR_OVERLAP THEN
             ROLLBACK;
             RAISE_APPLICATION_ERROR(-20015, '파티원의 기존 예약 일정과 겹치는 시간이 있어 예약이 불가능합니다.'); 
+        WHEN ERR_UNDERAGE THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20016, '성인 테마입니다. 파티원의 연령을 확인해 주세요.');
         WHEN OTHERS THEN
             ROLLBACK;
             RAISE_APPLICATION_ERROR(-20099, '예약 처리 중 오류가 발생했습니다.');
