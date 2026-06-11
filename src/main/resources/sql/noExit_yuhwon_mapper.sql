@@ -519,3 +519,67 @@ VALUES(RESERVATION_SEQ.NEXTVAL, 22, SYSDATE);
 
 COMMIT;
 
+
+
+
+
+
+
+
+-- 예약 정보 확인
+-- party_id, user_id
+
+-- cafeid, cafenaem, room_id, room_name, open_at,
+-- leader_id, leader_name, leader_tel, total_member
+-- room_img, room_price
+
+SELECT
+FROM PARTY P 
+    JOIN PARTY_ROOM PR
+    ON P.PARTY_ID = PR.PARTY_ID
+    JOIN RES_OPEN RO
+    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+    JOIN ROOM R
+    ON RO.ROOM_ID = R.ROOM_ID
+    JOIN CAFE C
+    ON R.CAFE_ID = C.CAFE_ID
+    JOIN USER_INFO UI
+    ON C.USER_ID = UI.USER_INFO
+WHERE P.PARTY_ID = P_PARTY_ID;
+
+
+
+SELECT *
+FROM USER_INFO;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

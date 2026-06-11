@@ -925,17 +925,45 @@ END;
 -- 인원수 체크해서 파티아이디에 묶여있는 RES_OPEN_ID로 테마 찾아서 최소인원, 최대인원 비교
 -- 파티아이디로 RES_OPEN_ID가 예약 가능한 상태인지 체크
 -- 여러 사람이 동시에 예약 시도시 처리할 방법(묶어두기)
+
+    
+    
+    -- 파티아이디로 예약오픈아이디를 찾아서 예약이 가능한 상태인지 확인
+    -- 새 예약 시간 구하기
+    -- 여기서 LOCK 걸기
+    -- 락을 건 테이블에서 직접 상태를 확인 하기(뷰는 구조에 따라 반영이 안될 수도 있음)
+    -- FOR UPDATE는 내가 점유하고 있는 특정 행을 보호하는 것
+    -- 뷰를 통해 조회를 하면 뷰 안에서 사용하는 테이블들이 내가 락을 건 테이블과
+    -- 완전히 일치하지 않을 수 있고 그러면 락을 건 의미가 사라짐 -> 동시성 제어 깨짐
+    -- 데이터 정합성을 100% 보장하기 위해 락이 걸린 바로 그 물리적인 테이블을 직접 조회해야 함
+    -- 실제로 락의 지배를 받는 곳에서 판별을 해야 정확해짐
+    
+    -- 예약 등록된 res_open_id 찾기
+    -- 예약 테이블에서 party_id 를 찾아서
+    -- 그 파티아이디를 가지고 잇는 파티룸 테이블에서
+    -- res_open_id를 찾고
+    -- reservation_cancel에 같은 reservation_id가 없는거 중에서 res_open_id를 찾아야 함
+    -- 그게 예약 등록된 RES_OPEN_ID인데 그게 존재하지 않는거를 찾아야 하는거고
 -- 
 --RESERVATION INSERT(P_PARTY_ID, P_USER_ID)
+
+
+-- 설정된 테마가 성인테마인지 확인
+SELECT *
+FROM ROOM
+WHERE IS_ADULT = 1;
+
+-- 파티원들의 생년월일을 담아서 나이 확인
+
+
+
 CREATE OR REPLACE PROCEDURE PRC_RESERVATION
 ( P_USER_ID USER_ACCOUNT.USER_ID%TYPE
 , P_PARTY_ID   PARTY.PARTY_ID%TYPE
 )
 IS
-
     V_HAS_ID    NUMBER;
     V_PARTY     NUMBER;
-    V_HAS_RES   NUMBER;
     V_LEADER    NUMBER;
     V_RES_OPEN      NUMBER;  
     V_ROOM          NUMBER;  
@@ -944,14 +972,17 @@ IS
     V_MAX           NUMBER;  
     V_NOT_READY     NUMBER;  
     V_OVERLAP       NUMBER;
+    V_NEW_START     DATE;
+    V_NEW_END       DATE;
+    V_IS_ADULT      NUMBER;
     
     ERR_INVALID_USER    EXCEPTION;
     ERR_INVALID_PARTY   EXCEPTION;
-    RR_INVALID_RIGHT   EXCEPTION;  
+    ERR_INVALID_RIGHT   EXCEPTION;  
     ERR_INVALID_CNT     EXCEPTION;  
     ERR_NOT_READY       EXCEPTION;  
     ERR_OVERLAP         EXCEPTION;  
-    ERR_DUPLICATE       EXCEPTION;  
+    ERR_ALREADY_RES       EXCEPTION;  
     
 BEGIN
 
@@ -993,37 +1024,70 @@ BEGIN
         AND USER_ID = P_USER_ID;
         
     IF (V_LEADER < 1) THEN
-        RAISE ERR_INVAILD_USER
+        RAISE ERR_INVALID_RIGHT;
     END IF;
     
-    -- 파티아이디로 예약오픈아이디를 찾아서 예약이 가능한 상태인지 확인
-    
-    SELECT RES_OPEN_ID, ROOM_ID INTO V_RES_OPEN, V_ROOM
-    FROM PARTY P
-        JOIN PARTY_ROOM PR
-        ON P.PARTY_ID = PR.PARTY_ID
-    WHERE P.PARTY_ID = P_PARTY_ID;
-    
-    
-    SELECT COUNT(*) INTO V_HAS_RES
-    FROM VW_RES_OPEN_UNBOOKED
-    WHERE RES_OPEN_ID = V_RES_OPEN;
-    
-      IF (V_HAS_RES<1) THEN
-        RAISE ERR_INVALID_PARTY;
-    END IF;
+    -- 예약 가능 체크 및 Lock 걸기  
+    BEGIN 
+        SELECT RO.RES_OPEN_ID, R.ROOM_ID
+        , RO.OPEN_AT, RO.OPEN_AT + (R.DURATION / 1440) 
+        INTO V_RES_OPEN, V_ROOM , V_NEW_START, V_NEW_END
+        FROM RES_OPEN RO
+            JOIN ROOM R
+            ON RO.ROOM_ID = R.ROOM_ID
+            JOIN PARTY_ROOM PR
+            ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+            JOIN PARTY P
+            ON PR.PARTY_ID = P.PARTY_ID
+        WHERE P.PARTY_ID = P_PARTY_ID
+            AND NOT EXISTS (
+            -- 예약이 등록된 RES_OPEN_ID 찾기
+                SELECT 1
+                FROM PARTY_ROOM PR2
+                    JOIN RESERVATION RV
+                    ON PR2.PARTY_ID = RV.PARTY_ID
+                WHERE PR2.RES_OPEN_ID = RO.RES_OPEN_ID
+                 AND NOT EXISTS(
+                                SELECT 1
+                                FROM RESERVATION_CANCEL RC
+                                WHERE RV.RESERVATION_ID = RC.RESERVATION_ID
+                                )
+                )
+            AND NOT EXISTS(
+                        SELECT 1
+                        FROM RES_DROP RD
+                        WHERE  RD.RES_OPEN_ID = RO.RES_OPEN_ID
+                   )
+        FOR UPDATE OF RO.RES_OPEN_ID;
+        
+        EXCEPTION
+             WHEN NO_DATA_FOUND THEN
+             RAISE ERR_ALREADY_RES;
+    END;
 
     -- 파티 인원 수와 테마 최소인원 최대인원 수 확인
     SELECT FN_MEMBER_COUNT(P_PARTY_ID) INTO V_MEMBER_CNT
     FROM DUAL;
     
-    SELECT MIN_PLAYERS, MAX_PLAYERS INTO V_MIN, V_MAX
+    SELECT MIN_PLAYERS, MAX_PLAYERS, IS_ADULT INTO V_MIN, V_MAX, V_IS_ADULT
     FROM ROOM
     WHERE ROOM_ID = V_ROOM;
     
     IF(V_MEMBER_CNT < V_MIN OR V_MEMBER_CNT > V_MAX) THEN
-        RAISE ERR_INVALID_CNT
+        RAISE ERR_INVALID_CNT;
     END IF;
+    
+    
+    -- 성인테마인지 확인 후 파티원의 나이 조회해서 모두 성인인지 확인
+    IF (V_IS_ADULT = (SELECT COMMON_ID FROM COMMON WHERE COMMON_NAME ='Y')) THEN
+    
+       -- 파티장과 파티원의 생년월일 받아서 FN_GET_USER_AGE에 담아서 나이 판별하기
+       
+       
+        
+    END IF;
+    
+    
     
    -- 파티아이디의 모든 멤버가 레디 상태인지 확인
    SELECT COUNT(*) INTO V_NOT_READY
@@ -1034,21 +1098,14 @@ BEGIN
     IF (V_NOT_READY > 0) THEN
         RAISE ERR_NOT_READY;
     END IF;
-    
-    -- 새 예약 시간 구하기
-   SELECT RO.OPEN_AT, RO.OPEN_AT+R.DURATION / 1440 
-   INTO V_NEW_START, V_NEW_END
-   FROM RES_OPEN RO
-    JOIN ROOM R
-    ON RO.ROOM_ID = R.ROOM_ID;
-    
+
     -- 파티 구성원 중 시간 겹치는 예약 있는지 확인
     SELECT COUNT(*) INTO V_OVERLAP
     FROM VW_MEMBER_BOOKED_TIME
     WHERE USER_ID IN(
         SELECT USER_ID
         FROM PARTY
-        WHERE USER_ID = P_USER_ID
+        WHERE PARTY_ID = P_PARTY_ID
         UNION
         SELECT PA.USER_ID
         FROM PARTY_APPLY PA
@@ -1059,60 +1116,65 @@ BEGIN
             ) AND PA.PARTY_ID = P_PARTY_ID
         )
     AND V_NEW_START < END_AT
-    AND V_NEW_END > START_AT
-    
-    -- 새시작 6:00 새끝 7:00
-    -- 원시작 5:00 원끝 6:10
-    -- 원시작 6:50 원끝 8:00
+    AND V_NEW_END > START_AT;
     
     IF (V_OVERLAP > 0) THEN
         RAISE ERR_OVERLAP;
     END IF;
     
-    -- EH
+    -- 예약 등록 INSERT
+    INSERT INTO RESERVATION (RESERVATION_ID, PARTY_ID, CREATED_AT)
+    VALUES(RESERVATION_SEQ.NEXTVAL, P_PARTY_ID, SYSDATE);
     
+    COMMIT;
     
-
-
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20098,'데이터를 찾을 수 없습니다.');
+        WHEN ERR_INVALID_USER THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20001, '회원 정보가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_PARTY THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20011, '파티 정보가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_RIGHT THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20004, '권한이 없습니다.'); 
+        WHEN ERR_ALREADY_RES THEN
+             ROLLBACK;
+             RAISE_APPLICATION_ERROR(-20012, '이미 예약된 테마입니다.'); 
+        WHEN ERR_INVALID_CNT THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20013, '인원 설정 오류: 해당 테마는 ' || V_MIN ||'명부터 ' || V_MAX|| '명까지 예약 가능합니다.'); 
+        WHEN ERR_NOT_READY THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20014, '일부 인원이 준비되지 않았습니다. 모든 팀원이 준비 완료된 후 다시 시도해 주세요.'); 
+        WHEN ERR_OVERLAP THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20015, '파티원의 기존 예약 일정과 겹치는 시간이 있어 예약이 불가능합니다.'); 
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20099, '예약 처리 중 오류가 발생했습니다.');
+        
 END;
 /
 
 
 
 
+-- FK 인덱스 처리 
 
+-- PARTY_ROOM
+CREATE INDEX IDX_PARTY_ROOM_RES_OPEN ON PARTY_ROOM(RES_OPEN_ID);
+CREATE INDEX IDX_PARTY_ROOM_PARTY ON PARTY_ROOM(PARTY_ID);
 
+-- RES_DROP
+CREATE INDEX IDX_RES_DROP_RES_OPEN ON RES_DROP(RES_OPEN_ID);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+-- MANAGER_HISTORY (뷰에서 자주 쓰임)
+CREATE INDEX IDX_MGR_HISTORY_CAFE ON MANAGER_HISTORY(CAFE_ID);
+CREATE INDEX IDX_MGR_HISTORY_USER ON MANAGER_HISTORY(USER_ID);
 
 
 
