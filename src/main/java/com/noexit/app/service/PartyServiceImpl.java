@@ -92,13 +92,13 @@ public class PartyServiceImpl implements PartyService
 	}
 
 	@Override
-	public ThemeSlotDTO getThemeById(long themeId)
+	public ThemeSlotDTO getThemeSlotById(long themeId)
 	{
 		ThemeSlotDTO dto = null;
 		
 		try
 		{
-			dto = mapper.getThemeById(themeId);
+			dto = mapper.getThemeSlotById(themeId);
 		} 
 		catch (Exception e)
 		{
@@ -251,15 +251,35 @@ public class PartyServiceImpl implements PartyService
 	@Override
 	public int partyOut(long applyId)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		
+		try
+		{
+			result = mapper.partyOut(applyId);
+		} 
+		catch (Exception e)
+		{
+			log.info("partyOut : ",e);
+		}
+		
+		return result;
 	}
 
 	@Override
-	public int partyKick(long memberId)
+	public int partyKick(long crewId)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		int result = 0;
+		
+		try
+		{
+			result = mapper.partyKick(crewId);
+		} 
+		catch (Exception e)
+		{
+			log.info("partyKick : ",e);
+		}
+		
+		return result;
 	}
 
 	@Override

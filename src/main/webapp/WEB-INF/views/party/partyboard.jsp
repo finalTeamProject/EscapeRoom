@@ -360,7 +360,9 @@
 		// 파티 탈퇴;
 		$(".party-crew-list").on("click",".btn-out",function()
 		{
-			alert(this.getAttribute("data-apply-id"));
+			//alert(this.getAttribute("data-apply-id"));
+			this.disabled = true;
+			crewOut(this.getAttribute("data-apply-id"),this);
 		});
 
 		// 파티 강퇴
@@ -783,7 +785,7 @@
 	
 	function crewKick(crewId, btn)
 	{
-		if(!confirm("탈퇴 시키겠습니까?"))
+		if(!confirm("강퇴 시키겠습니까?"))
 		{
 			btn.disabled = false;
 			return;
@@ -798,7 +800,7 @@
 			{
 				if(!data.status)
 				{
-					alert("탈퇴 실패");
+					alert("강퇴 실패");
 					btn.disabled = false;
 				}				
 			}
@@ -822,9 +824,49 @@
 		});
 	}
 	
-	function crewOut()
+	function crewOut(applyId, btn)
 	{
+		if(!confirm("탈퇴하시겠습니까?"))
+		{
+			btn.disabled = false;
+			return;
+		}
 		
+		$.ajax(
+		{
+			"type":"POST"
+			, "url":"${path}/party/out/" + applyId
+			, "dataType":"json"
+			, "success":function(data)
+			{
+				if(!data)
+				{
+					btn.disabled = false;
+					alert("탈퇴 실패");
+				}
+				else
+				{
+					window.location.href="${path}/party/list";
+				}
+			}
+			, "error":function(e)
+			{
+				if (e.status === 401)
+	            {
+	                location.href = "${path}/user/login";
+	            }
+	            else if (e.status === 403 || e.status === 404)
+	            {
+	                location.href = "${path}/party/list";
+	            }
+	            else
+	            {
+	            	alert("서버 오류");
+	                console.log(e.responseText);
+	                btn.disabled = false;
+	            }
+			}
+		});
 	}
 	
 </script>

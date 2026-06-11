@@ -20,7 +20,7 @@ public interface PartyMapper
 	int hasApply(PartyApplyDTO dto);
 	int partyApply(PartyApplyDTO dto);
 	
-	ThemeSlotDTO getThemeById(long themeId);
+	ThemeSlotDTO getThemeSlotById(long themeId);
 	
 	int partyInsert(PartyDTO dto);
 	

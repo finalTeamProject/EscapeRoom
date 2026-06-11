@@ -46,7 +46,7 @@ public interface PartyService
 	int hasApply(PartyApplyDTO dto);
 	int partyApply(PartyApplyDTO dto);
 	
-	ThemeSlotDTO getThemeById(long themeId);
+	ThemeSlotDTO getThemeSlotById(long themeId);
 	
 	int partyInsert(PartyDTO dto);
 	
@@ -62,7 +62,7 @@ public interface PartyService
 	List<PartyCrewDTO> getPartyCrewList(long partyId);
 	int partyReady(long partyId);
 	int partyOut(long applyId);
-	int partyKick(long memberId);
+	int partyKick(long crewId);
 	PartyCrewDTO getPartyCrewById(long crewId);
 	
 	List<PartyApplyDTO> getPartyApplyList(long partyId);
