@@ -34,5 +34,7 @@ public interface AttendanceMapper {
 
 	// 노쇼 시 매너온도 차감
 	public void callInsertNoshow(Manner manner);
+	
+	public Long selectAttendanceIdByReservationId(Long reservationId);
 
 }

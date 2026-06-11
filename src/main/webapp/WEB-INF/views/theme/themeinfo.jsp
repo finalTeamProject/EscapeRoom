@@ -204,7 +204,7 @@
 				<div class="theme-info-wrap">
 
 					<div class="theme-image">
-						<img src="${pageContext.request.contextPath}/uploads/theme/${dto.imagePath}" alt="${dto.themeName }">
+						<img src="${pageContext.request.contextPath}/dist/images/${dto.imagePath}" alt="${dto.themeName }">
 					</div>
 
 					<div class="theme-info">
