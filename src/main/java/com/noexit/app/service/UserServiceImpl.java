@@ -50,12 +50,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User selectByLoginId(String loginId) {
+	public User findByLoginId(String loginId) {
 		User dto = null;
 		try {
 			dto = userMapper.findByLoginId(loginId);
 		} catch (Exception e) {
-			log.info("selectByLoginId : ", e);
+			log.info("findByLoginId : ", e);
 		}
 		return dto;
 	}

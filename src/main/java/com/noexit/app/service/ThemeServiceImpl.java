@@ -87,15 +87,28 @@ public class ThemeServiceImpl implements ThemeService {
 		return result;
 	}
 
+	// 테마 리스트 조회 (페이징 포함)
 	@Override
-	public List<ThemeDTO> selectListByOwnerUserId(long ownerUserId) {
+	public List<ThemeDTO> selectListByOwnerUserId(Map<String, Object> map) {
 		List<ThemeDTO> list = null;
 		try {
-			list = themeMapper.selectListByOwnerUserId(ownerUserId);
+			list = themeMapper.selectListByOwnerUserId(map);
 		} catch (Exception e) {
 			log.info("selectListByOwnerUserId : ", e);
 		}
 		return list;
+	}
+
+	// 테마 갯수 확인
+	@Override
+	public int dataCount(Map<String, Object> map) {
+		int result = 0;
+		try {
+			result = themeMapper.dataCount(map);
+		} catch (Exception e) {
+			log.info("dataCount : ", e);
+		}
+		return result;
 	}
 
 	@Override

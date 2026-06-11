@@ -95,11 +95,7 @@
 							</form>
 						</c:if>
 
-						<div class="paginate">
-							<span class="active">1</span>
-							<a href="#">2</a>
-							<a href="#">3</a>
-						</div>
+						${dataCount == 0 ? "" : paging}
 					</div>
 				</div>
 			</div>
