@@ -50,7 +50,6 @@ public class MailService {
 			
 			helper.setFrom(fromEmail, "NoExit");
 			helper.setTo(dto.getEmail());
-			//helper.setTo("god5228god@naver.com");
 			helper.setSubject("[NoExit] 예약이 취소되었습니다.");
 			helper.setText(content, true);	//-- true: HTML
 			

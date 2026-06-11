@@ -14,7 +14,7 @@ public interface CafeReservationMapper {
 	public List<CafeReservationDTO> resList(Map<String, Object> map);
 	
 	// 예약 상세 조회
-	public CafeReservationDTO resDetail(long reservationId);
+	public CafeReservationDTO resDetail(Long reservationId);
 	
 	
 	

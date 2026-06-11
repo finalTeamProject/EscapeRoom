@@ -12,10 +12,10 @@ import com.noexit.app.model.OpenReservationDTO;
 public interface OpenReservationMapper {
 
 	// 카페 목록 조회 
-	public List<OpenReservationDTO> getCafeList (long userId);
+	public List<OpenReservationDTO> getCafeList (Long userId);
 	
 	// 테마 목록 조회
-	public List<OpenReservationDTO> getThemeList (long cafeId);
+	public List<OpenReservationDTO> getThemeList (Long cafeId);
 	
 	// 등록된 예약 오픈 목록 조회
 	public List<OpenReservationDTO> getOpenReservationList (Map<String, Object> map);
@@ -24,9 +24,7 @@ public interface OpenReservationMapper {
 	public void openReservation(Map<String, Object> map) throws Exception;
 	
 	// 예약 비활성화 등록 프로시저
-	public void dropOpen(@Param("userId")long userId, @Param("resOpenId") long resOpenId) throws Exception;
+	public void dropOpen(@Param("userId")Long userId, @Param("resOpenId") Long resOpenId) throws Exception;
 	
-	// 예약 오픈 데이터 갯수
-	//public int dataCount(Map<String, Object> map);
 	
 }

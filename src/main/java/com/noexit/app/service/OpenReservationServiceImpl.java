@@ -22,7 +22,7 @@ public class OpenReservationServiceImpl implements OpenReservationService {
 	
 	// 카페 목록 가져오기
 	@Override
-	public List<OpenReservationDTO> getCafeList(long userId) {
+	public List<OpenReservationDTO> getCafeList(Long userId) {
 
 		List<OpenReservationDTO> result = new ArrayList<>();
 		
@@ -37,7 +37,7 @@ public class OpenReservationServiceImpl implements OpenReservationService {
 	
 
 	@Override
-	public List<OpenReservationDTO> getThemeList(long cafeId) {
+	public List<OpenReservationDTO> getThemeList(Long cafeId) {
 		
 		List<OpenReservationDTO> result = new ArrayList<>();
 		
@@ -84,7 +84,7 @@ public class OpenReservationServiceImpl implements OpenReservationService {
 	}
 
 	@Override
-	public void dropOpen(long userId, long resOpenId) throws Exception {
+	public void dropOpen(Long userId, Long resOpenId) throws Exception {
 		try {
 						
 			mapper.dropOpen(userId, resOpenId);
@@ -94,76 +94,6 @@ public class OpenReservationServiceImpl implements OpenReservationService {
 			throw e;
 		}
 	}
-
-	
-// 페이징 처리 안하면 삭제 	
-//	@Override
-//	public Map<String, Object> getListPaging(Map<String, Object> map) {
-//		
-//		Map<String, Object> result = new HashMap<>();
-//		
-//		try {
-//			
-//			int totalPage = 0 ;
-//			int dataCount = 0;
-//			int size = 10;
-//			
-//			int currentPage = (int) map.get("currentPage");
-//			
-//			// 전체 페이지 수 
-//			dataCount = mapper.dataCount(map);
-//			
-//			if(dataCount!=0)
-//				totalPage = paginateUtil.pageCount(dataCount, size);
-//			
-//			// 리스트에 출력할 데이터 가져오기
-//			int offset = (currentPage - 1) * size;
-//			if(offset<0)
-//				offset = 0;
-//			
-//			map.put("offset", offset);
-//			map.put("size", size);
-//			
-//			// 목록 조회
-//			List<OpenReservationDTO> list = getOpenReservationList(map);
-//			
-//			// 페이징 url 
-//			String schDate = (String) map.get("schDate");
-//			Long schCafe = (Long) map.get("schCafe");
-//			
-//			String listUrl = "/openRes?schDate="+schDate
-//					+ (schCafe != null ? "&schCafe="+schCafe : "" );
-//			String paging = paginateUtil.paging(currentPage, totalPage, listUrl);
-//			
-//			result.put("list", list);
-//			result.put("dataCount", dataCount);
-//			result.put("totalPage", totalPage);
-//			result.put("paging", paging);
-//	
-//			
-//		} catch (Exception e) {
-//			log.error("getListPaging: ",e);
-//		}
-//		
-//		
-//		return result;
-//	}
-//
-//	@Override
-//	public int dataCount(Map<String, Object> map) {
-//		
-//		int result = 0;
-//		
-//		try {
-//			
-//			result = mapper.dataCount(map);
-//			
-//		} catch (Exception e) {
-//			log.error("dataCount: ", e);
-//		}
-//		
-//		return result;
-//	}
 
 	
 }

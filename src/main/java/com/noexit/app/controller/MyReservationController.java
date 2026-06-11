@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.noexit.app.model.User;
 import com.noexit.app.service.MyReservationService;
 
 import jakarta.servlet.http.HttpSession;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 
-public class MyPageReserv {
+public class MyReservationController {
 	
 	private final MyReservationService service;
 	
@@ -32,8 +33,10 @@ public class MyPageReserv {
 			, Model model) {
 	
 			// 세션에서 userId 받아오기 
-			//long userId = (long)session.getAttribute("userId");
-			long userId = 5L;
+			//Long userId = (Long)session.getAttribute("userId");
+			
+			User loginUser = (User) session.getAttribute("loginUser");
+			Long userId = loginUser.getUserId();
 	
 		try {
 			int size = 10;
@@ -58,12 +61,13 @@ public class MyPageReserv {
 	@ResponseBody
 	//-- Map을 JSON으로 변환해서 반환 문자열 반환해서 뷰리졸버로 보내는게 아니라(JSP 화면을 보내는게 아니라서)
 	//  데이터 자체를 응답으로 보낼 때 사용 
-	public Map<String, Object> cancel(@RequestParam(name="reservationId") long reservationId
+	public Map<String, Object> cancel(@RequestParam(name="reservationId") Long reservationId
 			, HttpSession session) {
 
 		// 세션에서 userId 받아오기 
-		//long userId = (long)session.getAttribute("userId");
-			long userId = 5L;
+		//Long userId = (Long)session.getAttribute("userId");
+		User loginUser = (User) session.getAttribute("loginUser");
+		Long userId = loginUser.getUserId();
 			
 			Map<String, Object> result = new HashMap<>();
 			
