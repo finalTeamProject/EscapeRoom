@@ -1,7 +1,9 @@
 package com.noexit.app.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,17 +69,6 @@ public class AttendanceServiceImpl implements AttendanceService {
 		return list;
 	}
 
-	@Override
-	public void attendAll(List<AttendanceListDTO> list, Long staffUserId) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isCheckable(Long reservationId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 
 	// 개별 출석체크 임시저장
@@ -139,37 +130,101 @@ public class AttendanceServiceImpl implements AttendanceService {
 			// 예약별 처리
 			for (Long reservationId : resIds) {
 
-				// 스케줄러가 먼저 박은 경우 스킵
-				if (mapper.selectAttendanceExists(reservationId) > 0) continue;
+			    AttendItemDTO head = new AttendItemDTO();
 
-				// ATTENDANCE 1행
-				AttendItemDTO head = new AttendItemDTO();
-				head.setReservationId(reservationId);
-				head.setUserId(staffUserId);
-				mapper.insertAttendance(head);
+			    // 스케줄러가 먼저 박은 경우 → ATTENDANCE ID 재사용
+			    Long existingId = mapper.selectAttendanceIdByReservationId(reservationId);
 
-				// ATTENDANCE_DETAIL N행
-				for (AttendItemDTO it : drafts) {
-					if (!reservationId.equals(it.getReservationId())) continue;
+			    if (existingId != null) {
+			        head.setAttendanceId(existingId);
+			    } else {
+			        // ATTENDANCE 
+			        head.setReservationId(reservationId);
+			        head.setUserId(staffUserId);
+			        mapper.insertAttendance(head);
+			    }
 
-					it.setAttendanceId(head.getAttendanceId());
-					mapper.insertAttendDetailByUser(it);
+			    // ATTENDANCE_DETAIL 
+			    for (AttendItemDTO dto : drafts) {
+			        if (!reservationId.equals(dto.getReservationId())) continue;
 
-					// 노쇼면 매너온도 차감
-					if (it.getAttendStatusId() != null && it.getAttendStatusId() == 2L) {
-						Manner m = new Manner();
-						m.setUserId(it.getUserId());
-						mapper.callInsertNoshow(m);
-					}
-				}
+			        dto.setAttendanceId(head.getAttendanceId());
+			        mapper.insertAttendDetailByUser(dto);
+
+			        // 노쇼면 매너온도 차감
+			        if (dto.getAttendStatusId() != null && dto.getAttendStatusId() == 2L) {
+			            Manner m = new Manner();
+			            m.setUserId(dto.getUserId());
+			            mapper.callInsertNoshow(m);
+			        }			  
+			    }
 			}
-
-			session.removeAttribute("attendDraft");
-
-		} catch (Exception e) {
-			log.info("finalizeAttendance : ", e);
-			throw e;
+						session.removeAttribute("attendDraft");
+					}catch (Exception e) {                      
+					log.info("finalizeAttendance : ", e);
+					throw e;
+		   }
 		}
+	
+	
+	@Override
+	public List<AttendanceListDTO> selectAttendListByRole(Long userId, String role) {
+	    if ("OWNER".equals(role)) {
+	        return selectListByOwnerUserId(userId);
+	    } else {
+	        return selectListByManagerUserId(userId);
+	    }
 	}
+
+	//draft 기준 done/partial 분류
+	@Override
+	public Map<String, List<Long>> checkStatus(HttpSession session, List<AttendanceListDTO> attendList) {
+	   
+		List<Long> doneList = new ArrayList<>();
+	    List<Long> partialList = new ArrayList<>();
+
+	    @SuppressWarnings("unchecked")
+	    List<AttendItemDTO> draftList = (List<AttendItemDTO>) session.getAttribute("attendDraft");
+
+	    if (draftList != null) {
+	        // 중복 없는 reservationId 모으기
+	        List<Long> resIds = new ArrayList<>();
+	        for (AttendItemDTO d : draftList) {
+	            if (!resIds.contains(d.getReservationId())) {
+	                resIds.add(d.getReservationId());
+	            }
+	        }
+
+	        // 예약별 draft 개수랑 TOTAL_MEMBER 비교
+	        for (Long rid : resIds) {
+	            int draftCount = 0;
+	            for (AttendItemDTO d : draftList) {
+	                if (rid.equals(d.getReservationId())) draftCount++;
+	            }
+
+	            int total = 0;
+	            for (AttendanceListDTO a : attendList) {
+	                if (rid.equals(a.getReservationId())) {
+	                    total = a.getTotalMember();
+	                    break;
+	                }
+	            }
+
+	            if (draftCount >= total) {
+	                doneList.add(rid);
+	            } else {
+	                partialList.add(rid);
+	            }
+	        }
+	    }
+
+	    Map<String, List<Long>> result = new HashMap<>();
+	    result.put("done", doneList);
+	    result.put("partial", partialList);
+	   
+	    return result;
+	}
+	
+	
 
 }

@@ -33,7 +33,7 @@ public class ThemeServiceImpl implements ThemeService {
 
 	@PostConstruct
 	public void init() {
-		uploadPath =  new File("uploads/theme").getAbsolutePath();
+		this.uploadPath = new File("src/main/resources/static/dist/images").getAbsolutePath();
 
 		File file = new File(uploadPath);
 		if (!file.exists()) {

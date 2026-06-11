@@ -248,7 +248,7 @@
 	function renderTheme(item)
 	{
 		return "<a href='${path}/theme/info/" + item.themeId + "' class='theme-item'>"
-		+ "<div class='theme-image'><img src='" + (item.imagePath && item.imagePath.charAt(0) === '/' ? '${path}' + item.imagePath : '${path}/uploads/theme/' + item.imagePath)
+		+ "<div class='theme-image'><img src='" + (item.imagePath && item.imagePath.charAt(0) === '/' ? '${path}' + item.imagePath : '${path}/dist/images/' + item.imagePath)
 		+ "'></div>"
 		+ "<div class='theme-info'>"
 			+ getItem('카페명',item.cafeName)
