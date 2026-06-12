@@ -8,12 +8,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class OpenReservationDTO {
-	private long cafeId;
+	private Long cafeId;
 	private String cafeName;
-	private long roomId;
-	private String roonName;
-	private long ownerId;
-	private long managerId;
+	private Long roomId;
+	private String roomName;
+	private Long ownerId;
+	private Long managerId;
 	private String openAt;
-	private long resOpenId;
+	private String openDate;
+	private String openTime;
+	private Long resOpenId;
 }

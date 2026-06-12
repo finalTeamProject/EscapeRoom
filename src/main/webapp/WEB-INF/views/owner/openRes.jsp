@@ -9,12 +9,151 @@
 <link rel="stylesheet"
 	href='${pageContext.request.contextPath }/dist/css/openRes.css' />
 <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 <script type="text/javascript">
+	$(function(){
+		
+		// 페이지 로드 시에 컨트롤러에서 넘겨준 schDate를 loadList()함수로 넘겨주기
+		// 목록조회 ajax 처리하는 함수 loadList(schDate, schCafe)
+		loadList("${schDate}", null);
+		//-- 오늘날짜, 전체카페(null) 로 목록 조회
+		
+		// schDate 변경 시 목록 조회
+		$("#selectDate").on("change", function(){
+			loadList($(this).val(), $("#selectCafe").val());			
+		});
+		
+		// schCafe 변경 시 목록 조회
+		$("#selectCafe").on("change", function(){
+			loadList($("#selectDate").val(), $(this).val());			
+		});
+		
+		// 카페 셀렉트 변경 시 테마 셀렉트 변경 AJAX
+		$("#cafeSelect").on("change", function(){
+			
+			const cafeId = $(this).val();
+			
+			$("#themeSelect").empty().append('<option value="" disabled selected>-- 테마 선택 --</option>');
+			
+			if(!cafeId)
+				return;
+			
+			$.ajax({
+				  url: '/owner/openRes/theme'
+				, type: 'GET'
+				, data: {cafeId:cafeId}
+				, success: function(res){
+					  res.forEach(function(room){
+					        $("#themeSelect").append('<option value="' + room.roomId + '">' + room.roomName + '</option>');
+					    });
+				}
+			});
+			
+		});
+		// 예약 슬롯 등록 
+		$("#openResBtn").on("click", function(){
+			
+			const cafeId  = $('#cafeSelect').val();
+		    const roomId  = $('#themeSelect').val();
+		    const date    = $('#openDate').val();
+		    const hour    = $('select[name="hour"]').val();
+		    const min     = $('select[name="min"]').val();
+			
+		 // 유효성 체크
+		    if(!cafeId || cafeId == '') { alert('카페를 선택해주세요.'); return; }
+		    if(!roomId || roomId == '') { alert('테마를 선택해주세요.'); return; }
+		    if(!date)                   { alert('날짜를 선택해주세요.'); return; }
 
-	function deleteOk(){
-		if(confirm('정말 비활성화 하시겠습니까?')){
-			//const url = "${pageContext.request.contextPath}/owner/res/delete/${dto.num}?;
-			location.href=url;
+		 // 예약 슬롯 등록 폼 구성 AJAX 처리
+		    $.ajax({
+		          url: '/owner/openRes/open'
+		        , type: 'POST'
+		        , data: {
+		              cafe:  cafeId
+		            , theme: roomId
+		            , date:  date
+		            , hour:  hour
+		            , min:   min
+		          }
+		        , success: function(res){
+		            if(res.success){
+		                alert(res.message);
+		                // 등록 성공 후 등록한 건에 맞는 목록 조회 
+		                $("#selectCafe").val(cafeId);
+		                $("#selectDate").val(date);
+		                loadList(date, cafeId);
+		            } else {
+		                alert(res.message);
+		            }
+		        }
+		        , error: function(){
+		            alert('오류가 발생했습니다.');
+		        }
+		    });
+		    
+		});
+	});
+	
+	// 목록 조회 - AJAX
+	function loadList(schDate, schCafe) {
+	    $.ajax({
+	          url: '/owner/openRes/list'
+	        , type: 'GET'
+	        , data: { schDate: schDate, schCafe: schCafe}
+	        , success: function(res) {
+	        	
+	        	if(res.length==0){
+	        		$('#emptyList').show();
+	        	}else{
+	        		$('#emptyList').hide();
+	        	}
+	        	
+	            const tbody = $('tbody');
+	            tbody.empty();
+	            
+	            res.forEach(function(item) {
+	                tbody.append(
+	                    '<tr>' +
+	                    '<td>' + item.cafeName + '</td>' +
+	                    '<td>' + item.roomName + '</td>' +
+	                    '<td>' + item.openDate + '</td>' +
+	                    '<td class="fw-bold">' + item.openTime + '</td>' +
+	                    '<td><button type="button" class="btn ne-btn-deact" onclick="deleteOk('+item.resOpenId+')">슬롯 삭제</button></td>' +
+	                    '</tr>'
+	                );
+	            });
+	        }
+	    });
+	}
+	
+	
+	// 비활성화 버튼 클릭
+	function deleteOk(resOpenId){
+	
+		if(confirm("정말 삭제하시겠습니까?")){
+			
+			// 예약 슬롯 비활성화 폼 구성 AJAX 처리
+		    $.ajax({
+		          url: '/owner/openRes/delete'
+		        , type: 'POST'
+		        , data: {
+		              resOpen:  resOpenId
+		          }
+		        , success: function(res){
+		            if(res.success){
+		                alert(res.message);
+		                // 비활성화 성공 후 목록 조회 
+		             	// 현재 선택된 날짜/카페로 목록 갱신
+		                loadList($('#selectDate').val(), $('#selectCafe').val());
+		            } else {
+		                alert(res.message);
+		            }
+		        }
+		        , error: function(){
+		            alert('오류가 발생했습니다.');
+		        }
+		    });
+			
 		}
 	}
 	
@@ -35,32 +174,32 @@
 						<div class="res-title">예약 시간 등록</div>
 						<form method="post" name="resOpenForm">
 							<div class="form-label">카페 선택</div>
-							<select name="" id="" class="selectBox ne-box">
-								<option value="" disabled selected>-- 카페 선택 --</option>
-								<option>지구별</option>
-								<option>우주별</option>
+							<select name="cafe" class="selectBox ne-box" id="cafeSelect">
+								<option disabled selected>-- 카페 선택 --</option>
+								<c:forEach var="list" items="${cafeList }">
+									<option value="${list.cafeId }">${list.cafeName }</option>
+								</c:forEach>
 							</select>
 							<div class="form-label">테마 선택</div>
-							<select name="" class="selectBox ne-box">
+							<select name="theme" class="selectBox ne-box" id="themeSelect">
 								<option value="" disabled selected>-- 테마 선택 --</option>
-								<option value="">어둠의 저택</option>
-								<option value="">바이러스 연구소</option>
 							</select>
 							<div class="form-label">날짜 선택</div>
-							<input type="date" id="openDate" class="ne-box selectBox"/>
+							<input type="date" id="openDate" name="date" class="ne-box selectBox" value="${minDate }"
+							min="<%= java.time.LocalDate.now().plusDays(1).toString() %>"/>
 							<div class="form-label">시간 선택</div>
 							<div class="timeWrap ">
-								<select name="" id="" class="ne-box">
-									<option value="0">00</option>
-									<option value="1">01</option>
-									<option value="2">02</option>
-									<option value="3">03</option>
-									<option value="4">04</option>
-									<option value="5">05</option>
-									<option value="6">06</option>
-									<option value="7">07</option>
-									<option value="8">08</option>
-									<option value="9">09</option>
+								<select name="hour" class="ne-box">
+									<option value="00">00</option>
+									<option value="01">01</option>
+									<option value="02">02</option>
+									<option value="03">03</option>
+									<option value="04">04</option>
+									<option value="05">05</option>
+									<option value="06">06</option>
+									<option value="07">07</option>
+									<option value="08">08</option>
+									<option value="09">09</option>
 									<option value="10">10</option>
 									<option value="11">11</option>
 									<option value="12">12</option>
@@ -76,9 +215,9 @@
 									<option value="22">22</option>
 									<option value="23">23</option>
 								</select> 시 
-								<select name="" id="" class="ne-box ms-2">
-									<option value="0">00</option>
-									<option value="5">05</option>
+								<select name="min" class="ne-box ms-2">
+									<option value="00">00</option>
+									<option value="05">05</option>
 									<option value="10">10</option>
 									<option value="15">15</option>
 									<option value="20">20</option>
@@ -91,7 +230,8 @@
 									<option value="55">55</option>
 								</select> 분
 							</div>
-							<button type="button" class="btn btn-primary">예약시간 등록</button>
+							<button type="button" class="btn btn-primary" id="openResBtn">예약시간 등록</button>
+						
 						</form>
 					</div>
 					<div class="resOpenList">
@@ -99,12 +239,15 @@
 							<div class="res-title d-flex justify-content-between align-items-center">
 								<span>등록된 슬롯</span>
 								 <form action="">
-								 	<select name="" id="" class="selectBox ne-box">
+								 
+								 	<select name="schCafe" class="selectBox ne-box" id="selectCafe">
 								 		<option value="">전체 카페</option>
-								 		<option value="">지구별</option>
-								 		<option value="">우주별</option>
+								 		<c:forEach var="list" items="${cafeList }">
+									 		<option value="${list.cafeId }">${list.cafeName }</option>
+								 		</c:forEach>
 								 	</select>
-								 	<input type="date" class="ne-box" value="2026-06-01" />
+								 	<input type="date" class="ne-box" name="schDate" value="${schDate }" id="selectDate"
+								 	min="<%= java.time.LocalDate.now().toString() %>"/>
 								 </form>						
 							</div>
 						</div>
@@ -119,62 +262,22 @@
 								</tr>
 							</thead>
 							<tbody>
+							<c:forEach var="list" items="${openList}">
 								<tr>
-									<td>지구별</td>
-									<td>어둠의 저택</td>
-									<td>2026-06-01</td>
-									<td class="fw-bold">10:00</td>
+									<td>${list.cafeName }</td>
+									<td>${list.roomName }</td>
+									<td>${list.openDate }</td>
+									<td class="fw-bold">${list.openTime }</td>
 									<td>
-										<button type="button" class="btn ne-btn-deact" onclick="deleteOk()">비활성화</button>
+										<button type="button" class="btn ne-btn-deact" onclick="deleteOk(${list.resOpenId})">비활성화</button>
 									</td>
 								</tr>
-								<tr>
-									<td>지구별</td>
-									<td>어둠의 저택</td>
-									<td>2026-06-01</td>
-									<td class="fw-bold">15:00</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact" onclick="deleteOk()">비활성화</button>
-									</td>
-								</tr>
-								<tr>
-									<td>지구별</td>
-									<td>어둠의 저택</td>
-									<td>2026-06-01</td>
-									<td class="fw-bold">18:10</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact" onclick="deleteOk()">비활성화</button>
-									</td>
-								</tr>
-								<tr>
-									<td>우주별</td>
-									<td>바이러스 연구소</td>
-									<td>2026-06-01</td>
-									<td class="fw-bold">12:15</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact" onclick="deleteOk()">비활성화</button>
-									</td>
-								</tr>
-								<tr>
-									<td>우주별</td>
-									<td>바이러스 연구소</td>
-									<td>2026-06-01</td>
-									<td class="fw-bold">15:45</td>
-									<td>
-										<button type="button" class="btn ne-btn-deact" onclick="deleteOk()">비활성화</button>
-									</td>
-								</tr>
-								
-								
+							</c:forEach>
 							</tbody>
 						</table>
-						<div class="paginate">
-							<a href="#"> 1 </a>
-							<a href="#"> 2 </a>
-							<span class="active">3</span>
-							<a href="#"> 4 </a>
-							<a href="#"> 5 </a>
-						</div>
+						
+						<div class="text-center" id="emptyList" style="display: none; margin-top: 10px;">등록된 슬롯이 없습니다.</div>
+						
 					</div>
 				</div>
 			</div>

@@ -8,10 +8,12 @@ import lombok.Setter;
 public class PartyApplyDTO
 {
 	private long applyId;
-	private String name;
+	private long partyId;
+	private long userId;
+	private String nickName;
 	private String gender;
 	private int age;
-	private int temp;
+	private double temp;
 	private String applyComment;
 	private String createdAt;
 }

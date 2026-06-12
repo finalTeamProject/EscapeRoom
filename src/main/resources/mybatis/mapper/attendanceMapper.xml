@@ -4,6 +4,7 @@
     "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.noexit.app.mapper.AttendanceMapper">
 
+
 	<insert id="insertAttendance" parameterType="com.noexit.app.model.AttendanceListDTO">
 		<selectKey keyProperty="attendanceId" resultType="Long" order="BEFORE">
 			SELECT ATTENDANCE_SEQ.NEXTVAL FROM DUAL
@@ -18,7 +19,7 @@
 	</insert>
 
 
-	<select id="selectListByOwnerUserId" parameterType="Long"
+	<select id="selectListByOwnerUserId" parameterType="map"
 	        resultType="com.noexit.app.model.AttendanceListDTO">
 		SELECT VRA.RESERVATION_ID, VRA.OPEN_AT, VRA.CAFE_ID, VRA.CAFE_NAME,
 		       VRA.ROOM_ID, VRA.ROOM_NAME, VRA.LEADER_ID,
@@ -29,13 +30,27 @@
 		  JOIN CAFE C ON VRA.CAFE_ID = C.CAFE_ID
 		  JOIN USER_ACCOUNT UA ON VRA.LEADER_ID = UA.USER_ID
 		 WHERE C.USER_ID = #{ownerUserId}
+		 AND VRA.CANCEL_ID IS NULL
 		   <![CDATA[
-		   AND VRA.OPEN_AT < SYSDATE
+		 AND VRA.OPEN_AT <= SYSDATE + 1/24
 		   ]]>
 		 ORDER BY VRA.OPEN_AT DESC
+		 OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
 	</select>
 
-	<select id="selectListByManagerUserId" parameterType="Long"
+	<!-- 출석체크 목록 갯수 (사장, 페이징용) -->
+	<select id="dataCountByOwnerUserId" parameterType="map" resultType="int">
+		SELECT NVL(COUNT(*), 0)
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN CAFE C ON VRA.CAFE_ID = C.CAFE_ID
+		 WHERE C.USER_ID = #{ownerUserId}
+		 AND VRA.CANCEL_ID IS NULL
+		   <![CDATA[
+		 AND VRA.OPEN_AT <= SYSDATE + 1/24
+		   ]]>
+	</select>
+
+	<select id="selectListByManagerUserId" parameterType="map"
 	        resultType="com.noexit.app.model.AttendanceListDTO">
 		SELECT VRA.RESERVATION_ID, VRA.OPEN_AT, VRA.CAFE_ID, VRA.CAFE_NAME,
 		       VRA.ROOM_ID, VRA.ROOM_NAME, VRA.LEADER_ID,
@@ -46,10 +61,167 @@
 		  JOIN V_ACTIVE_MANAGER VAM ON VAM.CAFE_ID = VRA.CAFE_ID
 		  JOIN USER_ACCOUNT UA ON VRA.LEADER_ID = UA.USER_ID
 		 WHERE VAM.USER_ID = #{managerUserId}
+		 AND VRA.CANCEL_ID IS NULL
 		   <![CDATA[
-		   AND VRA.OPEN_AT < SYSDATE
+		   AND VRA.OPEN_AT <= SYSDATE + 1/24
 		   ]]>
 		 ORDER BY VRA.OPEN_AT DESC
+		 OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
 	</select>
+
+	<!-- 출석체크 목록 갯수 (매니저, 페이징용) -->
+	<select id="dataCountByManagerUserId" parameterType="map" resultType="int">
+		SELECT NVL(COUNT(*), 0)
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN V_ACTIVE_MANAGER VAM ON VAM.CAFE_ID = VRA.CAFE_ID
+		 WHERE VAM.USER_ID = #{managerUserId}
+		 AND VRA.CANCEL_ID IS NULL
+		   <![CDATA[
+		   AND VRA.OPEN_AT <= SYSDATE + 1/24
+		   ]]>
+	</select>
+
+	<!--한 예약에 대한 모든 파티원 정보  -->
+	<select id="selectCrewByReservationId" parameterType="Long"
+	        resultType="com.noexit.app.model.AttendCrew">
+		  SELECT USER_ID, NICKNAME, POSITION
+		  FROM (
+		      SELECT P.USER_ID, UA.NICKNAME, 'HOST' AS POSITION
+		      FROM PARTY P
+		      JOIN USER_ACCOUNT UA ON UA.USER_ID = P.USER_ID
+		      JOIN RESERVATION R ON R.PARTY_ID = P.PARTY_ID
+		      WHERE R.RESERVATION_ID = #{reservationId}
+		      UNION ALL
+		      SELECT PA.USER_ID, UA.NICKNAME, 'MEMBER' AS POSITION
+		      FROM PARTY_MEMBER PM
+		      JOIN PARTY_APPLY PA ON PA.APPLY_ID = PM.APPLY_ID
+		      JOIN USER_ACCOUNT UA ON UA.USER_ID = PA.USER_ID
+		      JOIN RESERVATION R ON R.PARTY_ID = PA.PARTY_ID
+		      WHERE R.RESERVATION_ID = #{reservationId}
+		      AND NOT EXISTS (
+		         SELECT 1 FROM PARTY_KICK PK WHERE PK.MEMBER_ID = PM.MEMBER_ID
+		       )
+		  )
+		  ORDER BY DECODE(POSITION, 'HOST', 0, 1), USER_ID
+		 
+	</select>
+	
+	<!-- 출석체크 진입 가능 여부 : 취소 아님 + 시작 1시간 전 이후면 1, 아니면 0 -->
+	<select id="selectCheckable" parameterType="Long" resultType="int">
+		SELECT CASE
+		       WHEN VRA.CANCEL_ID IS NULL
+		       <![CDATA[
+		        AND VRA.OPEN_AT - 1/24 <= SYSDATE THEN 1
+		       ]]>
+		       ELSE 0 END
+		  FROM VW_RESERVATION_ALL VRA
+		 WHERE VRA.RESERVATION_ID = #{reservationId}
+	</select>	
+	
+	<select id="selectAttendanceExists" parameterType="Long" resultType="int">
+  	   SELECT COUNT(*) FROM ATTENDANCE
+  	   WHERE RESERVATION_ID = #{reservationId}
+	</select>
+
+	<!-- 파티원 1명당 출석 상태 INSERT -->
+	<insert id="insertAttendDetailByUser" parameterType="com.noexit.app.model.AttendItemDTO">
+		INSERT INTO ATTENDANCE_DETAIL (DETAIL_ID, ATTENDANCE_ID, USER_ID, ATTEND_STATUS_ID)
+		VALUES (ATTENDANCE_DETAIL_SEQ.NEXTVAL, #{attendanceId}, #{userId}, #{attendStatusId})
+	</insert>
+
+	<!-- 노쇼 시 매너온도 차감 -->
+	<update id="callInsertNoshow" parameterType="com.noexit.app.model.Manner" statementType="CALLABLE">
+		{ CALL SP_INSERT_NOSHOW(
+			#{userId,  mode=IN,  jdbcType=NUMERIC},
+			#{newTemp, mode=OUT, jdbcType=NUMERIC}
+		) }
+	</update>
+	
+	<!--ATTENDANCE 있으면 그 ID 재사용 + DETAIL은 무조건 INSERT   -->
+	<select id="selectAttendanceIdByReservationId" parameterType="Long" resultType="Long">
+    SELECT ATTENDANCE_ID
+    FROM ATTENDANCE
+    WHERE RESERVATION_ID = #{reservationId}
+	</select>
+
+
+	<!-- 출석기록 목록 (사장) : ATTENDANCE 박힌 예약만 + 완료/노쇼 카운트 -->
+	<select id="selectHistoryByOwnerUserId" parameterType="map"
+	        resultType="com.noexit.app.model.AttendanceListDTO">
+		SELECT VRA.RESERVATION_ID, VRA.OPEN_AT, VRA.CAFE_ID, VRA.CAFE_NAME,
+		       VRA.ROOM_ID, VRA.ROOM_NAME, VRA.LEADER_ID,
+		       UA.NICKNAME AS LEADER_NICKNAME,
+		       VRA.TOTAL_MEMBER,
+		       (SELECT COUNT(*) FROM ATTENDANCE_DETAIL AD
+		          JOIN ATTENDANCE A2 ON A2.ATTENDANCE_ID = AD.ATTENDANCE_ID
+		         WHERE A2.RESERVATION_ID = VRA.RESERVATION_ID
+		           AND AD.ATTEND_STATUS_ID = 1) AS DONE_COUNT,
+		       (SELECT COUNT(*) FROM ATTENDANCE_DETAIL AD
+		          JOIN ATTENDANCE A2 ON A2.ATTENDANCE_ID = AD.ATTENDANCE_ID
+		         WHERE A2.RESERVATION_ID = VRA.RESERVATION_ID
+		           AND AD.ATTEND_STATUS_ID = 2) AS NOSHOW_COUNT
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN CAFE C ON VRA.CAFE_ID = C.CAFE_ID
+		  JOIN USER_ACCOUNT UA ON VRA.LEADER_ID = UA.USER_ID
+		  JOIN ATTENDANCE A ON A.RESERVATION_ID = VRA.RESERVATION_ID
+		 WHERE C.USER_ID = #{ownerUserId}
+		 ORDER BY VRA.OPEN_AT DESC
+		 OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+	</select>
+
+	<!-- 출석기록 갯수 (사장, 페이징용) -->
+	<select id="dataCountHistoryByOwnerUserId" parameterType="map" resultType="int">
+		SELECT NVL(COUNT(*), 0)
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN CAFE C ON VRA.CAFE_ID = C.CAFE_ID
+		  JOIN ATTENDANCE A ON A.RESERVATION_ID = VRA.RESERVATION_ID
+		 WHERE C.USER_ID = #{ownerUserId}
+	</select>
+
+	<!-- 출석기록 목록 (매니저) : 본인이 매니저로 등록된 카페의 처리 기록 -->
+	<select id="selectHistoryByManagerUserId" parameterType="map"
+	        resultType="com.noexit.app.model.AttendanceListDTO">
+		SELECT VRA.RESERVATION_ID, VRA.OPEN_AT, VRA.CAFE_ID, VRA.CAFE_NAME,
+		       VRA.ROOM_ID, VRA.ROOM_NAME, VRA.LEADER_ID,
+		       UA.NICKNAME AS LEADER_NICKNAME,
+		       VRA.TOTAL_MEMBER,
+		       (SELECT COUNT(*) FROM ATTENDANCE_DETAIL AD
+		          JOIN ATTENDANCE A2 ON A2.ATTENDANCE_ID = AD.ATTENDANCE_ID
+		         WHERE A2.RESERVATION_ID = VRA.RESERVATION_ID
+		           AND AD.ATTEND_STATUS_ID = 1) AS DONE_COUNT,
+		       (SELECT COUNT(*) FROM ATTENDANCE_DETAIL AD
+		          JOIN ATTENDANCE A2 ON A2.ATTENDANCE_ID = AD.ATTENDANCE_ID
+		         WHERE A2.RESERVATION_ID = VRA.RESERVATION_ID
+		           AND AD.ATTEND_STATUS_ID = 2) AS NOSHOW_COUNT
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN V_ACTIVE_MANAGER VAM ON VAM.CAFE_ID = VRA.CAFE_ID
+		  JOIN USER_ACCOUNT UA ON VRA.LEADER_ID = UA.USER_ID
+		  JOIN ATTENDANCE A ON A.RESERVATION_ID = VRA.RESERVATION_ID
+		 WHERE VAM.USER_ID = #{managerUserId}
+		 ORDER BY VRA.OPEN_AT DESC
+		 OFFSET #{offset} ROWS FETCH FIRST #{size} ROWS ONLY
+	</select>
+
+	<!-- 출석기록 갯수 (매니저, 페이징용) -->
+	<select id="dataCountHistoryByManagerUserId" parameterType="map" resultType="int">
+		SELECT NVL(COUNT(*), 0)
+		  FROM VW_RESERVATION_ALL VRA
+		  JOIN V_ACTIVE_MANAGER VAM ON VAM.CAFE_ID = VRA.CAFE_ID
+		  JOIN ATTENDANCE A ON A.RESERVATION_ID = VRA.RESERVATION_ID
+		 WHERE VAM.USER_ID = #{managerUserId}
+	</select>
+	
+	<!-- 출석기록 상세 -->
+	<select id="selectHistoryDetail" parameterType="Long"
+   	     resultType="com.noexit.app.model.AttendCrew">
+   	 SELECT AD.USER_ID, UA.NICKNAME, AD.ATTEND_STATUS_ID, TS.STATUS_NAME
+   	   FROM ATTENDANCE A
+       JOIN ATTENDANCE_DETAIL AD ON A.ATTENDANCE_ID = AD.ATTENDANCE_ID
+       JOIN USER_ACCOUNT UA ON AD.USER_ID = UA.USER_ID
+       LEFT JOIN ATTEND_STATUS TS ON AD.ATTEND_STATUS_ID = TS.STATUS_ID
+       WHERE A.RESERVATION_ID = ${reservationId}
+       ORDER BY AD.USER_ID
+	</select>
+	
 
 </mapper>

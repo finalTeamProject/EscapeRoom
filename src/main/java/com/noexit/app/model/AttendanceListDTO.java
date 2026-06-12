@@ -24,4 +24,8 @@ public class AttendanceListDTO {
 	private Long   attendanceId;
 	private Long   userId;
 	private Long   attendStatusId;
+
+	// 출석기록 페이지용 카운트
+	private int    doneCount;
+	private int    noshowCount;
 }

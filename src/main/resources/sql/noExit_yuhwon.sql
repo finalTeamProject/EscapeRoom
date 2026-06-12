@@ -39,14 +39,8 @@ BEGIN
 END;
 /
 
-DESC PARTY_KICK;
 
-
-DESC PARTY_MEMBER;
-
-
-
--- 2. 예약오픈아이디로 유저아이디를 보고 사장인지, 매니저인지, 일반사용자인지 판별하는 함수
+-- 2. 예약오픈아이디 유저아이디를 보고 사장인지, 매니저인지, 일반사용자인지 판별하는 함수
 -- 취소일자도 넘겨줘야함 
 CREATE OR REPLACE FUNCTION FN_GET_USER_ROLE
 (
@@ -114,9 +108,6 @@ END;
 
 
 
-DESC MANAGER_HISTORY;
-
-
 -- 3. 출석상태 판별함수(사용자예약아이디, 사용자아이디)
 CREATE OR REPLACE FUNCTION FN_GET_ATTEND_STATUS
 (
@@ -167,12 +158,6 @@ BEGIN
     
 END;
 /
-
-DESC ATTENDANCE;
-DESC ATTENDANCE_DETAIL;
-
-SELECT *
-FROM ATTEND_STATUS;
 
 
 -- 4. 사용자예약번호와 사용자아이디로 사장/매니저/예약자/해당없음 판별하는 함수
@@ -257,9 +242,6 @@ END;
 
 
 
-
-
-
 --==============================================================================
 -- VIEW 생성
 --==============================================================================
@@ -301,7 +283,6 @@ WHERE NOT EXISTS (
     WHERE RO.RES_OPEN_ID = RD.RES_OPEN_ID
 );
 
-desc res_open;
 
 
 
@@ -339,8 +320,8 @@ END AS PHONE
 , UI.PHONE AS LEADER_PHONE
 , FN_MEMBER_COUNT(RV.PARTY_ID) AS TOTAL_MEMBER
 , RV.CREATED_AT AS BOOKED_AT
-FROM RESERVATION_CANCEL RC
-    RIGHT JOIN RESERVATION RV
+FROM RESERVATION RV
+    LEFT JOIN RESERVATION_CANCEL RC
         ON RV.RESERVATION_ID = RC.RESERVATION_ID
     JOIN PARTY_ROOM PR
         ON PR.PARTY_ID = RV.PARTY_ID
@@ -356,8 +337,10 @@ FROM RESERVATION_CANCEL RC
         ON R.CAFE_ID = C.CAFE_ID
 ORDER BY RV.RESERVATION_ID;
         
-select *
-from cafe;
+
+SELECT *
+FROM VW_RESERVATION_ALL
+ORDER BY BOOKED_AT DESC;
 
 
 -- 4. 예약 된 오픈(슬롯) 뷰
@@ -384,6 +367,23 @@ WHERE NOT EXISTS (
         FROM RESERVATION_CANCEL RC
         WHERE RC.RESERVATION_ID = VRA.RESERVATION_ID
 );
+
+SELECT RESERVATION_ID, CAFE_ID, CAFE_NAME, ROOM_ID, ROOM_NAME, OPEN_AT
+FROM VW_RESERVATION_ALL
+WHERE CANCEL_ID IS NOT NULL
+AND OPEN_AT>SYSDATE;
+
+
+
+
+SELECT *
+FROM VW_RES_OPEN_BOOKED
+ORDER BY BOOKED_AT DESC;
+
+SELECT USER_ID
+FROM CAFE
+WHERE CAFE_ID=4;
+
 
 
 -- 5. 예약 가능 목록 뷰
@@ -467,6 +467,110 @@ FROM CAFE C
     ON C.CAFE_ID = VAM.CAFE_ID
 ;
     
+    
+-- 파티원 아이디별 예약된 시간대 조회 뷰
+CREATE OR REPLACE VIEW VW_MEMBER_BOOKED_TIME
+AS
+-- 파티장의 예약 내역
+SELECT UA.USER_ID 
+, P.PARTY_ID, PR.RES_OPEN_ID
+, RV.RESERVATION_ID, RO.ROOM_ID
+, RO.OPEN_AT AS START_AT
+, RO.OPEN_AT + R.DURATION /1440 AS END_AT
+FROM USER_ACCOUNT UA
+    JOIN PARTY P
+    ON UA.USER_ID = P.USER_ID
+    JOIN PARTY_ROOM PR
+    ON P.PARTY_ID = PR.PARTY_ID
+    JOIN RESERVATION RV
+    ON P.PARTY_ID = RV.PARTY_ID
+    JOIN RES_OPEN RO
+    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+    JOIN ROOM R
+    ON RO.ROOM_ID =R.ROOM_ID
+WHERE RV.RESERVATION_ID NOT IN(SELECT RESERVATION_ID
+                                FROM RESERVATION_CANCEL
+) AND P.PARTY_ID NOT IN(SELECT PARTY_ID
+                        FROM PARTY_DROP
+) AND RO.RES_OPEN_ID NOT IN (SELECT RES_OPEN_ID
+                            FROM RES_DROP
+) AND R.ROOM_ID NOT IN (SELECT ROOM_ID
+                        FROM ROOM_DROP
+) AND UA.USER_ID NOT IN (SELECT USER_ID
+                        FROM USER_DROP
+) AND R.CAFE_ID NOT IN(SELECT CAFE_ID
+                        FROM CAFE_DROP
+)
+UNION
+-- 파티원의 예약 내역
+SELECT  UA.USER_ID, P.PARTY_ID, PR.RES_OPEN_ID
+, RV.RESERVATION_ID, RO.ROOM_ID
+, RO.OPEN_AT AS START_AT
+, RO.OPEN_AT + R.DURATION /1440 AS END_AT
+FROM USER_ACCOUNT UA
+    JOIN PARTY_APPLY PA
+    ON UA.USER_ID = PA.USER_ID
+    JOIN PARTY_MEMBER PM
+    ON PA.APPLY_ID = PM.APPLY_ID
+    JOIN PARTY P
+    ON PA.PARTY_ID = P.PARTY_ID
+    JOIN PARTY_ROOM PR
+    ON P.PARTY_ID = PR.PARTY_ID
+    JOIN RES_OPEN RO
+    ON RO.RES_OPEN_ID = PR.RES_OPEN_ID
+    JOIN ROOM R
+    ON RO.ROOM_ID = R.ROOM_ID
+    JOIN RESERVATION RV 
+    ON RV.PARTY_ID = PR.PARTY_ID
+WHERE RV.RESERVATION_ID NOT IN(SELECT RESERVATION_ID
+                                FROM RESERVATION_CANCEL
+) AND P.PARTY_ID NOT IN(SELECT PARTY_ID
+                        FROM PARTY_DROP
+) AND RO.RES_OPEN_ID NOT IN (SELECT RES_OPEN_ID
+                            FROM RES_DROP
+) AND R.ROOM_ID NOT IN (SELECT ROOM_ID
+                        FROM ROOM_DROP
+) AND UA.USER_ID NOT IN (SELECT USER_ID
+                        FROM USER_DROP
+) AND R.CAFE_ID NOT IN(SELECT CAFE_ID
+                        FROM CAFE_DROP
+) AND PM.MEMBER_ID  NOT IN (SELECT MEMBER_ID
+                            FROM PARTY_KICK
+)
+;
+
+
+--* VW_MEMBER_BOOKED_TIME 리팩토링
+-- LEFT JOIN, NOT EXISTS, IS NULL 활용
+-- NOT IN 은 직관적인지만 서브쿼리를 매번 실행하며, null위험이 있음
+-- LEFT JOIN + IS NULL은 대용량에서 가장 효율적이며 실무에서 선호됨
+-- NOT EXISTS는 Null에 안전하며 조건에 맞으면 조기 종료함
+
+
+
+
+
+
+
+
+SELECT PA.USER_ID AS MEMBER, PR.RES_OPEN_ID, RO.OPEN_AT 
+FROM PARTY_MEMBER PM
+    JOIN PARTY_APPLY PA
+    ON PM.APPLY_ID=PA.APPLY_ID
+    JOIN PARTY P
+    ON PA.PARTY_ID = P.PARTY_ID
+    JOIN PARTY_ROOM PR
+    ON PR.PARTY_ID = P.PARTY_ID
+    JOIN RES_OPEN RO
+    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+WHERE PM.MEMBER_ID NOT IN
+        (   SELECT MEMBER_ID
+            FROM PARTY_KICK
+        );
+
+SELECT *
+FROM VW_RES_OPEN_BOOKED
+WHERE OPEN_AT > SYSDATE;
 
 
 
@@ -582,7 +686,10 @@ END;
 -- 로그인한 아이디 확인(사장 혹은 매니저)
 -- 입력한 날짜가 오늘+24시간 이후인지 확인(등록일 기준으로 24시간 이후만 등록 가능)
 -- 동일한 카페, 룸, 일시가 있는지 확인
+-- 이미 오픈된 것 중에 같은 카페, 룸, 날짜를 비교하고
+-- 그 룸의 +소요시간이후만 등록 가능 처리
 -- 없으면 예약 오픈 등록 가능(res_open) insert
+
 -- 
 CREATE OR REPLACE PROCEDURE PRC_RES_OPEN
 (
@@ -594,14 +701,15 @@ IS
 
     V_HAS_ID    USER_ACCOUNT.USER_ID%TYPE;
     V_ROLE      NUMBER;
-    V_OPEN_AT   NUMBER;
+    V_DURATION  ROOM.DURATION%TYPE;
+    V_CONFLICT  NUMBER;
 
     ERR_INVALID_USER    EXCEPTION;
     ERR_INVALID_ROOM    EXCEPTION;
     ERR_INVALID_DATE    EXCEPTION;
     ERR_INVALID_RIGHT   EXCEPTION;
     ERR_INVALID_OPEN_AT EXCEPTION;
-    ERR_INVALID_ALREADY EXCEPTION;
+    ERR_TIME_CONFLICT   EXCEPTION;
 
 BEGIN
        -- 파라미터 체크
@@ -643,17 +751,26 @@ BEGIN
        IF (P_OPEN_AT <= SYSDATE+1)  THEN
            RAISE ERR_INVALID_OPEN_AT;
        END IF;
+
     
-    -- 동일한 카페, 룸, 일시가 있는지 확인
+    -- 이미 오픈된 것 중에 같은 룸아이디, 날짜를 비교, 
+    -- 해당 룸의 소요시간 이후만 가능하도록 처리
+    SELECT COUNT(*) INTO V_CONFLICT
+    FROM RES_OPEN RO
+        JOIN ROOM R 
+        ON RO.ROOM_ID = R.ROOM_ID
+    WHERE RO.ROOM_ID = P_ROOM_ID
+        AND RO.RES_OPEN_ID NOT IN 
+                        (SELECT RES_OPEN_ID 
+                        FROM RES_DROP)
+        AND P_OPEN_AT < RO.OPEN_AT + (R.DURATION+10) / 1440
+        AND P_OPEN_AT > RO.OPEN_AT - (R.DURATION+10) / 1440;
     
-        SELECT COUNT(*) INTO V_OPEN_AT
-        FROM RES_OPEN
-        WHERE ROOM_ID = P_ROOM_ID
-            AND OPEN_AT = P_OPEN_AT;
-            
-        IF (V_OPEN_AT > 0) THEN
-            RAISE ERR_INVALID_ALREADY;
-        END IF;
+    IF V_CONFLICT > 0 THEN
+        RAISE ERR_TIME_CONFLICT;
+    END IF;
+    
+
         
     -- 예약 오픈 등록
     INSERT INTO RES_OPEN 
@@ -677,11 +794,11 @@ BEGIN
         WHEN ERR_INVALID_OPEN_AT THEN
             ROLLBACK;
             RAISE_APPLICATION_ERROR(-20007, '예약은 현재 시간으로부터 24시간 이후부터 가능합니다.');
-        WHEN ERR_INVALID_ALREADY THEN
+        WHEN ERR_TIME_CONFLICT THEN
             ROLLBACK;
-            RAISE_APPLICATION_ERROR(-20008, '이미 등록된 시간입니다.');
+            RAISE_APPLICATION_ERROR(-20008, '해당 시간 대에 이미 등록된 슬롯이 있습니다.');
 END;
-
+/
 
 
 
@@ -695,6 +812,379 @@ END;
 -- 예약 오픈 아이디에 걸려있는 예약이 있는지 체크
 -- 걸려 있는 예약이 있다면 이미 예약이 있으니 예약 취소를 먼저하라고 안내하고 종료
 -- 걸려 있는 예약이 없다면 res_drop INSERT 
+
+CREATE OR REPLACE PROCEDURE PRC_RES_DROP
+( P_USER_ID         IN USER_ACCOUNT.USER_ID%TYPE
+, P_RES_OPEN_ID     IN RES_OPEN.RES_OPEN_ID%TYPE
+)
+IS
+
+    V_CAFE_ID               CAFE.CAFE_ID%TYPE;
+    V_HAS_RES               NUMBER;
+    V_IS_RES                NUMBER;
+    V_HAS_ID                NUMBER;
+    V_ROLE                  NUMBER;
+    
+    ERR_INVALID_USER        EXCEPTION;
+    ERR_INVALID_RES_OPEN    EXCEPTION;
+    ERR_INVALID_RIGHT       EXCEPTION;
+    ERR_HAS_RES             EXCEPTION;
+
+BEGIN
+
+     -- 파라미터 체크
+    IF P_USER_ID IS NULL THEN
+        RAISE ERR_INVALID_USER;
+    END IF;
+
+    IF P_RES_OPEN_ID IS NULL THEN
+        RAISE ERR_INVALID_RES_OPEN; 
+    END IF;
+
+    -- 사용자 아이디가 유효한지 검사
+    SELECT COUNT(*) INTO V_HAS_ID
+    FROM USER_INFO
+    WHERE USER_ID = P_USER_ID;
+    
+    IF (V_HAS_ID<1) THEN
+        RAISE ERR_INVALID_USER;
+    END IF;
+    
+    -- 예약 오픈 아이디 존재 여부 및 활성 상태인지 체크
+    SELECT COUNT(*) INTO V_HAS_RES
+    FROM RES_OPEN
+    WHERE RES_OPEN_ID = P_RES_OPEN_ID
+        AND RES_OPEN_ID NOT IN( SELECT RES_OPEN_ID
+                                FROM RES_DROP
+                                WHERE RES_OPEN_ID = P_RES_OPEN_ID
+                            );
+    IF (V_HAS_RES<1) THEN
+        RAISE ERR_INVALID_RES_OPEN;
+    END IF;
+
+    -- 권한 체크
+    -- 입력한 예약등록아이디의 매니저와 사장을 조회해서 있는 지 확인
+    SELECT R.CAFE_ID INTO V_CAFE_ID
+    FROM RES_OPEN RO
+        JOIN ROOM R 
+        ON RO.ROOM_ID = R.ROOM_ID
+    WHERE RES_OPEN_ID = P_RES_OPEN_ID;
+   
+    SELECT COUNT(*) INTO V_ROLE
+    FROM VW_CAFE_ROOM_INFO
+    WHERE CAFE_ID = V_CAFE_ID
+        AND (CAFE_OWNER=P_USER_ID OR CAFE_MANAGER=P_USER_ID);
+    
+    IF (V_ROLE<1) THEN
+        RAISE ERR_INVALID_RIGHT;
+    END IF;
+    
+    -- 예약 오픈 아이디에 걸려있는 예약이 있는지 체크
+    SELECT COUNT(*) INTO V_IS_RES
+    FROM VW_RES_OPEN_BOOKED
+    WHERE RES_OPEN_ID = P_RES_OPEN_ID;
+    
+    IF(V_IS_RES >0) THEN
+        RAISE ERR_HAS_RES;
+    END IF;
+    
+   INSERT INTO RES_DROP
+   VALUES(RES_DROP_SEQ.NEXTVAL, P_RES_OPEN_ID, SYSDATE);
+   
+   COMMIT;
+   
+   EXCEPTION
+        WHEN ERR_INVALID_USER THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20001, '회원 정보가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_RES_OPEN THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20009, '예약 오픈 번호가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_RIGHT THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20004, '권한이 없습니다.'); 
+        WHEN ERR_HAS_RES THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20010, '진행 중인 예약 건이 있어 삭제할 수 없습니다. 예약 취소 처리 후 다시 시도해 주세요.'); 
+END;
+/
+
+
+-- 예약 등록 프로시저
+-- PARTY, PARTY_ROOM 조회해서
+-- 파라미터 존재 확인
+-- 파라미터로 받은 파티아이디랑 유저아이디 검증
+-- 파티 활성화 조회
+-- 예약오픈아이디 예약 가능한지 조회
+-- 인원수 체크
+-- 동시 등록 시도 차단
+-- 유저아이디가 동시간대에 예약이 잡힌 것이 있는 지 확인?
+-- 파티원이 동시간대에 예약이 잡힌게 있는지 확인 ? 
+-- 파티조회해서 파티 활성화되어있는지 확인(이 유저가 파티장인지 확인, 파티 아이디 매칭 확인)
+-- PARTY_MEMBER 테이블 조회해서 모두 레디 상태인지 체크
+-- 인원수 체크해서 파티아이디에 묶여있는 RES_OPEN_ID로 테마 찾아서 최소인원, 최대인원 비교
+-- 파티아이디로 RES_OPEN_ID가 예약 가능한 상태인지 체크
+-- 여러 사람이 동시에 예약 시도시 처리할 방법(묶어두기)
+
+    
+    
+    -- 파티아이디로 예약오픈아이디를 찾아서 예약이 가능한 상태인지 확인
+    -- 새 예약 시간 구하기
+    -- 여기서 LOCK 걸기
+    -- 락을 건 테이블에서 직접 상태를 확인 하기(뷰는 구조에 따라 반영이 안될 수도 있음)
+    -- FOR UPDATE는 내가 점유하고 있는 특정 행을 보호하는 것
+    -- 뷰를 통해 조회를 하면 뷰 안에서 사용하는 테이블들이 내가 락을 건 테이블과
+    -- 완전히 일치하지 않을 수 있고 그러면 락을 건 의미가 사라짐 -> 동시성 제어 깨짐
+    -- 데이터 정합성을 100% 보장하기 위해 락이 걸린 바로 그 물리적인 테이블을 직접 조회해야 함
+    -- 실제로 락의 지배를 받는 곳에서 판별을 해야 정확해짐
+    
+    -- 예약 등록된 res_open_id 찾기
+    -- 예약 테이블에서 party_id 를 찾아서
+    -- 그 파티아이디를 가지고 잇는 파티룸 테이블에서
+    -- res_open_id를 찾고
+    -- reservation_cancel에 같은 reservation_id가 없는거 중에서 res_open_id를 찾아야 함
+    -- 그게 예약 등록된 RES_OPEN_ID인데 그게 존재하지 않는거를 찾아야 하는거고
+-- 
+--RESERVATION INSERT(P_PARTY_ID, P_USER_ID)
+
+
+-- 설정된 테마가 성인테마인지 확인
+SELECT *
+FROM ROOM
+WHERE IS_ADULT = 1;
+
+-- 파티원들의 생년월일을 담아서 나이 확인
+
+
+
+CREATE OR REPLACE PROCEDURE PRC_RESERVATION
+( P_USER_ID USER_ACCOUNT.USER_ID%TYPE
+, P_PARTY_ID   PARTY.PARTY_ID%TYPE
+)
+IS
+    V_HAS_ID    NUMBER;
+    V_PARTY     NUMBER;
+    V_LEADER    NUMBER;
+    V_RES_OPEN      NUMBER;  
+    V_ROOM          NUMBER;  
+    V_MEMBER_CNT    NUMBER;   
+    V_MIN           NUMBER;   
+    V_MAX           NUMBER;  
+    V_NOT_READY     NUMBER;  
+    V_OVERLAP       NUMBER;
+    V_NEW_START     DATE;
+    V_NEW_END       DATE;
+    V_IS_ADULT      NUMBER;
+    V_UNDERAGE      NUMBER;
+    
+    ERR_INVALID_USER    EXCEPTION;
+    ERR_INVALID_PARTY   EXCEPTION;
+    ERR_INVALID_RIGHT   EXCEPTION;  
+    ERR_INVALID_CNT     EXCEPTION;  
+    ERR_NOT_READY       EXCEPTION;  
+    ERR_OVERLAP         EXCEPTION;  
+    ERR_ALREADY_RES     EXCEPTION;  
+    ERR_UNDERAGE        EXCEPTION;
+    
+BEGIN
+
+    -- 파라미터 체크
+    IF P_USER_ID IS NULL THEN
+        RAISE ERR_INVALID_USER;
+    END IF;
+
+    IF P_PARTY_ID IS NULL THEN
+        RAISE ERR_INVALID_PARTY; 
+    END IF;
+
+    -- 사용자 아이디가 유효한지 검사
+    SELECT COUNT(*) INTO V_HAS_ID
+    FROM USER_INFO
+    WHERE USER_ID = P_USER_ID;
+    
+    IF (V_HAS_ID<1) THEN
+        RAISE ERR_INVALID_USER;
+    END IF;
+    
+    -- 파티 아이디 존재 여부 확인
+    SELECT COUNT(*)  INTO V_PARTY
+    FROM PARTY
+    WHERE PARTY_ID NOT IN  (
+                            SELECT PARTY_ID
+                            FROM PARTY_DROP
+                            ) 
+        AND PARTY_ID=P_PARTY_ID;
+    
+   IF (V_PARTY<1) THEN
+        RAISE ERR_INVALID_PARTY;
+    END IF;
+    
+     -- 입력한 유저아이디가 입력한 파티아이디의 파티장인지 확인
+    SELECT COUNT(*) INTO V_LEADER
+    FROM PARTY
+    WHERE PARTY_ID = P_PARTY_ID
+        AND USER_ID = P_USER_ID;
+        
+    IF (V_LEADER < 1) THEN
+        RAISE ERR_INVALID_RIGHT;
+    END IF;
+    
+    -- 예약 가능 체크 및 Lock 걸기  
+    BEGIN 
+        SELECT RO.RES_OPEN_ID, R.ROOM_ID
+        , RO.OPEN_AT, RO.OPEN_AT + (R.DURATION / 1440) 
+        INTO V_RES_OPEN, V_ROOM , V_NEW_START, V_NEW_END
+        FROM RES_OPEN RO
+            JOIN ROOM R
+            ON RO.ROOM_ID = R.ROOM_ID
+            JOIN PARTY_ROOM PR
+            ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+            JOIN PARTY P
+            ON PR.PARTY_ID = P.PARTY_ID
+        WHERE P.PARTY_ID = P_PARTY_ID
+            AND NOT EXISTS (
+            -- 예약이 등록된 RES_OPEN_ID 찾기
+                SELECT 1
+                FROM PARTY_ROOM PR2
+                    JOIN RESERVATION RV
+                    ON PR2.PARTY_ID = RV.PARTY_ID
+                WHERE PR2.RES_OPEN_ID = RO.RES_OPEN_ID
+                 AND NOT EXISTS(
+                                SELECT 1
+                                FROM RESERVATION_CANCEL RC
+                                WHERE RV.RESERVATION_ID = RC.RESERVATION_ID
+                                )
+                )
+            AND NOT EXISTS(
+                        SELECT 1
+                        FROM RES_DROP RD
+                        WHERE  RD.RES_OPEN_ID = RO.RES_OPEN_ID
+                   )
+        FOR UPDATE OF RO.RES_OPEN_ID;
+        
+        EXCEPTION
+             WHEN NO_DATA_FOUND THEN
+             RAISE ERR_ALREADY_RES;
+    END;
+
+    -- 파티 인원 수와 테마 최소인원 최대인원 수 확인
+    SELECT FN_MEMBER_COUNT(P_PARTY_ID) INTO V_MEMBER_CNT
+    FROM DUAL;
+    
+    SELECT MIN_PLAYERS, MAX_PLAYERS, IS_ADULT INTO V_MIN, V_MAX, V_IS_ADULT
+    FROM ROOM
+    WHERE ROOM_ID = V_ROOM;
+    
+    IF(V_MEMBER_CNT < V_MIN OR V_MEMBER_CNT > V_MAX) THEN
+        RAISE ERR_INVALID_CNT;
+    END IF;
+    
+    
+    -- 성인테마인지 확인 후 파티원의 나이 조회해서 모두 성인인지 확인
+    IF (V_IS_ADULT = 1) THEN
+    
+       -- 파티장과 파티원의 생년월일 받아서 FN_GET_USER_AGE에 담아서 나이 판별하기
+       SELECT COUNT(*) INTO V_UNDERAGE
+       FROM VW_PARTY_ACTIVE_MEMBER VPAM
+        JOIN USER_INFO UI
+        ON VPAM.USER_ID = UI.USER_ID
+       WHERE PARTY_ID = P_PARTY_ID
+        AND FN_GET_USER_AGE(UI.BIRTHDATE) < 19;
+        
+        IF (V_UNDERAGE > 0) THEN
+            RAISE ERR_UNDERAGE;
+        END IF;
+    END IF;
+        
+   -- 파티아이디의 모든 멤버가 레디 상태인지 확인
+   SELECT COUNT(*) INTO V_NOT_READY
+   FROM VW_PARTY_ACTIVE_MEMBER
+    WHERE PARTY_ID = P_PARTY_ID
+        AND READY != 'READY';
+    
+    IF (V_NOT_READY > 0) THEN
+        RAISE ERR_NOT_READY;
+    END IF;
+
+    -- 파티 구성원 중 시간 겹치는 예약 있는지 확인
+    SELECT COUNT(*) INTO V_OVERLAP
+    FROM VW_MEMBER_BOOKED_TIME
+    WHERE USER_ID IN(
+        SELECT USER_ID
+        FROM PARTY
+        WHERE PARTY_ID = P_PARTY_ID
+        UNION
+        SELECT PA.USER_ID
+        FROM PARTY_APPLY PA
+            JOIN PARTY_MEMBER PM
+            ON PA.APPLY_ID = PM.APPLY_ID
+        WHERE PM.MEMBER_ID NOT IN (SELECT MEMBER_ID
+                                   FROM PARTY_KICK
+            ) AND PA.PARTY_ID = P_PARTY_ID
+        )
+    AND V_NEW_START < END_AT
+    AND V_NEW_END > START_AT;
+    
+    IF (V_OVERLAP > 0) THEN
+        RAISE ERR_OVERLAP;
+    END IF;
+    
+    -- 예약 등록 INSERT
+    INSERT INTO RESERVATION (RESERVATION_ID, PARTY_ID, CREATED_AT)
+    VALUES(RESERVATION_SEQ.NEXTVAL, P_PARTY_ID, SYSDATE);
+    
+    COMMIT;
+    
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20098,'데이터를 찾을 수 없습니다.');
+        WHEN ERR_INVALID_USER THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20001, '회원 정보가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_PARTY THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20011, '파티 정보가 유효하지 않습니다.'); 
+        WHEN ERR_INVALID_RIGHT THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20004, '권한이 없습니다.'); 
+        WHEN ERR_ALREADY_RES THEN
+             ROLLBACK;
+             RAISE_APPLICATION_ERROR(-20012, '이미 예약된 테마입니다.'); 
+        WHEN ERR_INVALID_CNT THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20013, '인원 설정 오류: 해당 테마는 ' || V_MIN ||'명부터 ' || V_MAX|| '명까지 예약 가능합니다.'); 
+        WHEN ERR_NOT_READY THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20014, '일부 인원이 준비되지 않았습니다. 모든 팀원이 준비 완료된 후 다시 시도해 주세요.'); 
+        WHEN ERR_OVERLAP THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20015, '파티원의 기존 예약 일정과 겹치는 시간이 있어 예약이 불가능합니다.'); 
+        WHEN ERR_UNDERAGE THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20016, '성인 테마입니다. 파티원의 연령을 확인해 주세요.');
+        WHEN OTHERS THEN
+            ROLLBACK;
+            RAISE_APPLICATION_ERROR(-20099, '예약 처리 중 오류가 발생했습니다.');
+        
+END;
+/
+
+
+
+
+-- FK 인덱스 처리 
+
+-- PARTY_ROOM
+CREATE INDEX IDX_PARTY_ROOM_RES_OPEN ON PARTY_ROOM(RES_OPEN_ID);
+CREATE INDEX IDX_PARTY_ROOM_PARTY ON PARTY_ROOM(PARTY_ID);
+
+-- RES_DROP
+CREATE INDEX IDX_RES_DROP_RES_OPEN ON RES_DROP(RES_OPEN_ID);
+
+-- MANAGER_HISTORY (뷰에서 자주 쓰임)
+CREATE INDEX IDX_MGR_HISTORY_CAFE ON MANAGER_HISTORY(CAFE_ID);
+CREATE INDEX IDX_MGR_HISTORY_USER ON MANAGER_HISTORY(USER_ID);
 
 
 
@@ -838,16 +1328,8 @@ SELECT * FROM VW_RESERVATION_ALL WHERE ROWNUM = 1;
 
 
 
-
-
-
-
-
-SELECT USER_ID, OWNER_USER_ID
-FROM V_ACTIVE_MANAGER
-ORDER BY CAFE_ID;
-
-
+SELECT *
+FROM VW_RES_OPEN_BOOKED;
 
 
 

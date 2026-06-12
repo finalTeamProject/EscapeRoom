@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.noexit.app.mapper.MypageMapper">
+	
+<select id="getUserRecord" parameterType="map" resultType="com.noexit.app.model.MyPage">
+    SELECT * FROM (
+        
+        SELECT rownum AS rnum, A.* FROM (
+            
+            SELECT 
+                C.ROOM_NAME AS roomName, 
+                RC.PLAY_TIME AS playTime, 
+                RC.HINT_COUNT AS hintCount, 
+                RC.PLAYER_COUNT AS peopleCount, 
+                RO.OPEN_AT AS playDate, 
+                RC.RECORD_COMMENT AS recordComment,
+                RC.IS_ESCAPED AS isEscaped
+            FROM RECORD RC
+            JOIN ATTENDANCE_DETAIL AD ON RC.DETAIL_ID = AD.DETAIL_ID
+            JOIN ATTENDANCE AT ON AD.ATTENDANCE_ID = AT.ATTENDANCE_ID
+            JOIN RESERVATION RS ON AT.RESERVATION_ID = RS.RESERVATION_ID
+            JOIN PARTY P ON RS.PARTY_ID = P.PARTY_ID
+            JOIN PARTY_ROOM PR ON P.PARTY_ID = PR.PARTY_ID
+            JOIN RES_OPEN RO ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+            JOIN ROOM C ON RO.ROOM_ID = C.ROOM_ID
+            WHERE AD.USER_ID = #{userId}
+            ORDER BY RO.OPEN_AT DESC
+            
+        ) A
+        WHERE rownum &lt;= #{endRow} )
+    WHERE rnum &gt;= #{startRow}
+    
+</select>
+
+
+	<select id="getMutualList" parameterType="Long" resultType="com.noexit.app.model.MyPage">
+	    SELECT
+	        AD2.DETAIL_ID AS detailId, 
+	        AD2.USER_ID AS targetId,
+	        UA.NICKNAME AS targetNickName,
+	        RM.ROOM_NAME,
+	        RO.OPEN_AT,
+	        CA.CAFE_NAME
+	    FROM ATTENDANCE_DETAIL AD1
+	    JOIN ATTENDANCE_DETAIL AD2 ON AD1.ATTENDANCE_ID = AD2.ATTENDANCE_ID
+	    JOIN ATTENDANCE AT ON AD1.ATTENDANCE_ID = AT.ATTENDANCE_ID
+	    JOIN RESERVATION RS ON AT.RESERVATION_ID = RS.RESERVATION_ID
+	    JOIN PARTY_ROOM PR ON RS.PARTY_ID = PR.PARTY_ID
+	    JOIN RES_OPEN RO ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+	    JOIN ROOM RM ON RO.ROOM_ID = RM.ROOM_ID
+	    JOIN CAFE CA ON CA.CAFE_ID = RM.CAFE_ID
+	    JOIN USER_ACCOUNT UA ON AD2.USER_ID = UA.USER_ID
+	    WHERE AD1.USER_ID = #{userId}
+	      AND AD2.USER_ID != AD1.USER_ID
+	      
+	      AND NOT EXISTS (
+	          SELECT 1 
+	          FROM MUTUAL_EVALUATION ME
+	          JOIN ATTENDANCE_DETAIL AD3 ON ME.DETAIL_ID = AD3.DETAIL_ID
+	          WHERE AD3.ATTENDANCE_ID = AD1.ATTENDANCE_ID
+	            AND ME.TARGET_ID = AD2.USER_ID
+	      )
+	    ORDER BY RO.OPEN_AT DESC
+	</select>
+
+	<select id="getQuestionList" resultType="String">
+		SELECT QUESTION
+		FROM EVAL_QUESTION
+	</select>
+
+
+	<select id="getUserManner" resultType="double">
+		SELECT FN_GET_MANNER(#{userId}) AS MANNER
+		FROM DUAL
+	</select>
+
+	<select id="getRoomImg" parameterType="Long" resultType="com.noexit.app.model.MyPage">
+	    SELECT 
+	        C.ROOM_NAME AS roomName,
+	        C.ROOM_IMG AS roomImg,  RC.PLAY_TIME AS playTime,
+	        RC.HINT_COUNT AS hintCount,
+	        RC.PLAYER_COUNT AS peopleCount,
+	        RO.OPEN_AT AS playDate,
+	        RC.RECORD_COMMENT AS recordComment,
+	        RC.IS_ESCAPED AS isEscaped
+	    FROM RECORD RC
+	    JOIN ATTENDANCE_DETAIL AD ON RC.DETAIL_ID = AD.DETAIL_ID
+	    JOIN ATTENDANCE AT ON AD.ATTENDANCE_ID = AT.ATTENDANCE_ID
+	    JOIN RESERVATION RS ON AT.RESERVATION_ID = RS.RESERVATION_ID
+	    JOIN PARTY P ON RS.PARTY_ID = P.PARTY_ID
+	    JOIN PARTY_ROOM PR ON P.PARTY_ID = PR.PARTY_ID
+	    JOIN RES_OPEN RO ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+	    JOIN ROOM C ON RO.ROOM_ID = C.ROOM_ID  
+	    WHERE AD.USER_ID = #{userId}
+	    ORDER BY RO.OPEN_AT DESC
+	</select>
+
+	
+	<!-- 
+	내가 출석체크가 되어있고
+	아직 기록을 남기지 않은 
+	카페 이름, 테마이름, 플레이 일시 
+	-->
+<select id="getUnrecordedList" resultType="com.noexit.app.model.MyPage">
+    SELECT 
+        CA.CAFE_NAME AS cafeName, 
+        C.ROOM_NAME AS roomName, 
+        RO.OPEN_AT AS playDate, 
+        AD.DETAIL_ID AS detailId 
+    FROM ATTENDANCE_DETAIL AD 
+    JOIN ATTENDANCE AT ON AD.ATTENDANCE_ID = AT.ATTENDANCE_ID 
+    JOIN RESERVATION RS ON AT.RESERVATION_ID = RS.RESERVATION_ID 
+    JOIN PARTY P ON RS.PARTY_ID = P.PARTY_ID 
+    JOIN PARTY_ROOM PR ON P.PARTY_ID = PR.PARTY_ID 
+    JOIN RES_OPEN RO ON PR.RES_OPEN_ID = RO.RES_OPEN_ID 
+    JOIN ROOM C ON RO.ROOM_ID = C.ROOM_ID 
+    JOIN CAFE CA ON C.CAFE_ID = CA.CAFE_ID 
+    LEFT JOIN RECORD RC ON AD.DETAIL_ID = RC.DETAIL_ID 
+    WHERE AD.USER_ID = #{userId} 
+    AND AD.ATTEND_STATUS_ID = 1 
+    AND RC.DETAIL_ID IS NULL 
+    ORDER BY RO.OPEN_AT DESC
+</select>
+	
+	
+	
+	<insert id="insertRecord" parameterType="com.noexit.app.model.MyPage">
+	    INSERT INTO RECORD (RECORD_ID, DETAIL_ID, PLAY_TIME, HINT_COUNT, PLAYER_COUNT
+	    					, RECORD_COMMENT, IS_ESCAPED)
+	    VALUES (RECORD_SEQ.NEXTVAL, #{detailId}, #{playTime}, #{hintCount}, #{peopleCount}, #{recordComment}, #{isEscaped})
+	</insert>
+
+
+	<select id="getUserRecordCount" parameterType="Long" resultType="int">
+		SELECT COUNT(*)
+	    FROM RECORD RC
+	    JOIN ATTENDANCE_DETAIL AD ON RC.DETAIL_ID = AD.DETAIL_ID
+	    WHERE AD.USER_ID = #{userId}
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

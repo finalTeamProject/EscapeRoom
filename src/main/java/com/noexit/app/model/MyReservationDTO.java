@@ -9,18 +9,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class MyReservationDTO {
-	private long reservationId;
-	private long cafeId;
+	private Long reservationId;
+	private Long cafeId;
 	private String cafeName;
 	private String cafeTel;
-	private long roomId;
+	private Long roomId;
 	private String roomName;
 	private int totalMember;
-	private long partyId;
+	private Long partyId;
 	private String partyName;
 	private String partyRole;
 	private String resStatus;
-	private long resOpenId;
+	private Long resOpenId;
 	private String openAt;
 	private String bookedAt;
 	private String attendStatus;

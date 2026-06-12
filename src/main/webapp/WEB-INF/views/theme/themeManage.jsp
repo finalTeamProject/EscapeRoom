@@ -53,6 +53,9 @@
 								<div class="text-center py-3">등록된 테마가 없습니다.</div>
 							</c:if>
 						</div>
+
+						${dataCount == 0 ? "" : paging}
+
 					</div>
 				</div>
 			</div>

@@ -50,7 +50,6 @@ public class MailService {
 			
 			helper.setFrom(fromEmail, "NoExit");
 			helper.setTo(dto.getEmail());
-			//helper.setTo("god5228god@naver.com");
 			helper.setSubject("[NoExit] 예약이 취소되었습니다.");
 			helper.setText(content, true);	//-- true: HTML
 			
@@ -71,7 +70,58 @@ public class MailService {
 		return new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 	}
 	
-	
-	
-	
+	@Async
+	public void sendUserIdMail(String email, String userId)
+	{
+	    try
+	    {
+	        MimeMessage message = mailSender.createMimeMessage();
+
+	        MimeMessageHelper helper =
+	                new MimeMessageHelper(message, false, "UTF-8");
+
+	        helper.setFrom(fromEmail, "NoExit");
+	        helper.setTo(email);
+
+	        helper.setSubject("[NoExit] 아이디 찾기 결과");
+
+	        helper.setText(
+	                "<h3>회원님의 아이디입니다.</h3>"
+	                + "<p><b>" + userId + "</b></p>", true);
+
+	        mailSender.send(message);
+	    }
+	    catch (Exception e)
+	    {
+	        log.error("sendUserIdMail", e);
+	    }
+	}
+
+
+	// 비밀번호 찾기 인증번호 메일
+	public void sendAuthCodeMail(String email, String authCode) {
+
+		try {
+			MimeMessage message = mailSender.createMimeMessage();
+
+			MimeMessageHelper helper =
+					new MimeMessageHelper(message, false, "UTF-8");
+
+			helper.setFrom(fromEmail, "NoExit");
+			helper.setTo(email);
+
+			helper.setSubject("[NoExit] 비밀번호 찾기 인증번호");
+
+			helper.setText(
+					"<h3>인증번호를 입력해주세요.</h3>"
+					+ "<p><b>" + authCode + "</b></p>", true);
+
+			mailSender.send(message);
+
+		} catch (Exception e) {
+			log.error("sendAuthCodeMail", e);
+		}
+	}
+
+
 }

@@ -10,148 +10,167 @@
 
 <style type="text/css">
 
-.container
-{
+/* ── 페이지 레이아웃 ───────────────────────────── */
+.container {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	padding: 20px 0;
+	gap: 1.5rem;
+	padding: 2rem 0;
 }
 
-.theme-info-wrap
-{
+/* ── 테마 정보 (이미지 + 정보) ─────────────────── */
+.theme-info-wrap {
 	display: grid;
-	grid-template-columns : 2fr 3fr;
-	gap: 20px;
+	grid-template-columns: 2fr 3fr;
+	gap: 1.5rem;
+	align-items: stretch;
 }
 
-.theme-image
-{
-	background-color: #f5f5f5;
+.theme-image {
+	border-radius: var(--ne-radius);
+	overflow: hidden;
+	border: 1px solid var(--ne-border);
+	background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+}
+.theme-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
-.theme-info
-{
+.theme-info {
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
+	gap: .35rem;
 }
 
-.info-item
-{
+.theme-title {
+	font-size: 1.4rem;
+	font-weight: 800;
+	margin: 0 0 .25rem;
+	display: flex;
+	align-items: center;
+	gap: .5rem;
+	flex-wrap: wrap;
+}
+
+.info-item {
 	display: flex;
 	justify-content: space-between;
- 	padding: 5px;
-  	background: #f5f5f5;
-  	border-radius: 5px;
+	align-items: center;
+	padding: .5rem .9rem;
+	background: #ffffff;
+	border: 1px solid var(--ne-border);
+	border-radius: var(--ne-radius-sm);
+	font-size: .9rem;
+}
+.info-item > span:first-child {
+	color: var(--ne-text-2);
+	font-weight: 600;
+	font-size: .84rem;
+}
+.info-item > span:last-child {
+	font-weight: 600;
+}
+.info-item .ne-star { color: var(--ne-primary); letter-spacing: 1px; }
+
+/* ── 테마 소개 ─────────────────────────────────── */
+.theme-description p {
+	margin: 0;
+	padding: 1rem 1.25rem;
+	background: var(--ne-primary-light);
+	border: 1.5px solid var(--ne-primary-mid);
+	border-radius: var(--ne-radius-md);
+	font-size: .9rem;
+	line-height: 1.7;
+	color: #7a4f00;
 }
 
-.theme-description 
-{
-  	display: flex;
-  	flex-direction: column;
-  	gap: 5px;
+/* ── 예약 슬롯 ─────────────────────────────────── */
+.slot {
+	display: flex;
+	align-items: flex-start;
+	gap: 1.25rem;
+	padding: .9rem 1.1rem;
+	background: #ffffff;
+	border: 1px solid var(--ne-border);
+	border-radius: var(--ne-radius-md);
+	margin-bottom: .6rem;
+}
+.slot-date {
+	font-weight: 800;
+	font-size: .9rem;
+	min-width: 95px;
+	padding-top: .35rem;
+	color: var(--ne-text);
+}
+.slot-time {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+.slot-time .slot-btn {
+	padding: .45rem .9rem;
+	border: 1.5px solid var(--ne-border-dark);
+	border-radius: var(--ne-radius-sm);
+	background: #ffffff;
+	font-size: .84rem;
+	font-weight: 600;
+	color: var(--ne-text-2);
+	cursor: pointer;
+	transition: all .13s;
+	line-height: 1.3;
+}
+.slot-time .slot-btn:hover {
+	border-color: var(--ne-primary);
+	background: var(--ne-primary-light);
+	color: var(--ne-primary-dark);
+}
+.slot-time .slot-off {
+	padding: .45rem .9rem;
+	border: 1.5px solid var(--ne-border);
+	border-radius: var(--ne-radius-sm);
+	background: var(--ne-bg);
+	font-size: .84rem;
+	color: var(--ne-text-3);
+	line-height: 1.3;
+	cursor: not-allowed;
 }
 
-.theme-description span 
-{
-  	font-weight: bold;
+/* ── 리뷰 ──────────────────────────────────────── */
+.review-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: .75rem;
 }
+.review-total { max-width: 360px; }
 
-.theme-description p 
-{
-  padding: 10px;
-  border: 1px solid black;
-  border-radius: 5px;
-  background: #f5f5f5;
+.review {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: .87rem;
+	padding: .25rem 0;
 }
+.review > span:first-child { color: var(--ne-text-2); }
+.review .ne-star { color: var(--ne-primary); letter-spacing: 1px; }
 
-.slot-list 
-{
-  	display: flex;
-  	flex-direction: column;
-  	gap: 10px;
-}
-
-.slot-list > span
-{
-	font-weight: bold;
-}
-
-.slot 
-{
-  	display: flex;
-  	align-items: center;
-  	gap: 15px;
-  	padding: 10px;
-  	border: 1px solid black;
-  	border-radius: 10px;
-}
-
-.slot-date 
-{
-  font-weight: bold;
-}
-
-.slot-time 
-{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.slot-time button, .slot-time span
-{
-  padding: 5px;
-  border: 1px solid black;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.slot-time span
-{
-	background: #d1d1d1;
-}
-
-.slot-time button
-{
-	background: white;
-}
-
-.slot-time button:hover
-{
-	background-color: orange;
-}
-
-.review-wrap > span
-{
-	font-weight: bold;
-}
-
-.review-total
-{
-	width: 30%;
-}
-
-.review 
-{
-  display: flex;
-  justify-content: space-between;
-}
-
-.review-list
-{
+.review-list {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr;	
-	gap : 10px;
+	grid-template-columns: repeat(4, 1fr);
+	gap: .75rem;
 }
+.review-list .ne-sc { margin-bottom: 0; }
 
-.comment p 
-{
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #444;
+.comment p {
+	margin: .6rem 0 0;
+	padding: .6rem .8rem;
+	font-size: .84rem;
+	line-height: 1.6;
+	color: var(--ne-text-2);
+	background: var(--ne-bg);
+	border-radius: var(--ne-radius-sm);
 }
 
 </style>
@@ -161,16 +180,16 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
 
 <script type="text/javascript">
-	
+
 	$(function()
 	{
 		$(".slot-btn").click(function()
 		{
 			window.location.href = "${path}/party/write?slotId=" + this.getAttribute("data-slot");
 		});
-		
+
 	});
-	
+
 </script>
 
 </head>
@@ -180,102 +199,93 @@
 	<main class="ne-main-content ne-body-offset">
 		<div class="ne-container">
 			<div class="container">
-				
+
+				<!-- 테마 정보 -->
 				<div class="theme-info-wrap">
-					
+
 					<div class="theme-image">
-						<span>${dto.imagePath }</span>
+						<img src="${pageContext.request.contextPath}/dist/images/${dto.imagePath}" alt="${dto.themeName }">
 					</div>
-					
+
 					<div class="theme-info">
-						
+
+						<h1 class="theme-title">
+							${dto.themeName }
+							<span class="ne-tag ne-tag-sm ne-tag-primary">${dto.genre }</span>
+							<c:if test="${dto.adult == 1 }">
+								<span class="ne-st ne-st-sm ne-st-red">성인 전용</span>
+							</c:if>
+						</h1>
+
 						<div class="info-item">
 							<span>카페명</span>
 							<span>${dto.cafeName }</span>
 						</div>
-						
+
 						<div class="info-item">
-							<span>카페위치</span>
+							<span>카페 위치</span>
 							<span>${dto.cafeLocation }</span>
 						</div>
-						
+
 						<div class="info-item">
-							<span>카페전화번호</span>
+							<span>전화번호</span>
 							<span>${dto.cafePhone }</span>
 						</div>
-						
-						<div class="info-item">
-							<span>테마명</span>
-							<span>${dto.themeName }</span>
-						</div>
-						
-						<div class="info-item">
-							<span>테마 장르</span>
-							<span>${dto.genre }</span>
-						</div>
-						
+
 						<div class="info-item">
 							<span>테마 시간</span>
 							<span>${dto.duration }분</span>
 						</div>
-						
+
 						<div class="info-item">
 							<span>난이도</span>
-							<span><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1}" end="5">☆</c:forEach>
-							</span>
+							<span class="ne-star"><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1}" end="5">☆</c:forEach></span>
 						</div>
-						
+
 						<div class="info-item">
 							<span>공포도</span>
-							<span><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1}" end="5">☆</c:forEach>
-							</span>
+							<span class="ne-star"><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1}" end="5">☆</c:forEach></span>
 						</div>
-						
+
 						<div class="info-item">
 							<span>활동도</span>
-							<span><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach>
-							</span>
+							<span class="ne-star"><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach></span>
 						</div>
-						
+
 						<div class="info-item">
-							<span>테마 가격</span>
-							<span>${dto.price }</span>
+							<span>가격</span>
+							<span><fmt:formatNumber value="${dto.price }" pattern="#,###"/>원</span>
 						</div>
-						
+
 						<div class="info-item">
-							<span>테마 인원</span>
+							<span>인원</span>
 							<span>${dto.minPlayers }명 ~ ${dto.maxPlayers }명</span>
 						</div>
-						
-						<div class="info-item">
-							<span>성인 전용</span>
-							<span>${dto.adult == 1 ? 'Y' : 'N'}</span>
-						</div>
-						
+
 					</div>
 				</div>
-				
+
+				<!-- 테마 소개 -->
 				<div class="theme-description">
-					<span>테마 소개</span>
-					<p>${dto.description } </p>
+					<div class="ne-title">테마 소개</div>
+					<p>${dto.description }</p>
 				</div>
-							
+
+				<!-- 예약 목록 -->
 				<div class="slot-list">
-					
-					<span>예약 목록</span>
-					
+
+					<div class="ne-title">예약 목록</div>
+
 					<c:forEach var="date" items="${slot }">
-						
+
 						<div class="slot">
-							
-							<div class="slot-date">
-								<span>${date.key }</span>
-							</div>
-							
+
+							<div class="slot-date">${date.key }</div>
+
 							<div class="slot-time">
-								
+
 							<c:forEach var="time" items="${date.value }">
-								
+
 								<c:choose>
 									<c:when test="${time.status == 1 }">
 										<button type="button" data-slot="${time.slotId }" class="slot-btn">
@@ -283,178 +293,116 @@
 										</button>
 									</c:when>
 									<c:otherwise>
-										<span class="ne-st ne-st-gray">
-											${time.resTime }
-										</span>
+										<span class="slot-off">${time.resTime }</span>
 									</c:otherwise>
-									
-								</c:choose>		
-								
+								</c:choose>
+
 							</c:forEach>
-							
+
 							</div>
-														
+
 						</div>
-						
+
 					</c:forEach>
-					
-					<!-- 
-					<div class="slot">
-					
-						<div class="slot-date">
-							<span>2026-06-01</span>
+
+					<c:if test="${empty slot }">
+						<div class="ne-empty">
+							<div class="ne-empty-title">예약 가능한 시간이 없습니다</div>
+							<div class="ne-empty-desc">다른 날짜를 확인해 주세요.</div>
 						</div>
-						
-						<div class="slot-time">
-							<span class="ne-st ne-st-gray">10:00</span>
-							<button type="button" data-slot="1" class="slot-btn">12:00</button>
-							<button type="button" data-slot="2" class="slot-btn">14:00</button>
-							<button type="button" data-slot="3" class="slot-btn">16:00</button>
-							<button type="button" data-slot="4" class="slot-btn">18:00</button>
-							<button type="button" data-slot="5" class="slot-btn">20:00</button>
-						</div>
-						
-					</div>
-					
-					<div class="slot">
-					
-						<div class="slot-date">
-							<span>2026-06-02</span>
-						</div>
-						
-						<div class="slot-time">
-							<button type="button" data-slot="6" class="slot-btn">12:00</button>
-							<button type="button" data-slot="7" class="slot-btn">14:00</button>
-							<button type="button" data-slot="8" class="slot-btn">16:00</button>
-							<button type="button" data-slot="9" class="slot-btn">18:00</button>
-						</div>
-						
-					</div> -->
-					
-				</div>							
-				
+					</c:if>
+
+				</div>
+
+				<!-- 리뷰 -->
 				<div class="review-wrap">
-					
-					<span>리뷰</span>
-					
+
+					<div class="ne-title">리뷰</div>
+
 					<div class="review-total">
-						
-						<div class="ne-sc item">
+
+						<div class="ne-sc">
 							<div class="ne-sc-title">리뷰 통계 (${count }개)</div>
-							  	
-							 <div class="review">
-							 	<span>만족도</span>
-							 	<span><c:forEach begin="1" end="${total.satisfaction }">★</c:forEach><c:forEach begin="${total.satisfaction +1 }" end="5">☆</c:forEach>
-							 	</span>
-							 </div>	 
-							 
-							 <div class="review">
-							 	<span>체감난이도</span>
-							 	<span><c:forEach begin="1" end="${total.difficulty }">★</c:forEach><c:forEach begin="${total.difficulty +1 }" end="5">☆</c:forEach></span>
-							 </div>	
-							   
-							 <div class="review">
-							 	<span>체감공포도</span>
-							 	<span><c:forEach begin="1" end="${total.horror }">★</c:forEach><c:forEach begin="${total.horror +1 }" end="5">☆</c:forEach></span>
-							 </div>	 
-							  
-							 <div class="review">
-							 	<span>체감활동도</span>
-							 	<span><c:forEach begin="1" end="${total.activity }">★</c:forEach><c:forEach begin="${total.activity +1 }" end="5">☆</c:forEach></span>
-							 </div>	  
-							  
-							 <div class="review">
-							 	<span>몰입도</span>
-							 	<span><c:forEach begin="1" end="${total.satisfaction }">★</c:forEach><c:forEach begin="${total.immersion +1 }" end="5">☆</c:forEach></span>
-							 </div>	  
-							  
+
+							<div class="review">
+								<span>만족도</span>
+								<span class="ne-star"><c:forEach begin="1" end="${total.satisfaction }">★</c:forEach><c:forEach begin="${total.satisfaction +1 }" end="5">☆</c:forEach></span>
+							</div>
+
+							<div class="review">
+								<span>체감난이도</span>
+								<span class="ne-star"><c:forEach begin="1" end="${total.difficulty }">★</c:forEach><c:forEach begin="${total.difficulty +1 }" end="5">☆</c:forEach></span>
+							</div>
+
+							<div class="review">
+								<span>체감공포도</span>
+								<span class="ne-star"><c:forEach begin="1" end="${total.horror }">★</c:forEach><c:forEach begin="${total.horror +1 }" end="5">☆</c:forEach></span>
+							</div>
+
+							<div class="review">
+								<span>체감활동도</span>
+								<span class="ne-star"><c:forEach begin="1" end="${total.activity }">★</c:forEach><c:forEach begin="${total.activity +1 }" end="5">☆</c:forEach></span>
+							</div>
+
+							<div class="review">
+								<span>몰입도</span>
+								<span class="ne-star"><c:forEach begin="1" end="${total.immersion }">★</c:forEach><c:forEach begin="${total.immersion +1 }" end="5">☆</c:forEach></span>
+							</div>
+
 						</div>
-						
+
 					</div>
-					
+
 					<div class="review-list">
-						
+
 						<c:forEach var="dto" items="${review }">
-							
-							<div class="ne-sc item">
+
+							<div class="ne-sc">
 								<div class="ne-sc-title">${dto.nickName }</div>
-								
+
 								<div class="review">
 									<span>만족도</span>
-									<span><c:forEach begin="1" end="${dto.satisfaction }">★</c:forEach><c:forEach begin="${dto.satisfaction +1 }" end="5">☆</c:forEach>
-									</span>
+									<span class="ne-star"><c:forEach begin="1" end="${dto.satisfaction }">★</c:forEach><c:forEach begin="${dto.satisfaction +1 }" end="5">☆</c:forEach></span>
 								</div>
-								
+
 								<div class="review">
 									<span>체감난이도</span>
-									<span><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1 }" end="5">☆</c:forEach>
-									</span>
+									<span class="ne-star"><c:forEach begin="1" end="${dto.difficulty }">★</c:forEach><c:forEach begin="${dto.difficulty +1 }" end="5">☆</c:forEach></span>
 								</div>
-								
+
 								<div class="review">
 									<span>체감공포도</span>
-									<span><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1 }" end="5">☆</c:forEach>
-									</span>
+									<span class="ne-star"><c:forEach begin="1" end="${dto.horror }">★</c:forEach><c:forEach begin="${dto.horror +1 }" end="5">☆</c:forEach></span>
 								</div>
-								
+
 								<div class="review">
 									<span>체감활동도</span>
-									<span><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach>
-									</span>
+									<span class="ne-star"><c:forEach begin="1" end="${dto.activity }">★</c:forEach><c:forEach begin="${dto.activity +1 }" end="5">☆</c:forEach></span>
 								</div>
-								
+
 								<div class="review">
 									<span>몰입도</span>
-									<span><c:forEach begin="1" end="${dto.immersion }">★</c:forEach><c:forEach begin="${dto.immersion +1 }" end="5">☆</c:forEach>
-									</span>
+									<span class="ne-star"><c:forEach begin="1" end="${dto.immersion }">★</c:forEach><c:forEach begin="${dto.immersion +1 }" end="5">☆</c:forEach></span>
 								</div>
-								
+
 								<div class="comment">
 									<p>${dto.reviewComment }</p>
 								</div>
-								
+
 							</div>
-							
+
 						</c:forEach>
-						
-						<!-- <div class="ne-sc item">
-						  	<div class="ne-sc-title">윤주열</div>
-							
-							 <div class="review">
-							 	<span>만족도</span>
-							 	<span>★★★☆☆</span>
-							 </div>	 
-							  
-							 <div class="review">
-							 	<span>체감난이도</span>
-							 	<span>★★★☆☆</span>
-							 </div>	
-							   
-							 <div class="review">
-							 	<span>체감공포도</span>
-							 	<span>★★★☆☆</span>
-							 </div>	 
-							  
-							 <div class="review">
-							 	<span>체감활동도</span>
-							 	<span>★★★☆☆</span>
-							 </div>	  
-							  
-							 <div class="review">
-							 	<span>몰입도</span>
-							 	<span>★★★☆☆</span>
-							 </div>	
-							
-							<div class="comment">
-								<p>장치가 다양하고 색다른 요소가 많이 있습니다. 방탈출 초보분들께 강추합니다.</p>
+
+						<c:if test="${empty review }">
+							<div class="ne-empty" style="grid-column: 1 / -1;">
+								<div class="ne-empty-title">아직 작성된 리뷰가 없습니다</div>
 							</div>
-							
-						</div> -->
-						
+						</c:if>
+
 					</div>
-					
+
 				</div>
-				
+
 			</div>
 		</div>
 	</main>

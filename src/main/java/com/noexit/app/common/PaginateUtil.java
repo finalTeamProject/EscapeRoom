@@ -1,6 +1,9 @@
 package com.noexit.app.common;
 
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 @Service
 public class PaginateUtil {
@@ -67,9 +70,44 @@ public class PaginateUtil {
 		return sb.toString();
 
 	}
+	
+	
 
 	protected String createLinkUrl(String url, int page, String label, String title) {
 		return String.format("<a href='%spage=%d' title='%s'>%s</a>", url, page, title, label);
 	}
+	
+	
+	public int preparePage(int currentPage, int size, int dataCount
+					, Map<String, Object> map, String listUrl, Model model) {
+
+		int totalPage = 0;
+		if (dataCount != 0) 
+			totalPage = pageCount(dataCount, size);
+		
+		// 페이지 번호 보정
+		currentPage = Math.min(currentPage, totalPage);
+
+		// 시작점 계산 + map에 offset/size 주입
+		int offset = (currentPage - 1) * size;
+		if (offset < 0) offset = 0;
+		map.put("offset", offset);
+		map.put("size", size);
+
+		// 페이징 HTML 생성
+		String paging = paging(currentPage, totalPage, listUrl);
+
+		
+		model.addAttribute("paging", paging);
+		model.addAttribute("dataCount", dataCount);
+		model.addAttribute("currentPage", currentPage);
+		model.addAttribute("size", size);
+
+return currentPage;
+}	
+	
+	
+	
+	
 
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.noexit.app.model.Cafe;
 import com.noexit.app.model.ThemeDTO;
 import com.noexit.app.model.ThemeReviewDTO;
 import com.noexit.app.model.ThemeSlotDTO;
@@ -18,7 +17,8 @@ public interface ThemeMapper
 	public int themeUpdate(ThemeDTO dto);
 	public int themeDelete(long themeId);
 
-	public List<ThemeDTO> selectListByOwnerUserId(long ownerUserId);
+	public List<ThemeDTO> selectListByOwnerUserId(Map<String, Object> map);
+	public int dataCount(Map<String, Object> map);
 		
 		
 	/*
@@ -27,6 +27,7 @@ public interface ThemeMapper
 	 * 테마 예약 슬롯 조회
 	 * 테마 리뷰 조회
 	 */
+	
 	
 	ThemeDTO getThemeInfoById(long themeId);
 	List<ThemeDTO> getThemeList(Map<String, Object> map);

@@ -1,0 +1,17 @@
+package com.noexit.app.model;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+public class AttendCrew {
+
+	private Long   userId;
+	private String nickname;
+	private String position;
+	private Long   attendStatusId;
+	private String statusName; 
+}

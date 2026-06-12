@@ -8,17 +8,18 @@ import lombok.Setter;
 public class PartyDTO
 {
 	private long partyId;
+	private long slotId;
 	private String partyStatus;
 	private long userId;
 	private String partyName;
 	private String cafeName;
 	private String themeName;
 	private String themeImg;
-	private String themeDate;
-	private String themeTime;
+	private String resDate;
+	private String resTime;
 	private double avgAge;
 	private double avgTemp;
-	private int count;
+	private int memberCount;
 	private int minPlayers;
 	private int maxPlayers;
 	private int price;
