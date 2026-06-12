@@ -284,5 +284,44 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 		return result;
 	}
+	
+	@Override
+	public List<AttendCrew> getCrewDraftStatus(Long reservationId, HttpSession session) {
+
+	    List<AttendCrew> crewList = selectCrewByReservationId(reservationId);
+
+	    // 이전 선택값 복원
+	    @SuppressWarnings("unchecked")
+	    List<AttendItemDTO> drafts = (List<AttendItemDTO>) session.getAttribute("attendDraft");
+
+	    if (drafts != null && crewList != null) {
+	        for (AttendCrew c : crewList) {
+	            for (AttendItemDTO d : drafts) {
+	                if (reservationId.equals(d.getReservationId()) && c.getUserId().equals(d.getUserId())) {
+	                    c.setAttendStatusId(d.getAttendStatusId());
+	                    break;
+	                }
+	            }
+	        }
+	    }
+
+	    return crewList;
+	}
+	
+	// 출석기록 상세 (파티원별 확정 출석상태)
+	@Override
+	public List<AttendCrew> selectHistoryDetail(Long reservationId) {
+
+	    List<AttendCrew> list = null;
+
+	    try {
+	        list = mapper.selectHistoryDetail(reservationId);
+	    } catch (Exception e) {
+	        log.info("selectHistoryDetail : ", e);
+	    }
+
+	    return list;
+	}
+	
 
 }

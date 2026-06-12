@@ -51,6 +51,7 @@ $(function(){
 	
 </head>
 <body>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <div class="container my-5" style="max-width: 720px;">
 

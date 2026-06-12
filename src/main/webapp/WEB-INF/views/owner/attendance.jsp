@@ -18,11 +18,15 @@
 			<aside class="col-md-2">
 					<%@ include file="/WEB-INF/views/common/ownerSide.jsp"%>
 			</aside>
-			<div class="col-md-10 resWrap">
-				<div class="title">출석 체크 현황</div>
-				<div class="d-flex justify-content-between">
-					<div class="resList" style="width:100%">
-						<div class="attend-list">
+			<div class="col-md-10 resWrap">	
+				<div class="title ">출석 체크 현황</div>						
+					<div class="d-flex justify-content-between">						
+   					 <div class="resList" style="width:100%">
+       					 <div class="inputBox d-flex justify-content-end">					 	
+         					   <a href="${pageContext.request.contextPath}/owner/attendance/history"
+            					   class="btn btn-outline-dark">출석기록</a>
+       					 </div>
+      					  <div class="attend-list">
 
 							<div class="row fw-bold border-bottom py-2 m-0">
 								<div class="col-1">시간</div>

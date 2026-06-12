@@ -39,5 +39,8 @@ public interface AttendanceMapper {
 	public List<AttendanceListDTO> selectHistoryByManagerUserId(Map<String, Object> map);
 	public int dataCountHistoryByOwnerUserId(Map<String, Object> map);
 	public int dataCountHistoryByManagerUserId(Map<String, Object> map);
+	
+	// 출석 기록 상세
+	public List<AttendCrew> selectHistoryDetail(Long reservationId);
 
 }

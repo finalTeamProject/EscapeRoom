@@ -16,8 +16,9 @@
 	href="${pageContext.request.contextPath}/dist/css/common.css">
 </head>
 <body>
+<%@ include file="/WEB-INF/views/common/header.jsp" %>
 
-<div class="container my-5" style="max-width: 720px;">
+ <div class="container my-5" style="max-width: 720px;">
 
 	<div class="ne-sc">
 		<div class="ne-sc-title fs-5">
