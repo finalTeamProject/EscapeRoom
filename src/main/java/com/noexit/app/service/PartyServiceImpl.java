@@ -403,6 +403,22 @@ public class PartyServiceImpl implements PartyService
 		return result;
 	}
 	
+	@Override
+	public int isSameGender(Map<String, Object> map)
+	{
+		int result = 0;
+		
+		try
+		{
+			result = mapper.isSameGender(map);
+		} 
+		catch (Exception e)
+		{
+			log.info("isSameGender : ",e);
+		}
+		
+		return result;
+	}
 	
 	@Override
 	public List<MyPartyDTO> getMyPartyApplyList(long userId)

@@ -310,6 +310,25 @@
 		
 	</delete>
 	
+	<select id="isSameGender" parameterType="map" resultType="Integer">
+		
+		SELECT CASE WHEN 
+		(
+		    SELECT GENDER
+		    FROM USER_INFO
+		    WHERE USER_ID = #{applyUserId}
+		) = 
+		(
+		    SELECT GENDER
+		    FROM USER_INFO
+		    WHERE USER_ID = #{partyHostId}
+		)
+		THEN 1
+		ELSE 2
+		END
+		FROM DUAL
+		
+	</select>
 
 	
 	<select id="getMyPartyApplyList" parameterType="Long" resultType="com.noexit.app.model.MyPartyDTO">

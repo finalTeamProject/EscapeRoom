@@ -380,6 +380,7 @@ public class Party
 		 * 존재하는 파티인가?
 		 * open 상태인 파티인가?
 		 * 이미 신청내역이 있는지? 있다면 파티정보창으로
+		 * 파티 조건에 부합하는 지?
 		 * 코멘트 길이 제한
 		 */
 
@@ -407,7 +408,6 @@ public class Party
 			long userId = user.getUserId();
 			
 			apply.setUserId(userId);
-			apply.setApplyComment(applyComment);
 			apply.setPartyId(partyId);
 
 			// 신청 내역이 있는지 확인
@@ -416,7 +416,30 @@ public class Party
 				reModel.addAttribute("errorMsg", "이미 신청한 파티입니다.");
 				return "redirect:/err/error";
 			}
-
+			
+			// 1 이면 동성만 받음
+			if(party.getGenderId() == 1)
+			{
+				Map<String, Object> map = new HashMap<>();
+				map.put("applyUserId", userId);
+				map.put("partyHostId", party.getUserId());
+				
+				// 같은 성별이면 1 다른 성별이면 2 
+				if(service.isSameGender(map) > 1)
+				{
+					reModel.addAttribute("errorMsg", "성별 조건에 부합하지 않습니다.");
+					return "redirect:/err/error";
+				}
+			}
+			
+			if(applyComment.length() >= 30)
+			{
+				reModel.addAttribute("errorMsg", "신청 메시지 길이 제한을 초과했습니다.");
+				return "redirect:/err/error";
+			}
+			
+			apply.setApplyComment(applyComment);
+			
 			service.partyApply(apply);
 
 			return "redirect:/mypage/myparty";
@@ -958,6 +981,21 @@ public class Party
 			
 			// 내가 파티장 인지 확인
 			if(crew.get().getUserId() != user.getUserId()){throw new ResponseStatusException(HttpStatus.FORBIDDEN);}
+			
+			// 1 이면 동성만 받음
+			if(party.getGenderId() == 1)
+			{
+				Map<String, Object> emp = new HashMap<>();
+				emp.put("applyUserId", apply.getUserId());
+				emp.put("partyHostId", user.getUserId());
+				
+				// 같은 성별이면 1 다른 성별이면 2 
+				if(service.isSameGender(emp) > 1)
+				{
+					// 바꿔야함
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+				}
+			}
 			
 			// 파티 승인 액션
 			if(service.aprvApply(applyId) > 0){map.put("status", true);}

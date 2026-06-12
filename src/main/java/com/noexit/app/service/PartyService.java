@@ -70,6 +70,7 @@ public interface PartyService
 	int aprvApply(long applyId);
 	int rejectApply(long applyId);
 	PartyApplyDTO getPartyApplyById(long applyId);
+	int isSameGender(Map<String, Object> map);
 	
 	List<MyPartyDTO> getMyPartyApplyList(long userId);
 	List<MyPartyDTO> getMyPartyList(long userId);
