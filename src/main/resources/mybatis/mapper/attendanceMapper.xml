@@ -210,5 +210,18 @@
 		  JOIN ATTENDANCE A ON A.RESERVATION_ID = VRA.RESERVATION_ID
 		 WHERE VAM.USER_ID = #{managerUserId}
 	</select>
+	
+	<!-- 출석기록 상세 -->
+	<select id="selectHistoryDetail" parameterType="Long"
+   	     resultType="com.noexit.app.model.AttendCrew">
+   	 SELECT AD.USER_ID, UA.NICKNAME, AD.ATTEND_STATUS_ID, TS.STATUS_NAME
+   	   FROM ATTENDANCE A
+       JOIN ATTENDANCE_DETAIL AD ON A.ATTENDANCE_ID = AD.ATTENDANCE_ID
+       JOIN USER_ACCOUNT UA ON AD.USER_ID = UA.USER_ID
+       LEFT JOIN ATTEND_STATUS TS ON AD.ATTEND_STATUS_ID = TS.STATUS_ID
+       WHERE A.RESERVATION_ID = ${reservationId}
+       ORDER BY AD.USER_ID
+	</select>
+	
 
 </mapper>
