@@ -198,20 +198,71 @@ public class MyPageController {
 	
 	@PostMapping("/mypage/record/write")
 	@ResponseBody
-	public String writeRecord(@RequestBody MyPage myPage) {
+	public String writeRecord(@RequestBody MyPage myPage, HttpSession session) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		
+		// 세션 만료 시 로그인 페이지 리다이렉트
+		if (loginUser == null || session.getAttribute("loginUser") == null)
+		{
+			return "redirect:/user/login";
+		}
 		
 	    int result = service.insertRecord(myPage);
 	    
+	    // insert 확인
 	    if(result > 0)
 	    	return "success";
 	    else
 	    	return "fail";
 	}
 	
-
+	@PostMapping("/mypage/record/update")
+	@ResponseBody
+	public String updateRecord(@RequestBody MyPage myPage,  HttpSession session) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		
+		// 세션 만료 시 로그인 페이지 리다이렉트
+		if (loginUser == null || session.getAttribute("loginUser") == null)
+		{
+			return "redirect:/user/login";
+		}
+		
+		
+		int result = service.updateRecord(myPage);
+		
+		// update 확인
+		if (result > 0)
+			return "success";
+		else
+			return "fail";
+	
+	}
 	
 	
-	
+	@PostMapping("/mypage/review/write")
+	@ResponseBody
+	public String writeReview(@RequestBody MyPage myPage, HttpSession session) {
+		
+		User loginUser = (User) session.getAttribute("loginUser");
+		
+		if (loginUser == null || session.getAttribute("loginUser") == null)
+		{
+			return "redirect:/user/login";
+		}
+		
+		
+			int result= service.insertReview(myPage);
+		
+		
+		// 성공 여부 반환
+		if (result > 0) {
+			return "success";
+		} else {
+			return "fail";
+		}
+	}
 	
 		
 }
