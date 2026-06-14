@@ -17,5 +17,8 @@ public interface MyPageService {
 	List<MyPage> getUnrecordedList(long userId);
 	public int insertRecord(MyPage myPage);
 	public int getUserRecordCount(Long userId);
+	int updateRecord(MyPage myPage);
+	int insertReview(MyPage myPage);
+	
 	
 }

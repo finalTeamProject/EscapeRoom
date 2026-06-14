@@ -78,6 +78,22 @@ public class MyPageServiceImpl implements MyPageService{
 		return mapper.getUserRecordCount(userId);
 	}
 	
+	@Override
+	public int updateRecord(MyPage myPage) {
+		return mapper.updateRecord(myPage);
+	}
+	
+	
+	@Override
+	public int insertReview(MyPage myPage) {
+		
+		int reviewCount = mapper.countReview(myPage.getDetailId());
+		
+		if (reviewCount > 0)
+			return mapper.updateReview(myPage);
+		else 
+			return mapper.insertReview(myPage);
+	}
 	
 	
 }

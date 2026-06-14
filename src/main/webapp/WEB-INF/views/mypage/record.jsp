@@ -10,297 +10,236 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/dist/css/common.css">
 
 <style type="text/css">
-	.main-body {
-		display: flex;                		
-		width: 100%;
-		box-sizing: border-box;
-		padding-left: 2rem;
-		padding-right: 2rem;
-		gap: 1.5rem;
-		align-items: stretch;
-	}
-
-	.main-content {
-		flex-grow: 1;
-		min-width: 0;
-		display: flex;
-    	flex-direction: column;
-	}
-	
-	.right-sidebar {
-		width: 340px;                    
-		flex-shrink: 0;                  
-		display: flex;
-		flex-direction: column;
-	}
-	
-	.record-item-body {
-		display: flex;
-		gap: 1.5rem;
-		align-items: center;
-	}
-	
-	.clickable-card {
-		cursor: pointer;
-		transition: transform 0.2s, box-shadow 0.2s;
-	}
-	.clickable-card:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-	}
-	
-	.ne-sc-title {
-		display: flex;
-		justify-content: space-between;
-	}
-	
-	.pagination-wrapper {
-    margin-top: auto;
-    padding-top: 2rem;
+	.main-body { display: flex; width: 100%; box-sizing: border-box; padding-left: 2rem; padding-right: 2rem; gap: 1.5rem; align-items: stretch; }
+	.main-content { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; }
+	.right-sidebar { width: 340px; flex-shrink: 0; display: flex; flex-direction: column; }
+	.record-item-body { display: flex; gap: 1.5rem; align-items: center; }
+	.clickable-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+	.clickable-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+	.ne-sc-title { display: flex; justify-content: space-between; }
+	.pagination-wrapper { margin-top: auto; padding-top: 2rem; }
 </style>
 
 <script type="text/javascript">
 
-	// 등록된 개인 기록 상세 보기 모달 띄우기
-	function openRecordDetail(cardElement) {
-		
-		// 상세 보기때는 Mode를 false로 초기화
-		switchRecordMode(false);
-		
-		// 클릭된 카드 태그에 숨겨져 있는 data- 속성 정보들 추출
-		const themeTitle = cardElement.getAttribute('data-theme-title');
-		const playDate = cardElement.getAttribute('data-play-date');
-		const playTime = cardElement.getAttribute('data-play-time');
-		const hintCount = cardElement.getAttribute('data-hint-count');
-		const playerCount = cardElement.getAttribute('data-player-count');
-		const isEscaped = cardElement.getAttribute('data-is-escaped');
-		const recordComment = cardElement.getAttribute('data-memo');
-		
-		// 모달 내부 HTML 태그 ID 기준으로 데이터 바인딩
-		document.getElementById('md-record-theme').innerText = themeTitle;
-		document.getElementById('md-record-date').innerText = playDate;
-		document.getElementById('md-record-time').innerText = playTime;
-		document.getElementById('md-record-hint').innerText = hintCount + "개";
-		document.getElementById('md-record-players').innerText = playerCount + "명";
-		document.getElementById('md-record-memo').innerText = recordComment ? recordComment : "등록된 메모가 없습니다.";
-		
-		// Escaped 여부에 따른 상태 뱃지 렌더링
-		const statusBadge = document.getElementById('md-record-status');
-		
-		if(isEscaped === "1") {
-			statusBadge.innerText = "성공";
-			statusBadge.className = "ne-st ne-st-amber"; 
-		} else {
-			statusBadge.innerText = "실패";
-			statusBadge.className = "ne-st ne-st-red"; 
-		}
-		
-		// 세팅 완료된 모달 띄우기
-		let myModal = new bootstrap.Modal(document.getElementById('recordDetailModal'));
-		myModal.show();
-	}
+	<%-- 경로 깨짐 방지용 공통 변수 --%>
+	const CTX = '${pageContext.request.contextPath}'; 
 	
-	// 기록 추가 버튼 클릭 시 미등록 리스트 비동기 조회 후 모달 오픈
-	function insertRecordModal() {
-		fetch(`${pageContext.request.contextPath}/mypage/record/write`)
-		.then(response => {
-			if (!response.ok) {
-				throw new Error("네트워크 응답 표준 에러 발생");
-			}
-			return response.json(); 
+	<%-- 모달끼리 공유할 리뷰 데이터 임시 저장용 --%>
+	let currentReviewData = {};
+
+	<%-- 카드 클릭 시 상세보기 모달에 데이터 채우기 --%>
+	function openRecordDetail(cardElement) {
+
+		<%-- 무조건 수정창이 아닌 보기창부터 뜨도록 초기화 --%>
+		switchRecordMode(false);
+
+		<%-- 카드 태그에 숨겨둔 데이터들 다 가져오기 --%>
+		const detailId     = cardElement.getAttribute('data-detail-id');
+		const themeTitle   = cardElement.getAttribute('data-theme-title');
+		const playDate     = cardElement.getAttribute('data-play-date');
+		const playTime     = cardElement.getAttribute('data-play-time');
+		const hintCount    = cardElement.getAttribute('data-hint-count');
+		const peopleCount  = cardElement.getAttribute('data-people-count');
+		const isEscaped    = cardElement.getAttribute('data-is-escaped');
+		const recordComment = cardElement.getAttribute('data-memo');
+
+		<%-- 리뷰 모달에서 그대로 쓰게 글로벌 객체에 복사 --%>
+		currentReviewData = {
+			reviewId      : cardElement.getAttribute('data-review-id'),
+			difficulty    : cardElement.getAttribute('data-rv-diff'),
+			horror        : cardElement.getAttribute('data-rv-horr'),
+			activity      : cardElement.getAttribute('data-rv-act'),
+			immersion     : cardElement.getAttribute('data-rv-imm'),
+			satisfaction  : cardElement.getAttribute('data-rv-sat'),
+			reviewComment : cardElement.getAttribute('data-rv-comment')
+		};
+
+		<%-- 일반 보기 모드 화면에 데이터 매핑 --%>
+		document.getElementById('md-record-detailId').value    = detailId;
+		document.getElementById('md-record-theme').innerText   = themeTitle;
+		document.getElementById('md-record-date').innerText    = playDate;
+		document.getElementById('md-record-time').innerText    = playTime + "분";
+		document.getElementById('md-record-hint').innerText    = hintCount + "개";
+		document.getElementById('md-record-players').innerText = peopleCount + "명";
+		document.getElementById('md-record-memo').innerText    = recordComment || "등록된 메모가 없습니다.";
+
+		<%-- 수정 모드 켰을 때 인풋창에 미리 채워둘 데이터 --%>
+		document.getElementById('mdEditPlayTime').value      = playTime;
+		document.getElementById('mdEditHintCount').value     = hintCount;
+		document.getElementById('mdEditPlayerCount').value   = peopleCount;
+		document.getElementById('mdEditRecordComment').value = recordComment || "";
+		
+		<%-- 탈출 성공 여부 체크박스 세팅 --%>
+		document.getElementById(isEscaped === "1" ? 'mdEditEscape' : 'mdEditFail').checked = true;
+
+		<%-- 성공 실패에 맞게 뱃지 색상 다르게 부여 --%>
+		const badge = document.getElementById('md-record-status');
+		if (isEscaped === "1") {
+			badge.innerText = "성공"; badge.className = "ne-st ne-st-amber";
+		} else {
+			badge.innerText = "실패"; badge.className = "ne-st ne-st-red";
+		}
+
+		new bootstrap.Modal(document.getElementById('recordDetailModal')).show();
+	}
+
+	<%-- 리뷰Id 여부 확인 후 등록/수정 모드 전환해서 열기 --%>
+	function openReviewModal() {
+		const detailId = document.getElementById('md-record-detailId').value;
+		if (!detailId) { alert("출석 번호를 식별할 수 없습니다."); return; }
+
+		document.getElementById('md-review-detailId').value = detailId;
+
+		const rid = currentReviewData.reviewId;
+		
+		<%-- reviewId가 존재하면 작성 이력이 있으므로 수정 모드 --%>
+		const isEditMode = rid && rid !== "0" && rid !== "";
+
+		if (isEditMode) {
+			<%-- 수정 모드: 기존 별점이랑 코멘트 그대로 세팅 --%>
+			document.getElementById('insReviewComment').value = currentReviewData.reviewComment || "";
+			document.getElementById('diff-' + currentReviewData.difficulty).checked = true;
+			document.getElementById('horr-' + currentReviewData.horror).checked     = true;
+			document.getElementById('act-' + currentReviewData.activity).checked    = true;
+			document.getElementById('imm-' + currentReviewData.immersion).checked   = true;
+			document.getElementById('sat-' + currentReviewData.satisfaction).checked = true;
+
+			document.getElementById('reviewModalTitle').innerText   = "테마 리뷰 수정하기";
+			document.getElementById('reviewSubmitBtn').innerText    = "리뷰 수정 완료";
+		} else {
+			<%-- 입력창과 라디오 버튼 1점으로 초기화 --%>
+			document.getElementById('insReviewComment').value = "";
+			document.getElementById('diff-1').checked = true;
+			document.getElementById('horr-1').checked = true;
+			document.getElementById('act-1').checked  = true;
+			document.getElementById('imm-1').checked  = true;
+			document.getElementById('sat-1').checked  = true;
+
+			document.getElementById('reviewModalTitle').innerText = "테마 만족도 및 리뷰 등록";
+			document.getElementById('reviewSubmitBtn').innerText  = "리뷰 등록 완료";
+		}
+
+		<%-- 기존 상세조회창은 닫고 리뷰창 열기 --%>
+		const detailModalEl = document.getElementById('recordDetailModal');
+		const detailModal   = bootstrap.Modal.getInstance(detailModalEl);
+		if (detailModal) detailModal.hide();
+
+		new bootstrap.Modal(document.getElementById('reviewModal')).show();
+	}
+
+	<%-- /write 단일 주소로 리뷰 데이터 일괄 전송 --%>
+	function submitReviewForm() {
+		const commentEl = document.getElementById('insReviewComment');
+		if (!commentEl.value.trim()) {
+			alert("한줄 코멘트를 입력해 주세요.");
+			commentEl.focus();
+			return;
+		}
+
+		const detailId = document.getElementById('md-review-detailId').value;
+		const formData = new FormData(document.getElementById('reviewInsertForm'));
+
+		<%-- 서버 컨트롤러 잭슨 매핑 규격에 맞춘 데이터 구조 --%>
+		const reviewData = {
+			detailId     : parseInt(detailId, 10),
+			difficulty   : parseInt(formData.get('difficulty'), 10),
+			horror       : parseInt(formData.get('horror'), 10),
+			activity     : parseInt(formData.get('activity'), 10),
+			immersion    : parseInt(formData.get('immersion'), 10),
+			satisfaction : parseInt(formData.get('satisfaction'), 10),
+			reviewComment: commentEl.value.trim()
+		};
+
+		fetch(`${CTX}/mypage/review/write`, {
+			method : 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body   : JSON.stringify(reviewData)
 		})
+		.then(res => { if (!res.ok) throw new Error(); return res.text(); })
+		.then(result => {
+			if (result === "success") {
+				alert("리뷰가 정상적으로 처리되었습니다.");
+				location.reload();
+			} else {
+				alert("처리에 실패했습니다.");
+			}
+		})
+		.catch(() => alert("통신 중 오류가 발생했습니다."));
+	}
+
+	<%-- 아직 기록 등록 안 한 플레이 리스트 가져오기 --%>
+	function insertRecordModal() {
+		fetch(`${CTX}/mypage/record/write`)
+		.then(res => res.json())
 		.then(list => {
 			const selectEl = document.getElementById('unrecordedSelect');
-			
 			selectEl.innerHTML = '<option value="" selected disabled>기록을 등록할 플레이를 선택하세요.</option>';
-			
 			if (!list || list.length === 0) {
 				alert("기록을 추가할 미등록 플레이 내역이 없습니다.");
 				return;
 			}
-			
+			<%-- 받아온 목록만큼 셀렉트 박스 옵션 동적 추가 --%>
 			list.forEach(item => {
-				const option = document.createElement('option');
-				option.value = item.detailId; 
-				option.innerText = `[\${item.cafeName}] \${item.roomName} (\${item.playDate})`;
-				selectEl.appendChild(option);
+				const opt = document.createElement('option');
+				opt.value     = item.detailId;
+				opt.innerText = `[${item.cafeName}] ${item.roomName} (${item.playDate})`;
+				selectEl.appendChild(opt);
 			});
-			
-			let insertModal = new bootstrap.Modal(document.getElementById('insertRecordModal'));
-			insertModal.show();
-		})
-		.catch(error => {
-			console.error("AJAX 통신 중 치명적 에러 발생:", error);
-			alert("내역을 불러오는 도중 오류가 발생했습니다. 브라우저 콘솔(F12)을 확인해 주세요.");
+			new bootstrap.Modal(document.getElementById('insertRecordModal')).show();
 		});
 	}
-	
-	// 3. 모달 내에서 [기록 추가 완료] 버튼 클릭 시 데이터 서버 전송
+
+	<%-- 새 기록 저장 전송 --%>
 	function submitRecordInsert() {
-		const selectEl = document.getElementById('unrecordedSelect');
-		if(!selectEl.value) {
-			alert("기록할 플레이 내역을 선택해 주세요.");
-			selectEl.focus();
-			return;
-		}
-		
+		const selectEl  = document.getElementById('unrecordedSelect');
 		const playTimeEl = document.getElementById('insPlayTime');
-		const rawPlayTime = playTimeEl.value.trim();
-		if(!rawPlayTime || isNaN(rawPlayTime)) {
-			alert("소요 시간을 숫자(분) 형식으로 정확히 입력해 주세요. (예: 52)");
-			playTimeEl.focus();
-			return;
-		}
+		if (!selectEl.value || !playTimeEl.value.trim()) return;
 
-		const form = document.getElementById('recordInsertForm');
-		const formData = new FormData(form);
-		
+		<%-- DTO에 매핑될 수 있도록 숫자 데이터 형변환 파싱 --%>
 		const recordData = {
-			detailId: parseInt(formData.get('detailId'), 10),
-			isEscaped: parseInt(formData.get('isEscaped'), 10),
-			playTime: parseInt(rawPlayTime, 10),
-			hintCount: parseInt(formData.get('hintCount'), 10),
-			peopleCount: parseInt(formData.get('peopleCount'), 10),
-			recordComment: formData.get('recordComment')
+			detailId     : parseInt(selectEl.value, 10),
+			isEscaped    : parseInt(document.querySelector('input[name="isEscaped"]:checked').value, 10),
+			playTime     : parseInt(playTimeEl.value.trim(), 10),
+			hintCount    : parseInt(document.getElementById('insHintCount').value, 10),
+			peopleCount  : parseInt(document.getElementById('insPlayerCount').value, 10),
+			recordComment: document.getElementById('insRecordComment').value
 		};
-		
-		fetch(`${pageContext.request.contextPath}/mypage/record/write`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(recordData)
-		})
-		.then(response => {
-			if(!response.ok) throw new Error("서버 처리 실패");
-			return response.text();
-		})
-		.then(result => {
-			if(result === "success") {
-				alert("새로운 플레이 기록이 정상적으로 등록되었습니다.");
-				
-				let insertModalEl = document.getElementById('insertRecordModal');
-				let insertModal = bootstrap.Modal.getInstance(insertModalEl);
-				insertModal.hide();
-				
-				location.href = "${pageContext.request.contextPath}/mypage/record?page=1";
-			} else {
-				alert("기록 등록에 실패했습니다. 입력값을 확인해주세요.");
-			}
-		})
-		.catch(error => {
-			console.error("기록 등록 에러:", error);
-			alert("기록 등록 중 오류가 발생했습니다.");
-		});
-	}
-	
-	// 1. [수정하기] 버튼 누르면 바로 수정 폼 모달 열기
-	function updateRecordModal(event, cardElement) {
-		// 부모 카드가 같이 클릭되어 상세 모달이 열리는 현상(버블링) 차단
-		if(event) event.stopPropagation();
-		
-		// 카드에 숨겨진 기존 데이터들 싹 추출하기
-		const detailId = cardElement.getAttribute('data-detail-id') || "0"; 
-		const themeTitle = cardElement.getAttribute('data-theme-title');
-		const playDate = cardElement.getAttribute('data-play-date');
-		const playTime = cardElement.getAttribute('data-play-time');
-		const hintCount = cardElement.getAttribute('data-hint-count');
-		const playerCount = cardElement.getAttribute('data-player-count');
-		const isEscaped = cardElement.getAttribute('data-is-escaped');
-		const recordComment = cardElement.getAttribute('data-memo');
-		
-		// 모달의 input, textarea 태그들에 기존 값 대입하기
-		document.getElementById('md-record-detailId').value = detailId;
-		document.getElementById('md-record-theme').innerText = themeTitle;
-		document.getElementById('md-record-date').innerText = playDate;
-		
-		document.getElementById('mdEditPlayTime').value = playTime;
-		document.getElementById('mdEditHintCount').value = hintCount;
-		document.getElementById('mdEditPlayerCount').value = playerCount;
-		document.getElementById('mdEditRecordComment').value = recordComment ? recordComment : "";
-		
-		// 성공/실패 라디오 버튼 체크
-		if(isEscaped === "1") {
-			document.getElementById('mdEditEscape').checked = true;
-		} else {
-			document.getElementById('mdEditFail').checked = true;
-		}
-		
-		// 모달이 열릴 때 무조건 '수정 폼(true)'이 보이도록 설정
-		switchRecordMode(true);
-		
-		// 모달 띄우기
-		let myModal = new bootstrap.Modal(document.getElementById('recordDetailModal'));
-		myModal.show();
-	}
-	
-	// 2. 모달 안의 UI를 조회 모드(false) / 수정 모드(true)로 스위칭하는 함수
-	function switchRecordMode(isEditMode) {
-		if(isEditMode) {
-			document.getElementById('md-view-form').classList.add('d-none');
-			document.getElementById('md-edit-form').classList.remove('d-none');
-			document.getElementById('md-view-footer').classList.add('d-none');
-			document.getElementById('md-edit-footer').classList.remove('d-none');
-		} else {
-			document.getElementById('md-view-form').classList.remove('d-none');
-			document.getElementById('md-edit-form').classList.add('d-none');
-			document.getElementById('md-view-footer').classList.remove('d-none');
-			document.getElementById('md-edit-footer').classList.add('d-none');
-		}
+
+		fetch(`${CTX}/mypage/record/write`, {
+			method : 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body   : JSON.stringify(recordData)
+		}).then(() => location.reload());
 	}
 
-	// 3. 수정 완료 버튼 누르면 서버(컨트롤러)로 비동기 전송할 함수
+	<%-- 기존 탈출 기록 및 메모 수정 요청 전송 --%>
 	function submitRecordUpdate() {
-		const playTimeEl = document.getElementById('mdEditPlayTime');
-		const rawPlayTime = playTimeEl.value.trim();
-		
-		// 유효성 검사 (분 단위 숫자만)
-		if(!rawPlayTime || isNaN(rawPlayTime)) {
-			alert("소요 시간을 숫자(분) 형식으로 정확히 입력해 주세요. (예: 52)");
-			playTimeEl.focus();
-			return;
-		}
-
-		// 서버로 보낼 JSON 데이터 묶기
+		const detailId   = document.getElementById('md-record-detailId').value;
 		const updateData = {
-			detailId: parseInt(document.getElementById('md-record-detailId').value, 10),
-			isEscaped: parseInt(document.querySelector('input[name="mdIsEscaped"]:checked').value, 10),
-			playTime: parseInt(rawPlayTime, 10),
-			hintCount: parseInt(document.getElementById('mdEditHintCount').value, 10),
-			peopleCount: parseInt(document.getElementById('mdEditPlayerCount').value, 10),
+			detailId     : parseInt(detailId, 10),
+			isEscaped    : parseInt(document.querySelector('input[name="mdIsEscaped"]:checked').value, 10),
+			playTime     : parseInt(document.getElementById('mdEditPlayTime').value, 10),
+			hintCount    : parseInt(document.getElementById('mdEditHintCount').value, 10),
+			peopleCount  : parseInt(document.getElementById('mdEditPlayerCount').value, 10),
 			recordComment: document.getElementById('mdEditRecordComment').value
 		};
 
-		// Fetch를 이용한 비동기 통신
-		fetch(`${pageContext.request.contextPath}/mypage/record/update`, {
-			method: 'POST', // 프로젝트 컨벤션에 맞춰 PUT 대신 POST 사용
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(updateData)
-		})
-		.then(response => {
-			if(!response.ok) throw new Error("서버 처리 실패");
-			return response.text();
-		})
-		.then(result => {
-			if(result === "success") {
-				alert("플레이 기록이 성공적으로 수정되었습니다.");
-				location.reload(); // 화면 새로고침하여 반영
-			} else {
-				alert("기록 수정에 실패했습니다. 입력값을 확인해주세요.");
-			}
-		})
-		.catch(error => {
-			console.error("기록 수정 에러:", error);
-			alert("기록 수정 중 오류가 발생했습니다.");
-		});
+		fetch(`${CTX}/mypage/record/update`, {
+			method : 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body   : JSON.stringify(updateData)
+		}).then(() => location.reload());
 	}
-	
-	
-	
-	
-	
+
+	<%-- 상세보기 모달에서 보기 폼 ↔ 수정 폼 토글 기능 --%>
+	function switchRecordMode(isEditMode) {
+		document.getElementById('md-view-form').classList.toggle('d-none', isEditMode);
+		document.getElementById('md-edit-form').classList.toggle('d-none', !isEditMode);
+		document.getElementById('md-view-footer').classList.toggle('d-none', isEditMode);
+		document.getElementById('md-edit-footer').classList.toggle('d-none', !isEditMode);
+	}
+
 </script>
 </head>
 <body>
@@ -308,191 +247,107 @@
 <%@ include file="/WEB-INF/views/common/header.jsp" %>
 
 <div class="main-body ne-body-offset">
-	
 	<%@ include file="/WEB-INF/views/common/leftSideBar.jsp" %>
 
 	<div class="main-content">
-	
 		<div class="ne-sc">
 			<div class="ne-sc-title" style="font-size: 24px;">
 				<span>개인 기록</span>
-			 	<span class="btn btn-outline-primary" onclick="insertRecordModal()">기록 추가</span>
-			 </div>
-			
-			
-			<!-- 더미 기록 카드 데이터 -->
-			 
-			<div class="ne-card ne-card-accent p-4 mb-3 clickable-card" onclick="openRecordDetail(this)"
-				 data-theme-title="비밀의 숲"
-				 data-play-date="2024.05.17 (금) 14:00"
-				 data-play-time="52:18"
-				 data-hint-count="2"
-				 data-player-count="3"
-				 data-is-escaped="1"
-				 data-memo="방탈출 친구들과 갔는데 인테리어가 정말 대박이었음!">
-				 
-				<div class="record-item-body justify-content-between">
-					<div class="d-flex align-items-center gap-3">
-						<div class="ne-room-img" style="width: 80px; height: 80px; flex-shrink: 0; border-radius: var(--ne-radius-md);">
-							<img src="/dist/images/miku.jpg" style="width: 100%; height: 100%; object-fit : contain">
-						</div>
-						<div>
-							<h4 class="m-0 mb-1 fw-bold" style="font-size: 18px;">비밀의 숲</h4>
-							<p class="m-0 text-secondary small">2024.05.17 (금) 14:00</p>
-						</div>
-					</div>
-					
-					<div class="d-flex align-items-center gap-3">
-						<div>
-							<span class="ne-st ne-st-amber">성공</span>
-						</div>
-					</div>
-				</div>
+				<span class="btn btn-outline-primary" onclick="insertRecordModal()">기록 추가</span>
 			</div>
-			
+
 			<c:choose>
 				<c:when test="${not empty recordList}">
 					<c:forEach var="record" items="${recordList}">
-						
-						<div class="ne-card ne-card-accent .clickable-card p-4 mb-3 " 
-							 onclick="openRecordDetail(this)"
-							 data-theme-title="${record.roomName}"
-							 data-play-date="${record.playDate}"
-							 data-play-time="${record.playTime}"
-							 data-hint-count="${record.hintCount}"
-							 data-player-count="${record.peopleCount}"
-							 data-is-escaped="${record.isEscaped}"
-							 data-memo="${record.recordComment}">
-							 
-							<div class="record-item-body justify-content-between">
-							
-								<div class="d-flex align-items-center gap-3">
-									<div class="ne-room-img" style="width: 80px; height: 80px; flex-shrink: 0; border-radius: var(--ne-radius-md);">
+						<%-- 탈출 성공/실패 여부가 실존하는 확정 내역만 카드 렌더링 --%>
+						<c:if test="${not empty record.isEscaped}">
+							<div id="card-${record.detailId}"
+							     class="ne-card ne-card-accent clickable-card p-4 mb-3"
+							     onclick="openRecordDetail(this)"
+							     data-detail-id="${record.detailId}"
+							     data-theme-title="${record.roomName}"
+							     data-play-date="${record.playDate}"
+							     data-play-time="${record.playTime}"
+							     data-hint-count="${record.hintCount}"
+							     data-people-count="${record.peopleCount}"
+							     data-is-escaped="${record.isEscaped}"
+							     data-memo="${record.recordComment}"
+							     data-review-id="${record.reviewId}"
+							     data-rv-diff="${record.difficulty}"
+							     data-rv-horr="${record.horror}"
+							     data-rv-act="${record.activity}"
+							     data-rv-imm="${record.immersion}"
+							     data-rv-sat="${record.satisfaction}"
+							     data-rv-comment="${record.reviewComment}">
+
+								<div class="record-item-body justify-content-between">
+									<div class="d-flex align-items-center gap-3">
+										<div style="width:80px; height:80px; flex-shrink:0; border-radius:var(--ne-radius-md); overflow:hidden;">
+											<img src="${pageContext.request.contextPath}/dist/images/${record.roomImg}"
+											     style="width:100%; height:100%; object-fit:cover;" alt="${record.roomName}">
+										</div>
+										<div>
+											<h4 class="m-0 mb-1 fw-bold" style="font-size:18px;">${record.roomName}</h4>
+											<p class="m-0 text-secondary small">${record.playDate}</p>
+										</div>
 									</div>
-									<div>
-										<h4 class="m-0 mb-1 fw-bold" style="font-size: 18px;">${record.roomName}</h4>
-										<p class="m-0 text-secondary small">${record.playDate}</p>
+									<div class="d-flex align-items-center gap-3">
+										<c:choose>
+											<c:when test="${record.isEscaped == 1}"><span class="ne-st ne-st-amber">성공</span></c:when>
+											<c:otherwise><span class="ne-st ne-st-red">실패</span></c:otherwise>
+										</c:choose>
 									</div>
-								</div>
-								
-								<div class="d-flex align-items-center gap-3">
-									<c:choose>
-										<c:when test="${empty record.isEscaped}">
-											<div>
-												<button type="button" class="btn btn-sm btn-outline-primary px-3 fw-semibold" onclick="insertRecordModal()">기록하기</button>
-											</div>
-										</c:when>
-										
-										
-										<c:otherwise>
-											<div>
-												<c:choose>
-													<c:when test="${empty review.reviewId}">
-														<button type="button" class="btn btn-sm btn-outline-primary px-3 fw-semibold me-2" 
-														onclick="updateRecordModal(event, this.closest('.clickable-card'))"
-														
-														>수정하기</button>
-													</c:when>
-												</c:choose>
-																			
-												<c:choose>
-													<c:when test="${record.isEscaped == 1}">
-														<span class="ne-st ne-st-amber">성공</span>
-													</c:when>
-													<c:otherwise>
-														<span class="ne-st ne-st-red">실패</span>
-													</c:otherwise>
-												</c:choose>
-											</div>
-										</c:otherwise>
-									</c:choose>
 								</div>
 							</div>
-						</div>
-						
+						</c:if>
 					</c:forEach>
 				</c:when>
-				
 				<c:otherwise>
-					<div class="text-center py-5 text-secondary">
-						현재 플레이 기록이 존재하지 않습니다.
-					</div>
+					<div class="text-center py-5 text-secondary">현재 플레이 기록이 존재하지 않습니다.</div>
 				</c:otherwise>
 			</c:choose>
-			<!-- 여기 -->
 
-			
-			<!-- 여기 -->
+			<%-- 하단 페이지 번호 출력 영역 --%>
+			<c:if test="${totalPage > 1}">
+				<div class="pagination-wrapper d-flex justify-content-center gap-2">
+					<c:if test="${hasPrev}">
+						<a href="?page=${currentPage - 1}" class="btn btn-sm btn-outline-secondary">이전</a>
+					</c:if>
+					<c:forEach var="p" begin="1" end="${totalPage}">
+						<a href="?page=${p}"
+						   class="btn btn-sm ${p == currentPage ? 'btn-primary' : 'btn-outline-secondary'}">${p}</a>
+					</c:forEach>
+					<c:if test="${hasNext}">
+						<a href="?page=${currentPage + 1}" class="btn btn-sm btn-outline-secondary">다음</a>
+					</c:if>
+				</div>
+			</c:if>
+
 		</div>
-		<div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-				
-				<c:choose>
-					<c:when test="${hasPrev}">
-						<a href="${pageContext.request.contextPath}/mypage/record?page=${currentPage - 1}" 
-						   class="btn btn-sm btn-outline-secondary px-3 fw-semibold">
-							&lt; 이전
-						</a>
-					</c:when>
-					<c:otherwise>
-						<button type="button" class="btn btn-sm btn-outline-secondary px-3 fw-semibold" disabled>
-							&lt; 이전
-						</button>
-					</c:otherwise>
-				</c:choose>
-
-				<span class="text-secondary small fw-medium">
-					<strong class="text-dark">${currentPage}</strong> / ${totalPage}
-				</span>
-
-				<c:choose>
-					<c:when test="${hasNext}">
-						<a href="${pageContext.request.contextPath}/mypage/record?page=${currentPage + 1}" 
-						   class="btn btn-sm btn-outline-secondary px-3 fw-semibold">
-							다음 &gt;
-						</a>
-					</c:when>
-					<c:otherwise>
-						<button type="button" class="btn btn-sm btn-outline-secondary px-3 fw-semibold" disabled>
-							다음 &gt;
-						</button>
-					</c:otherwise>
-				</c:choose>
-				
-			</div>
 	</div>
 
-<%@ include file="/WEB-INF/views/common/rightSideBar.jsp" %>
-
+	<%@ include file="/WEB-INF/views/common/rightSideBar.jsp" %>
 </div>
 
 
+<%-- 기록 상세 조회 및 인라인 수정 모달 레이아웃 --%>
 <div class="modal fade" id="recordDetailModal" tabindex="-1">
-	<div class="modal-dialog modal-dialog-centered"> 
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-		
 			<div class="modal-header">
 				<h5 class="modal-title" id="md-record-theme">테마 제목</h5>
 				<span id="md-record-status" class="ms-3"></span>
 				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
-			
-			<div class="modal-body p-4" style="font-size: 14px;">
+			<div class="modal-body p-4" style="font-size:14px;">
 				<input type="hidden" id="md-record-detailId" value="">
-				
+
+				<%-- 데이터 단순 출력 화면 --%>
 				<div id="md-view-form">
 					<div class="ne-price-box mb-4">
-						<div class="ne-price-row">
-							<span class="ne-text-muted">최종 소요 시간</span>
-							<strong id="md-record-time" class="text-dark"></strong>
-						</div>
-						<div class="ne-price-row">
-							<span class="ne-text-muted">사용 힌트 개수</span>
-							<strong id="md-record-hint" class="text-dark"></strong>
-						</div>
-						<div class="ne-price-row total">
-							<span>함께한 인원</span>
-							<span id="md-record-players" class="ne-price-total-amount"></span>
-						</div>
+						<div class="ne-price-row"><span class="ne-text-muted">최종 소요 시간</span><strong id="md-record-time" class="text-dark"></strong></div>
+						<div class="ne-price-row"><span class="ne-text-muted">사용 힌트 개수</span><strong id="md-record-hint" class="text-dark"></strong></div>
+						<div class="ne-price-row total"><span>함께한 인원</span><span id="md-record-players" class="ne-price-total-amount"></span></div>
 					</div>
 					<div class="mb-3">
 						<label class="form-label ne-text-muted">플레이 일시</label>
@@ -500,55 +355,47 @@
 					</div>
 					<div>
 						<label class="form-label ne-text-muted">기록 메모</label>
-						<div id="md-record-memo" class="ne-notice ne-notice-warning p-3 text-dark" style="min-height: 80px; white-space: pre-wrap;"></div>
+						<div id="md-record-memo" class="ne-notice ne-notice-warning p-3 text-dark" style="min-height:80px; white-space:pre-wrap;"></div>
 					</div>
 				</div>
 
+				<%-- 수정 버튼 클릭 시 교체되는 입력 폼 화면 --%>
 				<div id="md-edit-form" class="d-none">
 					<div class="mb-4">
 						<label class="ne-insert-label mb-2 d-block fw-semibold text-secondary">탈출 성공 여부</label>
 						<div class="ne-status-toggle-group">
 							<input type="radio" class="ne-status-toggle-btn" name="mdIsEscaped" id="mdEditEscape" value="1">
 							<label class="ne-status-label" for="mdEditEscape">탈출 성공</label>
-							
 							<input type="radio" class="ne-status-toggle-btn" name="mdIsEscaped" id="mdEditFail" value="0">
 							<label class="ne-status-label" for="mdEditFail">탈출 실패</label>
 						</div>
 					</div>
-					
-					<div class="ne-input-grid mb-4" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+					<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;" class="mb-4">
 						<div>
 							<label for="mdEditPlayTime" class="ne-insert-label mb-1 d-block text-secondary">소요 시간</label>
-							<input type="text" class="form-control form-control-sm text-center" id="mdEditPlayTime" placeholder="예: 52">
+							<input type="text" class="form-control form-control-sm text-center" id="mdEditPlayTime">
 						</div>
 						<div>
 							<label for="mdEditHintCount" class="ne-insert-label mb-1 d-block text-secondary">힌트 사용</label>
-							<div class="input-group input-group-sm">
-								<input type="number" class="form-control text-center" id="mdEditHintCount" min="0">
-								<span class="input-group-text">개</span>
-							</div>
+							<input type="number" class="form-control form-control-sm text-center" id="mdEditHintCount">
 						</div>
 						<div>
 							<label for="mdEditPlayerCount" class="ne-insert-label mb-1 d-block text-secondary">플레이 인원</label>
-							<div class="input-group input-group-sm">
-								<input type="number" class="form-control text-center" id="mdEditPlayerCount" min="1">
-								<span class="input-group-text">명</span>
-							</div>
+							<input type="number" class="form-control form-control-sm text-center" id="mdEditPlayerCount">
 						</div>
 					</div>
-					
 					<div class="mb-2">
 						<label for="mdEditRecordComment" class="ne-insert-label mb-1 d-block text-secondary">기록 메모</label>
-						<textarea class="form-control" id="mdEditRecordComment" rows="3" style="font-size: 13px; resize: none;" placeholder="플레이 소감을 수정해 보세요!"></textarea>
+						<textarea class="form-control" id="mdEditRecordComment" rows="3" style="font-size:13px; resize:none;"></textarea>
 					</div>
 				</div>
 			</div>
-			
+
 			<div class="modal-footer py-2" id="md-view-footer">
+				<button type="button" class="btn btn-sm btn-outline-success px-3 fw-semibold" onclick="openReviewModal()">리뷰 관리</button>
 				<button type="button" class="btn btn-sm btn-outline-primary px-3" onclick="switchRecordMode(true)">수정하기</button>
 				<button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">닫기</button>
 			</div>
-
 			<div class="modal-footer py-2 d-none" id="md-edit-footer">
 				<button type="button" class="btn btn-sm btn-secondary px-3" onclick="switchRecordMode(false)">취소</button>
 				<button type="button" class="btn btn-sm btn-primary px-3 fw-semibold" onclick="submitRecordUpdate()">수정 완료</button>
@@ -558,76 +405,135 @@
 </div>
 
 
-<div class="modal fade ne-record-insert-modal" id="insertRecordModal" tabindex="-1">
-	<div class="modal-dialog modal-dialog-centered" style="max-width: 460px;"> 
+<%-- 신규 미등록 내역 생성 모달 레이아웃 --%>
+<div class="modal fade" id="insertRecordModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-		
 			<div class="modal-header">
-				<h5 class="modal-title">새로운 플레이 기록 등록</h5>
+				<h5 class="modal-title">기록 추가</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
-			
-			<div class="modal-body p-4" style="font-size: 14px;">
-				<form id="recordInsertForm">
-					
-					<div class="ne-insert-select-box mb-4">
-						<label for="unrecordedSelect" class="ne-insert-label mb-2 d-block">기록할 플레이 내역 선택</label>
-						<select class="form-select form-select-sm" id="unrecordedSelect" name="detailId" required>
-							<option value="" selected disabled>-- 미등록 내역을 선택해 주세요 --</option>
-						</select>
+			<div class="modal-body p-4" style="font-size:14px;">
+				<div class="mb-3">
+					<label class="ne-insert-label mb-1 d-block text-secondary">플레이 선택</label>
+					<select class="form-select form-select-sm" id="unrecordedSelect"></select>
+				</div>
+				<div class="mb-4">
+					<label class="ne-insert-label mb-2 d-block fw-semibold text-secondary">탈출 성공 여부</label>
+					<div class="ne-status-toggle-group">
+						<input type="radio" class="ne-status-toggle-btn" name="isEscaped" id="insEscape" value="1" checked>
+						<label class="ne-status-label" for="insEscape">탈출 성공</label>
+						<input type="radio" class="ne-status-toggle-btn" name="isEscaped" id="insFail" value="0">
+						<label class="ne-status-label" for="insFail">탈출 실패</label>
 					</div>
-					
-					<div class="mb-4">
-						<label class="ne-insert-label mb-2 d-block">탈출 성공 여부</label>
-						<div class="ne-status-toggle-group">
-							<input type="radio" class="ne-status-toggle-btn" name="isEscaped" id="statusEscape" value="1" checked>
-							<label class="ne-status-label" for="statusEscape">탈출 성공</label>
-							
-							<input type="radio" class="ne-status-toggle-btn" name="isEscaped" id="statusFail" value="0">
-							<label class="ne-status-label" for="statusFail">탈출 실패</label>
-						</div>
+				</div>
+				<div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;" class="mb-4">
+					<div>
+						<label for="insPlayTime" class="ne-insert-label mb-1 d-block text-secondary">소요 시간</label>
+						<input type="text" class="form-control form-control-sm text-center" id="insPlayTime" placeholder="분">
 					</div>
-					
-					<div class="ne-input-grid mb-4">
-						<div>
-							<label for="insPlayTime" class="ne-insert-label mb-1">소요 시간</label>
-							<input type="text" class="form-control form-control-sm text-center" id="insPlayTime" name="playTime" placeholder="분 단위, 예:58" required>
-						</div>
-						<div>
-							<label for="insHintCount" class="ne-insert-label mb-1">힌트 사용</label>
-							<div class="input-group input-group-sm">
-								<input type="number" class="form-control text-center" id="insHintCount" name="hintCount" min="0" value="0" required>
-								<span class="input-group-text">개</span>
-							</div>
-						</div>
-						<div>
-							<label for="insPlayerCount" class="ne-insert-label mb-1">플레이 인원</label>
-							<div class="input-group input-group-sm">
-								<input type="number" class="form-control text-center" id="insPlayerCount" name="peopleCount" min="1" value="2" required>
-								<span class="input-group-text">명</span>
-							</div>
-						</div>
+					<div>
+						<label for="insHintCount" class="ne-insert-label mb-1 d-block text-secondary">힌트 사용</label>
+						<input type="number" class="form-control form-control-sm text-center" id="insHintCount" value="0" min="0">
 					</div>
-					
-					<div class="mb-2">
-						<label for="insRecordComment" class="ne-insert-label mb-1">기록 메모</label>
-						<textarea class="form-control" id="insRecordComment" name="recordComment" rows="3" 
-								  style="font-size: 13px; resize: none;" placeholder="인테리어나 플레이 소감을 자유롭게 기록해 보세요!"></textarea>
+					<div>
+						<label for="insPlayerCount" class="ne-insert-label mb-1 d-block text-secondary">플레이 인원</label>
+						<input type="number" class="form-control form-control-sm text-center" id="insPlayerCount" value="1" min="1">
 					</div>
-
-				</form>
+				</div>
+				<div class="mb-2">
+					<label for="insRecordComment" class="ne-insert-label mb-1 d-block text-secondary">기록 메모</label>
+					<textarea class="form-control" id="insRecordComment" rows="3" style="font-size:13px; resize:none;"></textarea>
+				</div>
 			</div>
-			
 			<div class="modal-footer py-2">
 				<button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-sm btn-primary px-3 fw-semibold" onclick="submitRecordInsert()">기록 추가 완료</button>
+				<button type="button" class="btn btn-sm btn-primary px-3 fw-semibold" onclick="submitRecordInsert()">기록 등록</button>
 			</div>
-			
 		</div>
 	</div>
 </div>
 
-<%@ include file="/WEB-INF/views/common/footer.jsp" %>
 
+<%-- 별점 정보 및 한줄평 리뷰 제어용 모달 레이아웃 --%>
+<div class="modal fade" id="reviewModal" tabindex="-1">
+	<div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="reviewModalTitle">테마 만족도 및 리뷰 등록</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body p-4" style="font-size:14px;">
+				<form id="reviewInsertForm">
+					<input type="hidden" id="md-review-detailId" name="detailId" value="">
+
+					<div class="mb-3">
+						<label class="ne-insert-label mb-2 d-block text-secondary fw-semibold">체감 난이도</label>
+						<div class="ne-status-toggle-group d-flex" style="gap:4px;">
+							<input type="radio" class="ne-status-toggle-btn" name="difficulty" id="diff-1" value="1"><label class="ne-status-label flex-fill text-center" for="diff-1">1</label>
+							<input type="radio" class="ne-status-toggle-btn" name="difficulty" id="diff-2" value="2"><label class="ne-status-label flex-fill text-center" for="diff-2">2</label>
+							<input type="radio" class="ne-status-toggle-btn" name="difficulty" id="diff-3" value="3"><label class="ne-status-label flex-fill text-center" for="diff-3">3</label>
+							<input type="radio" class="ne-status-toggle-btn" name="difficulty" id="diff-4" value="4"><label class="ne-status-label flex-fill text-center" for="diff-4">4</label>
+							<input type="radio" class="ne-status-toggle-btn" name="difficulty" id="diff-5" value="5"><label class="ne-status-label flex-fill text-center" for="diff-5">5</label>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="ne-insert-label mb-2 d-block text-secondary fw-semibold">체감 공포도</label>
+						<div class="ne-status-toggle-group d-flex" style="gap:4px;">
+							<input type="radio" class="ne-status-toggle-btn" name="horror" id="horr-1" value="1"><label class="ne-status-label flex-fill text-center" for="horr-1">1</label>
+							<input type="radio" class="ne-status-toggle-btn" name="horror" id="horr-2" value="2"><label class="ne-status-label flex-fill text-center" for="horr-2">2</label>
+							<input type="radio" class="ne-status-toggle-btn" name="horror" id="horr-3" value="3"><label class="ne-status-label flex-fill text-center" for="horr-3">3</label>
+							<input type="radio" class="ne-status-toggle-btn" name="horror" id="horr-4" value="4"><label class="ne-status-label flex-fill text-center" for="horr-4">4</label>
+							<input type="radio" class="ne-status-toggle-btn" name="horror" id="horr-5" value="5"><label class="ne-status-label flex-fill text-center" for="horr-5">5</label>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="ne-insert-label mb-2 d-block text-secondary fw-semibold">체감 활동성</label>
+						<div class="ne-status-toggle-group d-flex" style="gap:4px;">
+							<input type="radio" class="ne-status-toggle-btn" name="activity" id="act-1" value="1"><label class="ne-status-label flex-fill text-center" for="act-1">1</label>
+							<input type="radio" class="ne-status-toggle-btn" name="activity" id="act-2" value="2"><label class="ne-status-label flex-fill text-center" for="act-2">2</label>
+							<input type="radio" class="ne-status-toggle-btn" name="activity" id="act-3" value="3"><label class="ne-status-label flex-fill text-center" for="act-3">3</label>
+							<input type="radio" class="ne-status-toggle-btn" name="activity" id="act-4" value="4"><label class="ne-status-label flex-fill text-center" for="act-4">4</label>
+							<input type="radio" class="ne-status-toggle-btn" name="activity" id="act-5" value="5"><label class="ne-status-label flex-fill text-center" for="act-5">5</label>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label class="ne-insert-label mb-2 d-block text-secondary fw-semibold">스토리 몰입도</label>
+						<div class="ne-status-toggle-group d-flex" style="gap:4px;">
+							<input type="radio" class="ne-status-toggle-btn" name="immersion" id="imm-1" value="1"><label class="ne-status-label flex-fill text-center" for="imm-1">1</label>
+							<input type="radio" class="ne-status-toggle-btn" name="immersion" id="imm-2" value="2"><label class="ne-status-label flex-fill text-center" for="imm-2">2</label>
+							<input type="radio" class="ne-status-toggle-btn" name="immersion" id="imm-3" value="3"><label class="ne-status-label flex-fill text-center" for="imm-3">3</label>
+							<input type="radio" class="ne-status-toggle-btn" name="immersion" id="imm-4" value="4"><label class="ne-status-label flex-fill text-center" for="imm-4">4</label>
+							<input type="radio" class="ne-status-toggle-btn" name="immersion" id="imm-5" value="5"><label class="ne-status-label flex-fill text-center" for="imm-5">5</label>
+						</div>
+					</div>
+					<div class="mb-4">
+						<label class="ne-insert-label mb-2 d-block text-secondary fw-semibold">종합 만족도</label>
+						<div class="ne-status-toggle-group d-flex" style="gap:4px;">
+							<input type="radio" class="ne-status-toggle-btn" name="satisfaction" id="sat-1" value="1"><label class="ne-status-label flex-fill text-center" for="sat-1">1</label>
+							<input type="radio" class="ne-status-toggle-btn" name="satisfaction" id="sat-2" value="2"><label class="ne-status-label flex-fill text-center" for="sat-2">2</label>
+							<input type="radio" class="ne-status-toggle-btn" name="satisfaction" id="sat-3" value="3"><label class="ne-status-label flex-fill text-center" for="sat-3">3</label>
+							<input type="radio" class="ne-status-toggle-btn" name="satisfaction" id="sat-4" value="4"><label class="ne-status-label flex-fill text-center" for="sat-4">4</label>
+							<input type="radio" class="ne-status-toggle-btn" name="satisfaction" id="sat-5" value="5"><label class="ne-status-label flex-fill text-center" for="sat-5">5</label>
+						</div>
+					</div>
+					<div class="mb-2">
+						<label for="insReviewComment" class="ne-insert-label mb-1 text-secondary fw-semibold">한줄 코멘트</label>
+						<textarea class="form-control" id="insReviewComment" name="reviewComment" rows="3" style="font-size:13px; resize:none;"></textarea>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer py-2">
+				<button type="button" class="btn btn-sm btn-secondary px-3" data-bs-dismiss="modal">취소</button>
+				<button type="button" class="btn btn-sm btn-primary px-3 fw-semibold" id="reviewSubmitBtn" onclick="submitReviewForm()">리뷰 등록 완료</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<%@ include file="/WEB-INF/views/common/footer.jsp" %>
+<%-- 부트스트랩 토글 및 팝업 작동용 플러그인 --%>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
