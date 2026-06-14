@@ -124,6 +124,7 @@
 		<a href="/mypage/myparty" id="party" class="${fn:contains(pageContext.request.requestURI, '/myparty') ? 'active' : ''}">매칭 목록</a>
 		<a href="/mypage/reservations" id="reservations" class="${fn:contains(pageContext.request.requestURI, '/reservations') ? 'active' : ''}">예약 내역</a>
 		<a href="/mypage/cafe/enroll" id="reservations" class="${fn:contains(pageContext.request.requestURI, '/enroll') ? 'active' : ''}">카페 등록</a>
+		<a href="/user/withdraw">회원 탈퇴</a>
 	</nav>
 	
 	<!-- 상호평가 섹션 -->

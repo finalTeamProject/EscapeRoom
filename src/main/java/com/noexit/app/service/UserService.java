@@ -22,4 +22,8 @@ public interface UserService {
 
 	// 비밀번호 변경
 	public int resetPassword(String loginId, String newPassword, HttpSession session);
+
+	// 회원탈퇴
+	public void withdraw(Long userId);
+	public boolean verifyPassword(Long userId, String password);
 }

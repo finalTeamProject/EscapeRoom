@@ -164,5 +164,32 @@ public class UserServiceImpl implements UserService {
 
 		return result;
 	}
+
+	// 회원탈퇴
+	@Override
+	@Transactional
+	public void withdraw(Long userId) {
+		try {
+			userMapper.insertUserDrop(userId);
+			userMapper.deleteUserInfo(userId);
+		} catch (Exception e) {
+			log.info("withdraw : ", e);
+			throw e;
+		}
+	}
+
+	@Override
+	public boolean verifyPassword(Long userId, String password) {
+		int count = 0;
+		try {
+			User param = new User();
+			param.setUserId(userId);
+			param.setPassword(password);
+			count = userMapper.countByUserIdAndPassword(param);
+		} catch (Exception e) {
+			log.info("verifyPassword : ", e);
+		}
+		return count > 0;
+	}
 }
 
