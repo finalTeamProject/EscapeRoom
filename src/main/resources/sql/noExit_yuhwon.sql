@@ -429,6 +429,7 @@ WHERE VRA.CANCEL_AT IS NOT NULL;
 
 -- 7. 카페목록과 테마목록 뷰
 -- 카페운영자 확인 
+-- 수정필요 카페 목록 다시 잘 가져오기 - 매니저가 없으면 안나오는거를 처리해야
 CREATE OR REPLACE VIEW VW_CAFE_ROOM_INFO
 AS
 SELECT C.CAFE_ID, C.CAFE_NAME
@@ -463,9 +464,15 @@ FROM CAFE C
     ON R.GENRE_ID = RG.GENRE_ID
     JOIN COMMON CM
     ON R.IS_ADULT = CM.COMMON_ID
-    JOIN V_ACTIVE_MANAGER VAM
+    LEFT JOIN V_ACTIVE_MANAGER VAM
     ON C.CAFE_ID = VAM.CAFE_ID
 ;
+    
+    
+    
+    
+    
+    
     
     
 -- 파티원 아이디별 예약된 시간대 조회 뷰

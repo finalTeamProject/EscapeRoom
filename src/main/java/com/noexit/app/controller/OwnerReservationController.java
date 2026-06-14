@@ -291,7 +291,7 @@ public class OwnerReservationController {
 	    	if(roomId != null) 
 	    		map.put("roomId", roomId);
 	    	map.put("offset", offset);
-	    	map.put("limit", 10);
+	    	map.put("limit", 3);
 			
 		} catch (Exception e) {
 			log.error("getResList: ",e);
@@ -323,7 +323,7 @@ public class OwnerReservationController {
 	@PostMapping("/owner/resList/delete")
 	@ResponseBody
 	public Map<String, Object> resDelete(
-			@RequestParam(name="redId") Long resId
+			@RequestParam(name="resId") Long resId
 			, HttpSession session){
 		
 		User loginUser = (User) session.getAttribute("loginUser");

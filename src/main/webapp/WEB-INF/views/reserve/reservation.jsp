@@ -20,7 +20,9 @@ $(function(){
  			, success: function(res){
  				alert(res.message);
  				if(res.success){
- 					location.href="/mypage/reservation";
+ 					location.href="/mypage/reservations";
+ 				}else{
+ 					location.href="/party/board/"+partyId;
  				}
  			}
  			 , error: function(){

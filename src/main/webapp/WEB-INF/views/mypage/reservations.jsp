@@ -110,8 +110,8 @@
 							</div>
 							<c:if test="${dto.attendStatus == '출석 완료' }">
 								<div class="btnWrap">
-									<button type="button" class="btn btn-primary">기록 등록</button>
-									<button type="button" class="btn btn-outline-secondary">리뷰 등록</button>
+									<button type="button" class="btn btn-primary" onclick="location.href='${pageContext.request.contextPath}/mypage/record'">기록 등록</button>
+									<!-- <button type="button" class="btn btn-outline-secondary">리뷰 등록</button> -->
 								</div>
 							</c:if>
 							<c:if test="${dto.attendStatus == '출석 미등록' }">
