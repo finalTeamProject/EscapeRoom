@@ -48,3 +48,4 @@ out/
 
 ### Application Settings ###
 *.log
+/.metadata/
