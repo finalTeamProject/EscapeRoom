@@ -37,8 +37,8 @@ public class OwnerReservationController {
 	
 	@GetMapping("/owner/openRes")
 	public String openRes(@RequestParam(name="page", defaultValue="1") int currentPage
-			, @RequestParam(required=false) Long schCafe
-			, @RequestParam(required=false) String schDate
+			, @RequestParam(name="schCafe", required=false) Long schCafe
+			, @RequestParam(name="schDate", required=false) String schDate
 			, HttpSession session
 			, Model model) {
 		
