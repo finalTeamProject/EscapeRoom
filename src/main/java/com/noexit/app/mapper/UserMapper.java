@@ -19,4 +19,9 @@ public interface UserMapper {
 	public User findByLoginIdAndName(User user);
 	public int updatePassword(User user);
 
+	// 회원탈퇴
+	public int insertUserDrop(Long userId);
+	public int deleteUserInfo(Long userId);
+	public int countByUserIdAndPassword(User user);
+
 }

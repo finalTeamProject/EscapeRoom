@@ -1,6 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core"%>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+<%
+    response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+    response.setHeader("Pragma", "no-cache");
+    response.setDateHeader("Expires", 0);
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -53,10 +58,10 @@
 					<li><a href="${pageContext.request.contextPath }/theme/list">THEME</a></li>
 				</ul>
 				<ul class="d-flex m-0 gap-3 subNav">
-					<c:if test="${role == 'OWNER'}">
+					<c:if test="${not empty sessionScope.loginUser && sessionScope.role == 'OWNER'}">
 						<li><a href="${pageContext.request.contextPath }/owner/openRes">테마관리</a></li>
 					</c:if>
-					<c:if test="${role == 'MANAGER'}">
+					<c:if test="${not empty sessionScope.loginUser && sessionScope.role == 'MANAGER'}">
 						<li><a href="${pageContext.request.contextPath }/owner/attendance">출석체크</a></li>
 					</c:if>
 					
