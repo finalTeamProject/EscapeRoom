@@ -629,6 +629,19 @@ ORDER BY VAP.CREATED_AT DESC
 FETCH FIRST 3 ROWS ONLY
 ;
 
+select *
+from res_open
+where res_open_id = 99
+order by 1 desc;
+
+update res_open
+set open_at = to_date('2026-06-14 20:30','YYYY-MM-DD HH24:MI')
+WHERE RES_OPEN_ID = 99;
+
+COMMIT;
+
+select *
+from VW_RES_OPEN_BOOKED;
 
 
 select *
@@ -642,4 +655,10 @@ from vw_cafe_room_info;
 select *
 from user_account
 where user_id = 4;
+
+select *
+from reservation_cancel;
+
+select *
+from VW_CAFE_ROOM_INFO;
 
