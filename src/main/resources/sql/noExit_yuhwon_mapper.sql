@@ -631,7 +631,9 @@ FETCH FIRST 3 ROWS ONLY
 
 
 
-
+select *
+from party
+order by 1 desc;
 
 
 select *
