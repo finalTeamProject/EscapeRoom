@@ -34,6 +34,14 @@ public class UserController {
 	     response.setContentType("text/html; charset=UTF-8");
 	     response.getWriter().print(count == 0 ? "OK" : "NO");
 	  }
+
+	 // 이메일 중복확인 (Ajax)
+	 @PostMapping("/email-check")
+	 public void emailCheck(User user, HttpServletResponse response) throws IOException {
+	     int count = service.countByEmail(user.getEmail());
+	     response.setContentType("text/html; charset=UTF-8");
+	     response.getWriter().print(count == 0 ? "OK" : "NO");
+	  }
 	
 	
 	// 아이디 찾기 폼

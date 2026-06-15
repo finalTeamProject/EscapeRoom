@@ -34,6 +34,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public int countByEmail(String email) {
+		 return userMapper.countByEmail(email);
+	}
+
+	@Override
 	public User login(User user) {
 
 		User dto = null;
