@@ -10,6 +10,7 @@ public interface UserMapper {
 	public int insertAccount(User user);
 	public int insertInfo(User user);
 	public int countByLoginId(String loginId);
+	public int countByEmail(String email);
 	public User selectByLoginId(User user);
 	public User findByLoginId(String loginId);
 	public int countCafeByUserId(Long userId);
