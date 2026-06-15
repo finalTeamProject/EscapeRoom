@@ -192,5 +192,57 @@
 		WHERE REVIEW_ID = #{reviewId}
 	</delete>	
 	
+	
+	<select id="getReservationList" parameterType="long" resultType="com.noexit.app.model.MyPage">
+	
+	    SELECT DISTINCT TO_CHAR(RO.OPEN_AT, 'YYYY-MM-DD') AS reservedAt
+	    FROM ATTENDANCE_DETAIL AD
+	    JOIN ATTENDANCE AT
+	    ON AD.ATTENDANCE_ID = AT.ATTENDANCE_ID
+	    JOIN RESERVATION RS
+	    ON AT.RESERVATION_ID = RS.RESERVATION_ID
+	    JOIN PARTY P
+	    ON RS.PARTY_ID = P.PARTY_ID
+	    JOIN PARTY_ROOM PR
+	    ON P.PARTY_ID = PR.PARTY_ID
+	    JOIN RES_OPEN RO
+	    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+	    WHERE AD.USER_ID = #{userId}
+	    ORDER BY reservedAt
+	</select>
+	
+		
+	<select id="getReservationDetail" parameterType="map" resultType="com.noexit.app.model.MyPage">
+	    SELECT TO_CHAR(RO.OPEN_AT, 'YYYY-MM-DD HH24:MI') AS reservedAt
+	     , CA.CAFE_NAME AS reservedCafe
+	     , C.ROOM_NAME AS reservedRoom
+	     , C.ROOM_IMG AS roomImg
+	    FROM ATTENDANCE_DETAIL AD
+	    JOIN ATTENDANCE AT
+	    ON AD.ATTENDANCE_ID = AT.ATTENDANCE_ID
+	    JOIN RESERVATION RS
+	    ON AT.RESERVATION_ID = RS.RESERVATION_ID
+	    JOIN PARTY P
+	    ON RS.PARTY_ID = P.PARTY_ID
+	    JOIN PARTY_ROOM PR
+	    ON P.PARTY_ID = PR.PARTY_ID
+	    JOIN RES_OPEN RO
+	    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+	    JOIN ROOM C
+	    ON RO.ROOM_ID = C.ROOM_ID
+	    JOIN CAFE CA
+	    ON C.CAFE_ID = CA.CAFE_ID
+	    WHERE AD.USER_ID = #{userId}
+	    AND TO_CHAR(RO.OPEN_AT, 'YYYY-MM-DD') = #{date}
+	    ORDER BY RO.OPEN_AT
+	</select>
+	
+	
+	
+	
+	
+	
+	
+	
 
 </mapper>

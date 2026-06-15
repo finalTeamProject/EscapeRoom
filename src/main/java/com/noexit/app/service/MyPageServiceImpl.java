@@ -95,15 +95,23 @@ public class MyPageServiceImpl implements MyPageService{
 			return mapper.insertReview(myPage);
 	}
 	
-	
 	@Override
 	public int deleteReview(Long reviewId) {
 		return mapper.deleteReview(reviewId);
 		
 	}
 	
-	
-	
+	@Override
+	public List<MyPage> getReservationList(Long userId)
+	{
+	    return mapper.getReservationList(userId);
+	}
+
+	@Override
+	public List<MyPage> getReservationDetail(Map<String, Object> map)
+	{
+	    return mapper.getReservationDetail(map);
+	}
 	
 	
 }

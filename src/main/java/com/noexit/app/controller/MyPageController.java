@@ -130,7 +130,7 @@ public class MyPageController {
 		List<String> questionList = service.getQuestionList();
 		double userManner = service.getUserManner(loginUser.getUserId());
 		List<MyPage> roomImgList = service.getRoomImg(loginUser.getUserId());
-		
+		List<MyPage> reservationList = service.getReservationList(userId);
 		
 		
 		// 로그인 유저 정보 넘기기
@@ -140,7 +140,7 @@ public class MyPageController {
 		model.addAttribute("questionList",questionList);
 		model.addAttribute("userManner" ,userManner);
 		model.addAttribute("roomImgList" ,roomImgList);		// 이미지 insert 후 바인딩 예정
-		
+		model.addAttribute("reservationList", reservationList);
 		
 		// 페이징 처리 정보 넘기기
 		model.addAttribute("totalCount", totalCount);
@@ -285,10 +285,25 @@ public class MyPageController {
 		 else 
 			return "fail";
 		
-		
 	}
 	
 	
+	@GetMapping("/reservation/detail")
+	@ResponseBody
+	public List<MyPage> getReservationDetail(
+	        @RequestParam("date") String date
+	        ,HttpSession session)
+	{
+	    
+		User loginUser = (User) session.getAttribute("loginUser");
+
+	    Map<String, Object> map = new HashMap<>();
+
+	    map.put("userId", loginUser.getUserId());
+	    map.put("date", date);
+
+	    return service.getReservationDetail(map);
+	}
 	
 	
 	
