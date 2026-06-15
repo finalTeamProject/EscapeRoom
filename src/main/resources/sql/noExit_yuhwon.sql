@@ -1344,7 +1344,19 @@ FROM VW_RES_OPEN_BOOKED;
 
 
 
+SELECT *
+FROM USER_ACCOUNT
+ORDER BY 1 DESC;
 
+
+
+select *
+from user_info
+order by 1 desc;
+desc user_info;
+
+select *
+from user_drop;
 
 
 
@@ -1356,26 +1368,89 @@ select *
 from party
 order by 1 desc;
 
+select *
+from room
+order by 1 desc;
+
+39
+
+resopen117
+
+select *
+from res_open
+order by 1 desc;
+
+INSERT INTO RES_OPEN
+VALUES (RES_OPEN_SEQ.NEXTVAL, '39', TO_DATE('2026-06-14 17:00','YYYY-MM-DD HH24:MI'), '45', SYSDATE );
+
+select *
+from party
+ORDER BY 1 DESC;
+
+
+PARTY_ID = 52
+
+
+INSERT INTO PARTY
+VALUES(PARTY_SEQ.NEXTVAL, '55', '파티 들어오세요', 0, '아무나 오세요',SYSDATE );
+
+SELECT *
+FROM PARTY_ROOM;
+
+
+INSERT INTO PARTY_ROOM
+VALUES(PARTY_ROOM_SEQ.NEXTVAL, '117', '52', SYSDATE);
+
+SELECT *
+FROM PARTY_APPLY
+order by 1 desc;
+
+apply_id 76
+
+INSERT INTO PARTY_APPLY
+VALUES(PARTY_APPLY_SEQ.NEXTVAL, '52', '51', '신청합니다.', sysdate);
+
+select *
+from party_MEMBER;
+
+INSERT INTO PARTY_MEMBER
+VALUES(PARTY_MEMBER_SEQ.NEXTVAL, '76', TO_DATE('2026-06-14 20:00', 'YYYY-MM-DD HH24:MI'), TO_DATE('2026-06-14 17:02','YYYY-MM-DD HH24:MI'));
+
+SELECT *
+FROM RESERVATION
+ORDER BY 1 DESC
+;
+
+INSERT INTO RESERVATION
+VALUES(RESERVATION_SEQ.NEXTVAL, '52', SYSDATE);
 
 
 
+		SELECT P.PARTY_ID
+		, C.CAFE_NAME
+		, R.ROOM_NAME
+		, TO_CHAR(RO.OPEN_AT, 'YYYY-MM-DD HH24:MI') AS OPEN_AT
+		, P.USER_ID AS BOOKER_ID
+		, UI.NAME AS BOOKER_NAME
+		, SUBSTR(UI.PHONE,1,3)||'-'||SUBSTR(UI.PHONE,4,4)||'-'||SUBSTR(UI.PHONE,8,4) AS BOOKER_TEL
+		, R.ROOM_IMG, R.PRICE
+		, FN_MEMBER_COUNT(53) AS TOTAL_MEMBER
+		FROM PARTY P 
+		    JOIN PARTY_ROOM PR
+		    ON P.PARTY_ID = PR.PARTY_ID
+		    JOIN RES_OPEN RO
+		    ON PR.RES_OPEN_ID = RO.RES_OPEN_ID
+		    JOIN ROOM R
+		    ON RO.ROOM_ID = R.ROOM_ID
+		    JOIN CAFE C
+		    ON R.CAFE_ID = C.CAFE_ID
+		    JOIN USER_INFO UI
+		    ON P.USER_ID = UI.USER_ID
+		WHERE P.PARTY_ID = 53
+		AND P.USER_ID = 55
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+COMMIT;
 
 
