@@ -62,7 +62,6 @@
 		const evaluationData = {
 			detailId: document.getElementById('hiddenDetailId').value,
 		    targetId: document.getElementById('hiddenTargetId').value,
-		    writerId: ${USER.userId},
 			q1Answer: formData.get('answer1'),
 			q2Answer: formData.get('answer2')
 		};

@@ -53,14 +53,14 @@ public class MyPageController {
 	         
 	         List<MyPage> mutualList = service.getMutualList(userId);
 	         double userManner = service.getUserManner(userId);
-	         
+	         List<String> questionList = service.getQuestionList();
 	         
 	         model.addAttribute("myPartyList", partyService.getMyPartyList(userId));
 	         model.addAttribute("myPartyApplyList", partyService.getMyPartyApplyList(userId));
 	         model.addAttribute("myPartyKickList", partyService.getMyPartyKickList(userId));
 	         model.addAttribute("mutualList" ,mutualList);
 	         model.addAttribute("userManner" ,userManner);
-
+	         model.addAttribute("questionList",questionList);
 	         
 	         return "mypage/myparty";
 	      }
