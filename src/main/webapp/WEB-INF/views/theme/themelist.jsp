@@ -282,7 +282,7 @@
 
 		return "★".repeat(n) + "☆".repeat(5-n);
 	}
-
+	
 	function getItem(title,value)
 	{
 		return "<div class='info-item'>" + "<span>" + title + "</span>" + "<span>" + value + "</span>" + "</div>";
