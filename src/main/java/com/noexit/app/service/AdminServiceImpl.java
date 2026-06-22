@@ -49,4 +49,11 @@ public class AdminServiceImpl implements AdminService {
     }
 	
 	
+	@Override
+	public int hideCafe(Cafe cafe) {
+
+		return mapper.hideCafe(cafe);
+	}
+	
+	
 }

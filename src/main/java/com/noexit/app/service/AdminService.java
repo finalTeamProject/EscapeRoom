@@ -11,4 +11,5 @@ public interface AdminService {
 	public Admin login(Admin admin);
 	public AdminDashboard getDashboardStats();	// 관리자 메인 대시보드 데이터 조회
 	public List<Cafe> getCafeList();
+	public int hideCafe(Cafe cafe);
 }

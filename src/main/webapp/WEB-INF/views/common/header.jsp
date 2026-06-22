@@ -68,7 +68,7 @@
 					<c:choose>
 						<c:when test="${not empty sessionScope.loginAdmin}">
 							<li><span>${sessionScope.loginAdmin.loginId}(관리자)</span></li>
-							<li><a href="${pageContext.request.contextPath}/admin/dashboard">관리</a></li>
+							<li><a href="${pageContext.request.contextPath}/admin/cafelist">관리</a></li>
 							<li><a href="${pageContext.request.contextPath}/admin/logout">로그아웃</a></li>
 						</c:when>
 						<c:when test="${not empty sessionScope.loginUser}">

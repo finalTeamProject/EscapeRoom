@@ -185,35 +185,93 @@
 </div>
 
 <div class="modal fade" id="cafeHideModal" tabindex="-1" aria-hidden="true">
+	
 	<div class="modal-dialog modal-dialog-centered">
+		
 		<div class="modal-content">
+			
 			<div class="modal-header">
 				<h5 class="modal-title fw-bold">카페 숨김(비활성화) 경고</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-			<form action="${pageContext.request.contextPath}/admin/cafe/hide" method="post">
-				<input type="hidden" id="modal-cafe-id" name="cafeId">
+			
+			<div class="modal-body p-4" style="font-size: 14px; line-height: 1.6;">
+				<form action="${pageContext.request.contextPath}/admin/cafe/hide" method="post">
+					<input type="hidden" id="modal-cafe-id" name="cafeId">
+			
+						<div class="modal-body p-4" style="font-size: 14px; line-height: 1.6;">
+			
+							<div class="mb-3">
+								<label class="form-label fw-bold">숨김 사유</label>
 				
-				<div class="modal-body p-4" style="font-size: 14px; line-height: 1.6;">
-					<p class="m-0 mb-3 text-dark">
-						선택하신 카페: <strong id="modal-cafe-name" class="text-primary"></strong>
-					</p>
-					<div class="alert alert-warning m-0 d-flex flex-column gap-1 fw-medium">
-						<span> 카페 숨김 처리 시 발생할 수 있는 현상:</span>
-						<span class="small text-secondary">- 해당 카페의 노출 및 조회가 즉시 비활성화됩니다.</span>
-						<span class="small text-secondary">- 소속된 모든 테마의 <strong>신규 예약이 자동으로 불가 처리</strong>됩니다.</span>
+								<div class="form-check">
+									<input class="form-check-input"
+										   type="radio"
+										   name="dropReasonId"
+										   id="reason1"
+										   value="1"
+										   checked>
+									<label class="form-check-label" for="reason1">
+										폐업
+									</label>
+								</div>
+			
+								<div class="form-check">
+									<input class="form-check-input"
+										   type="radio"
+										   name="dropReasonId"
+										   id="reason2"
+										   value="2">
+									<label class="form-check-label" for="reason2">
+										개인사정
+									</label>
+								</div>
+			
+								<div class="form-check">
+									<input class="form-check-input"
+										   type="radio"
+										   name="dropReasonId"
+										   id="reason3"
+										   value="3">
+									<label class="form-check-label" for="reason3">
+										사용자신고
+									</label>
+								</div>
+							</div>
+			
+							<p class="m-0 mb-3 text-dark">
+								선택하신 카페:
+								<strong id="modal-cafe-name" class="text-primary"></strong>
+							</p>
+			
+						<div class="alert alert-warning m-0 d-flex flex-column gap-1 fw-medium">
+							<span>카페 숨김 처리 시 발생할 수 있는 현상:</span>
+							<span class="small text-secondary">- 해당 카페의 노출 및 조회가 즉시 비활성화됩니다.</span>
+							<span class="small text-secondary">- 소속된 모든 테마의 <strong>신규 예약이 자동으로 불가 처리</strong>됩니다.</span>
+						</div>
+			
+						<p class="mt-3 mb-0 fw-bold text-center text-dark">
+							정말 숨김 처리 하시겠습니까?
+						</p>
 					</div>
-					<p class="mt-3 mb-0 fw-bold text-center text-dark">정말 숨김 처리 하시겠습니까?</p>
-				</div>
-				<div class="modal-footer py-2">
-					<button type="button" class="btn btn-sm btn-secondary fw-semibold" data-bs-dismiss="modal">취소</button>
-					<button type="submit" class="btn btn-sm btn-danger fw-semibold px-3">숨김 처리</button>
-				</div>
-			</form>
+			
+					<div class="modal-footer py-2">
+						<button type="button"
+								class="btn btn-sm btn-secondary fw-semibold"
+								data-bs-dismiss="modal">
+							취소
+						</button>
+			
+						<button type="submit"
+								class="btn btn-sm btn-danger fw-semibold px-3">
+							숨김 처리
+						</button>
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>
-
 <%@ include file="/WEB-INF/views/common/footer.jsp" %>
 </body>
 </html>

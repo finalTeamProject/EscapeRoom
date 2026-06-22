@@ -6,7 +6,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.noexit.app.model.Admin;
 import com.noexit.app.model.AdminDashboard;
@@ -82,6 +84,17 @@ public class AdminController {
 		// 뷰 리턴
 		return "admin/list";
 	}
+	
+	
+	@PostMapping("/cafe/hide")
+	public String hideCafe(Cafe cafe) {
+		
+	    service.hideCafe(cafe);
+	    
+	    return "redirect:/admin/cafelist";
+	}
+	
+	
 	
 	
 }

@@ -24,6 +24,10 @@
 	    SELECT * FROM VW_CAFE_DETAIL ORDER BY CAFE_ID DESC
 	</select>
 
+	<insert id="hideCafe" parameterType="com.noexit.app.model.Cafe">
+	    INSERT INTO CAFE_DROP(CAFE_DROP_ID, CAFE_ID, DROP_REASON_ID, DROP_AT)
+	    VALUES(CAFE_DROP_SEQ.NEXTVAL, #{cafeId}, #{dropReasonId}, SYSDATE)
+	</insert>
 
 
 	
