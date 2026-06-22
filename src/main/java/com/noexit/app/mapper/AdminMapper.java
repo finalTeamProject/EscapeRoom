@@ -14,4 +14,5 @@ public interface AdminMapper {
 	public Admin findByLoginId(String loginId);
 	public AdminDashboard getDashboardStats();	// 관리자 메인 화면
 	public List<Cafe> getCafeList();			// 관리자 카페 리스트 조회
+	public int hideCafe(Cafe cafe);
 }
